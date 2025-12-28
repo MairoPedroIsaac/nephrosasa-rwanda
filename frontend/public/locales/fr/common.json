@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "about": "À propos",
+    "contact": "Contact",
+    "login": "Connexion",
+    "register": "S'inscrire",
+    "dashboard": "Tableau de bord",
+    "records": "Dossiers médicaux",
+    "payments": "Paiements",
+    "qrcode": "Mon QR Code",
+    "logout": "Déconnexion"
+  },
+  "hero": {
+    "title": "Vos dossiers médicaux, connectés en toute sécurité",
+    "subtitle": "Accédez à votre historique médical complet dans tous les établissements de santé au Rwanda. Contrôlez vos données, améliorez vos soins.",
+    "cta_patient": "S'inscrire comme patient",
+    "cta_provider": "S'inscrire comme prestataire"
+  },
+  "features": {
+    "title": "Pourquoi HealthVault Rwanda?",
+    "qr_title": "Accès par QR Code",
+    "qr_desc": "Montrez votre QR code dans n'importe quelle clinique. Les médecins voient instantanément votre historique médical.",
+    "payment_title": "Paiements Mobile Money",
+    "payment_desc": "Payez les frais de consultation via MTN ou Airtel Money. Reçus instantanés.",
+    "ai_title": "Alertes Santé IA",
+    "ai_desc": "Notre système détecte les tendances de santé et alerte votre médecin tôt.",
+    "secure_title": "Sécurisé et privé",
+    "secure_desc": "Vous contrôlez qui voit vos dossiers. Toutes les données sont cryptées."
+  },
+  "auth": {
+    "login_title": "Bienvenue",
+    "register_title": "Créer un compte",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "confirm_password": "Confirmer le mot de passe",
+    "phone": "Numéro de téléphone",
+    "first_name": "Prénom",
+    "last_name": "Nom",
+    "dob": "Date de naissance",
+    "national_id": "Carte d'identité nationale",
+    "submit": "Soumettre",
+    "have_account": "Vous avez déjà un compte?",
+    "no_account": "Vous n'avez pas de compte?"
+  },
+  "dashboard": {
+    "welcome": "Bienvenue",
+    "quick_stats": "Statistiques rapides",
+    "recent_visits": "Visites récentes",
+    "view_all": "Voir tout"
+  },
+  "common": {
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "loading": "Chargement...",
+    "error": "Une erreur s'est produite",
+    "success": "Succès!"
+  }
+}

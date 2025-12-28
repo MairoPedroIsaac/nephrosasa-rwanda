@@ -1,0 +1,61 @@
+{
+  "nav": {
+    "home": "Ahabanza",
+    "about": "Abo turibo",
+    "contact": "Twandikire",
+    "login": "Injira",
+    "register": "Iyandikishe",
+    "dashboard": "Ikibaho",
+    "records": "Inyandiko z'ubuzima",
+    "payments": "Kwishyura",
+    "qrcode": "Kode yanjye ya QR",
+    "logout": "Sohoka"
+  },
+  "hero": {
+    "title": "Inyandiko z'ubuzima bwawe, zihuye neza",
+    "subtitle": "Bona amateka yawe y'ubuzima muri amavuriro yose mu Rwanda. Genzura amakuru yawe, tera imbere ubuvuzi bwawe.",
+    "cta_patient": "Iyandikishe nk'Umurwayi",
+    "cta_provider": "Iyandikishe nk'Umuganga"
+  },
+  "features": {
+    "title": "Kuki HealthVault Rwanda?",
+    "qr_title": "Kwinjira binyuze kuri QR",
+    "qr_desc": "Erekana kode yawe ya QR ku kigo cy'ubuzima. Abaganga babona amateka yawe ako kanya.",
+    "payment_title": "Kwishyura binyuze kuri Mobile Money",
+    "payment_desc": "Ishyura amafaranga y'ubuvuzi ukoresheje MTN cyangwa Airtel Money. Inyemezabwishyu ako kanya.",
+    "ai_title": "Ingwate z'ubuzima za AI",
+    "ai_desc": "Sisitemu yacu ivumbura imiterere y'ubuzima kandi iramenyesha muganga wawe hakiri kare.",
+    "secure_title": "Gufatwa neza no kubikwa neza",
+    "secure_desc": "Wowe ugenzura uwabona inyandiko zawe. Amakuru yose arafunzwe."
+  },
+  "auth": {
+    "login_title": "Murakaza neza",
+    "register_title": "Kora Konti",
+    "email": "Imeyili",
+    "password": "Ijambo ry'ibanga",
+    "confirm_password": "Emeza ijambo ry'ibanga",
+    "phone": "Nimero ya telefoni",
+    "first_name": "Izina rya mbere",
+    "last_name": "Izina rya kabiri",
+    "dob": "Itariki y'amavuko",
+    "national_id": "Indangamuntu",
+    "submit": "Ohereza",
+    "have_account": "Ufite konti?",
+    "no_account": "Nta konti ufite?"
+  },
+  "dashboard": {
+    "welcome": "Murakaza neza",
+    "quick_stats": "Imibare yihuse",
+    "recent_visits": "Isubirane riherutse",
+    "view_all": "Reba byose"
+  },
+  "common": {
+    "save": "Bika",
+    "cancel": "Hagarika",
+    "delete": "Siba",
+    "edit": "Hindura",
+    "loading": "Birakoze...",
+    "error": "Habaye ikosa",
+    "success": "Byagenze neza!"
+  }
+}

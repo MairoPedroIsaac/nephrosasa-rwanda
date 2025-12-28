@@ -1,0 +1,98 @@
+# ==========================================
+# HEALTHVAULT RWANDA - GITIGNORE
+# ==========================================
+
+# ============ SECRETS & ENVIRONMENT ============
+# NEVER commit these files - they contain API keys!
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+*.env
+
+# Backend secrets
+backend/.env
+backend/config/.env
+
+# Frontend secrets
+frontend/.env.local
+frontend/.env.production
+
+# ============ PYTHON/DJANGO ============
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Virtual environments
+venv/
+env/
+ENV/
+backend/venv/
+
+# ============ NODE/NEXT.JS ============
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Next.js build output
+.next/
+out/
+frontend/.next/
+frontend/out/
+
+# Next.js cache
+.npm
+.cache/
+
+# Production build
+build/
+dist/
+
+# ============ IDE & EDITORS ============
+# VS Code
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+
+# ============ OS FILES ============
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ============ MISC ============
+# Testing
+coverage/
+*.cover
+.pytest_cache/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.tmp
+*.temp
+.temp/

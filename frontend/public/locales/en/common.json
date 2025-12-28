@@ -1,0 +1,66 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login",
+    "register": "Register",
+    "dashboard": "Dashboard",
+    "records": "Medical Records",
+    "payments": "Payments",
+    "qrcode": "My QR Code",
+    "logout": "Logout"
+  },
+  "hero": {
+    "title": "Your Health Records, Securely Connected",
+    "subtitle": "Access your complete medical history across all healthcare facilities in Rwanda. Control your data, improve your care.",
+    "cta_patient": "Register as Patient",
+    "cta_provider": "Register as Provider"
+  },
+  "features": {
+    "title": "Why HealthVault Rwanda?",
+    "qr_title": "QR Code Access",
+    "qr_desc": "Show your QR code at any clinic. Doctors instantly see your medical history.",
+    "payment_title": "Mobile Money Payments",
+    "payment_desc": "Pay consultation fees via MTN or Airtel Money. Instant receipts.",
+    "ai_title": "AI Health Alerts",
+    "ai_desc": "Our system detects health patterns and alerts your doctor early.",
+    "secure_title": "Secure & Private",
+    "secure_desc": "You control who sees your records. All data encrypted."
+  },
+  "stats": {
+    "facilities": "Healthcare Facilities",
+    "patients": "Patients Registered",
+    "records": "Medical Records Stored"
+  },
+  "auth": {
+    "login_title": "Welcome Back",
+    "register_title": "Create Account",
+    "email": "Email Address",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "phone": "Phone Number",
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "dob": "Date of Birth",
+    "national_id": "National ID",
+    "submit": "Submit",
+    "have_account": "Already have an account?",
+    "no_account": "Don't have an account?"
+  },
+  "dashboard": {
+    "welcome": "Welcome back",
+    "quick_stats": "Quick Stats",
+    "recent_visits": "Recent Visits",
+    "view_all": "View All"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success!"
+  }
+}
