@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 // Animated Counter Component
-const AnimatedCounter = ({ end, suffix = '', duration = 2000 }) => {
+ const AnimatedCounter = ({ end, suffix = '', duration = 2000 }: any) => {
   const [count, setCount] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
 
