@@ -122,7 +122,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom user model (we'll create this)
-AUTH_USER_MODEL = 'api.User'
+# AUTH_USER_MODEL = 'api.User'  # We'll add this later when we create the User model
 
 
 # REST Framework settings
