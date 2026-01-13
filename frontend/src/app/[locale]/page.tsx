@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 
 // Animated Counter Component
- const AnimatedCounter = ({ end, suffix = '', duration = 2000 }: any) => {
+const AnimatedCounter = ({ end, suffix = '', duration = 2000 }: any) => {
   const [count, setCount] = useState(0);
   const [hasAnimated, setHasAnimated] = useState(false);
 
@@ -135,55 +135,50 @@ export default function HomePage() {
   return (
     <div className="bg-white">
       {/* Enhanced Hero Section */}
-      <section className="relative min-h-screen flex items-center overflow-hidden">
+      <section className="relative min-h-[600px] md:min-h-[700px] overflow-hidden">
+        {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/hero/hero.jpg"
             alt="Modern healthcare facility in Rwanda"
             fill
-            className="object-cover object-center"
+            className="object-cover"
             priority
-            quality={100}
-            sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/85 via-blue-800/75 to-blue-900/85" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-blue-900/40" />
         </div>
-
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-1/4 -left-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
-        </div>
-
-        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-32">
-          <div className="max-w-4xl">
+        
+        {/* Gradient Blue Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/60 to-primary-dark/50 z-0"></div>
+        
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 flex items-center min-h-[600px] md:min-h-[700px]">
+          <div className="max-w-4xl text-white">
             <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full border border-white/30 mb-8">
               <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="text-white font-medium">Trusted by 1,000+ Rwandans</span>
+              <span className="font-medium">Trusted by 1,000+ Rwandans</span>
             </div>
 
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-8">
+            <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-6 md:mb-8">
               Your Health Records,
               <span className="block mt-2 bg-gradient-to-r from-cyan-300 to-white bg-clip-text text-transparent">
                 Securely Connected
               </span>
             </h1>
             
-            <p className="text-xl lg:text-2xl mb-10 text-white/90 max-w-3xl leading-relaxed">
+            <p className="text-lg md:text-xl lg:text-2xl mb-8 md:mb-10 text-blue-100 max-w-3xl leading-relaxed">
               Access your complete medical history across all healthcare facilities in Rwanda. 
               One platform. Complete control. Better care outcomes.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 mb-12">
+            <div className="flex flex-col sm:flex-row gap-4 mb-8 md:mb-12">
               <Link href="/en/register/patient">
-                <button className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 flex items-center justify-center gap-3 hover:-translate-y-0.5">
+                <button className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 flex items-center justify-center gap-3 hover:-translate-y-0.5 w-full sm:w-auto">
                   <span>Get Started Free</span>
                   <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
                 </button>
               </Link>
               
               <Link href="/en/register/provider">
-                <button className="group bg-white/10 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-3">
+                <button className="group bg-white/10 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto">
                   <Stethoscope size={20} />
                   <span>Join as Provider</span>
                 </button>
@@ -191,25 +186,25 @@ export default function HomePage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="flex items-center gap-3 text-white/90">
+              <div className="flex items-center gap-3 text-blue-100">
                 <div className="p-2 bg-white/20 rounded-lg">
                   <Check size={18} className="text-green-300" />
                 </div>
                 <span className="font-medium">Free for Patients</span>
               </div>
-              <div className="flex items-center gap-3 text-white/90">
+              <div className="flex items-center gap-3 text-blue-100">
                 <div className="p-2 bg-white/20 rounded-lg">
                   <Check size={18} className="text-green-300" />
                 </div>
                 <span className="font-medium">Bank-Level Security</span>
               </div>
-              <div className="flex items-center gap-3 text-white/90">
+              <div className="flex items-center gap-3 text-blue-100">
                 <div className="p-2 bg-white/20 rounded-lg">
                   <Check size={18} className="text-green-300" />
                 </div>
                 <span className="font-medium">Ministry Approved</span>
               </div>
-              <div className="flex items-center gap-3 text-white/90">
+              <div className="flex items-center gap-3 text-blue-100">
                 <div className="p-2 bg-white/20 rounded-lg">
                   <Check size={18} className="text-green-300" />
                 </div>
@@ -218,14 +213,10 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <ChevronRight className="text-white rotate-90" size={24} />
-        </div>
       </section>
 
-      {/* Stats Section with Animated Counters */}
-      <section className="py-16 bg-gradient-to-b from-white to-blue-50">
+      {/* Stats Section - FIXED to white background with dark text */}
+      <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
@@ -243,7 +234,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Grid with Mobile Carousel */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-full mb-6">
@@ -356,7 +347,7 @@ export default function HomePage() {
           </div>
 
           <div className="space-y-32">
-            {/* Step 1 - Fixed */}
+            {/* Step 1 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div className="order-2 lg:order-1">
                 <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-3 rounded-full mb-6">
@@ -389,7 +380,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Step 2 - Fixed */}
+            {/* Step 2 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div className="relative h-80 lg:h-96">
                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded-3xl blur-xl" />
@@ -422,7 +413,7 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Step 3 - Fixed */}
+            {/* Step 3 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
               <div className="order-2 lg:order-1">
                 <div className="inline-flex items-center gap-3 bg-gradient-to-r from-violet-600 to-purple-500 text-white px-6 py-3 rounded-full mb-6">
@@ -458,7 +449,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Security & Trust Section */}
+      {/* Security & Trust Section - FIXED back to original gradient */}
       <section className="py-24 bg-gradient-to-br from-blue-900 to-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -503,55 +494,50 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Enhanced CTA Section with Fixed Image */}
-      <section className="relative py-32 overflow-hidden">
-        <div className="absolute inset-0">
+      {/* Enhanced CTA Section - FIXED image to show full face */}
+      <section className="relative h-[500px] md:h-[600px] overflow-hidden">
+        {/* Background Image - FIXED positioning */}
+        <div className="absolute inset-0 z-0">
           <Image
             src="/images/hero/hero-1.jpg"
             alt="Rwandan healthcare professionals"
             fill
-            className="object-cover object-center"
+            className="object-cover object-[center_20%]"
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-900/90 via-blue-800/85 to-cyan-900/90" />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-blue-900/30" />
         </div>
-
-        <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-blue-500/20 to-cyan-400/20 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-blue-600/10 to-cyan-500/10 rounded-full blur-3xl animate-pulse delay-1000" />
-
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <div className="inline-flex items-center gap-3 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full mb-8">
-            <Users size={20} className="text-white" />
-            <span className="text-white font-semibold">Join Rwanda's Digital Health Revolution</span>
-          </div>
+        
+        {/* Gradient Blue Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/60 to-primary-dark/50 z-0"></div>
+        
+        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center h-full flex flex-col justify-center items-center">
+         
           
           <h2 className="text-4xl lg:text-5xl font-bold text-white mb-8">
             Ready to Transform Healthcare?
           </h2>
           
-          <p className="text-xl text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Join thousands of Rwandans and healthcare providers already using HealthVault 
-            for better, faster, and more secure healthcare.
+          <p className="text-xl text-blue-100 mb-12 max-w-2xl mx-auto leading-relaxed">
+            Join thousands of Rwandans using HealthVault for fast, secure healthcare.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
             <Link href="/en/register/patient">
-              <button className="group bg-gradient-to-r from-white to-gray-100 text-blue-600 px-8 py-4 rounded-xl font-semibold hover:shadow-2xl hover:shadow-white/20 transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-3">
+              <button className="group bg-white/10 backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto">
                 <span>Start Free as Patient</span>
                 <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
               </button>
             </Link>
             
             <Link href="/en/register/provider">
-              <button className="group bg-transparent border-2 border-white/30 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/10 transition-all duration-300 flex items-center justify-center gap-3 backdrop-blur-sm">
+              <button className="group bg-white/10 backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto">
                 <Stethoscope size={20} />
                 <span>Register as Provider</span>
               </button>
             </Link>
           </div>
           
-          <p className="mt-8 text-white/70">
+          <p className="mt-8 text-blue-100">
             No credit card required • Free forever for patients • 24/7 support
           </p>
         </div>

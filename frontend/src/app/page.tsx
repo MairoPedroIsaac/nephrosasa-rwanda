@@ -18,17 +18,31 @@ export default function HomePage() {
 
   return (
     <div className="bg-gray-50">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary to-primary-dark text-white overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
+      {/* Hero Section - FIXED for better image visibility */}
+      <section className="relative text-white overflow-hidden">
+        {/* Hero image as background - MORE VISIBLE */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/hero/hero.jpg"
+            alt="Healthcare professional using digital health records"
+            fill
+            className="object-cover"
+            priority
+            quality={90}
+          />
+        </div>
+        {/* MUCH LIGHTER gradient overlay - barely visible blue tint */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-primary-dark/20 z-0"></div>
+        
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text Content */}
             <div className="space-y-6">
-              <h1 className="text-4xl lg:text-6xl font-bold leading-tight">
-                Your Health Records, <span className="text-accent">Securely Connected</span>
+              <h1 className="text-4xl lg:text-6xl font-bold leading-tight drop-shadow-lg">
+                Your Health Records, <span className="text-accent drop-shadow-lg">Securely Connected</span>
               </h1>
               
-              <p className="text-lg lg:text-xl text-blue-100">
+              <p className="text-lg lg:text-xl text-white drop-shadow-md">
                 Access your complete medical history across all healthcare facilities in Rwanda. Control your data, improve your care.
               </p>
 
@@ -41,14 +55,14 @@ export default function HomePage() {
                 </Link>
                 
                 <Link href="/en/register/provider">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto bg-transparent border-2 border-white text-white hover:bg-white hover:text-primary">
+                  <Button variant="outline" size="lg" className="w-full sm:w-auto bg-white/10 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-primary">
                     Register as Provider
                   </Button>
                 </Link>
               </div>
 
               {/* Trust Indicators */}
-              <div className="flex items-center gap-6 pt-6 text-sm text-blue-100">
+              <div className="flex items-center gap-6 pt-6 text-sm text-white drop-shadow-md">
                 <div className="flex items-center gap-2">
                   <Shield size={20} />
                   <span>GDPR Compliant</span>
@@ -60,28 +74,29 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Column - Hero Image */}
-            <div className="relative h-96 lg:h-[500px]">
+            {/* Right Column - Additional visual */}
+            <div className="relative h-96 lg:h-[500px] z-10">
               <Image
                 src="/images/hero/hero.jpg"
                 alt="Healthcare professional using digital health records"
                 fill
-                className="object-cover rounded-2xl shadow-2xl"
+                className="object-cover rounded-2xl shadow-2xl border-4 border-white/20"
                 priority
+                quality={90}
               />
             </div>
           </div>
         </div>
 
         {/* Decorative wave */}
-        <div className="absolute bottom-0 left-0 right-0">
+        <div className="absolute bottom-0 left-0 right-0 z-10">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" className="w-full">
             <path fill="#F9FAFB" fillOpacity="1" d="M0,64L48,69.3C96,75,192,85,288,80C384,75,480,53,576,48C672,43,768,53,864,58.7C960,64,1056,64,1152,58.7C1248,53,1344,43,1392,37.3L1440,32L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"></path>
           </svg>
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* Stats Section - UNCHANGED */}
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -112,7 +127,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section - UNCHANGED */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -180,7 +195,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works Section */}
+      {/* How It Works Section - UNCHANGED */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -245,7 +260,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
+      {/* Testimonials Section - UNCHANGED */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
@@ -298,13 +313,27 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary to-accent text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl lg:text-4xl font-bold mb-6">
+      {/* CTA Section - FIXED for better image visibility */}
+      <section className="relative py-20 text-white">
+        {/* Background image - MORE VISIBLE */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/images/hero/hero-1.jpg"
+            alt="Healthcare professionals working together"
+            fill
+            className="object-cover"
+            priority
+            quality={90}
+          />
+        </div>
+        {/* MUCH LIGHTER gradient overlay - barely visible blue tint */}
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/20 z-0"></div>
+        
+        <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl lg:text-4xl font-bold mb-6 drop-shadow-lg">
             Ready to Take Control of Your Health Records?
           </h2>
-          <p className="text-lg mb-8 text-blue-100">
+          <p className="text-lg mb-8 text-white drop-shadow-md">
             Join thousands of Rwandans using HealthVault for better healthcare
           </p>
           
@@ -316,7 +345,7 @@ export default function HomePage() {
             </Link>
             
             <Link href="/en/register/provider">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto border-2 border-white text-white hover:bg-white hover:text-primary">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto bg-white/10 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-primary">
                 Register Your Facility
               </Button>
             </Link>
