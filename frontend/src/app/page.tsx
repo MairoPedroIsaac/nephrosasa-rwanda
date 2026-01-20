@@ -19,7 +19,7 @@ export default function HomePage() {
   return (
     <div className="bg-gray-50">
       {/* Hero Section - FIXED for better image visibility */}
-      <section className="relative text-white overflow-hidden">
+      <section className="relative text-gray-800 overflow-hidden">
         {/* Hero image as background - MORE VISIBLE */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -31,18 +31,18 @@ export default function HomePage() {
             quality={90}
           />
         </div>
-        {/* MUCH LIGHTER gradient overlay - barely visible blue tint */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 to-primary-dark/20 z-0"></div>
+        
+       
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             {/* Left Column - Text Content */}
             <div className="space-y-6">
-              <h1 className="text-4xl lg:text-6xl font-bold leading-tight drop-shadow-lg">
-                Your Health Records, <span className="text-accent drop-shadow-lg">Securely Connected</span>
+              <h1 className="text-4xl lg:text-6xl font-bold leading-tight drop-shadow-lg text-gray-900">
+                Your Health Records, <span className="text-primary-dark drop-shadow-lg">Securely Connected</span>
               </h1>
               
-              <p className="text-lg lg:text-xl text-white drop-shadow-md">
+              <p className="text-lg lg:text-xl text-gray-800 drop-shadow-md">
                 Access your complete medical history across all healthcare facilities in Rwanda. Control your data, improve your care.
               </p>
 
@@ -62,7 +62,7 @@ export default function HomePage() {
               </div>
 
               {/* Trust Indicators */}
-              <div className="flex items-center gap-6 pt-6 text-sm text-white drop-shadow-md">
+              <div className="flex items-center gap-6 pt-6 text-sm text-gray-800 drop-shadow-md">
                 <div className="flex items-center gap-2">
                   <Shield size={20} />
                   <span>GDPR Compliant</span>
@@ -80,7 +80,7 @@ export default function HomePage() {
                 src="/images/hero/hero.jpg"
                 alt="Healthcare professional using digital health records"
                 fill
-                className="object-cover rounded-2xl shadow-2xl border-4 border-white/20"
+                className="object-cover rounded-2xl shadow-2xl"
                 priority
                 quality={90}
               />
@@ -314,7 +314,7 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section - FIXED for better image visibility */}
-      <section className="relative py-20 text-white">
+      <section className="relative py-20 text-gray-800">
         {/* Background image - MORE VISIBLE */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -327,13 +327,13 @@ export default function HomePage() {
           />
         </div>
         {/* MUCH LIGHTER gradient overlay - barely visible blue tint */}
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/20 z-0"></div>
+        <div className="absolute inset-0 bg-white/10 z-0"></div>
         
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl lg:text-4xl font-bold mb-6 drop-shadow-lg">
             Ready to Take Control of Your Health Records?
           </h2>
-          <p className="text-lg mb-8 text-white drop-shadow-md">
+          <p className="text-lg mb-8 text-gray-800 drop-shadow-md">
             Join thousands of Rwandans using HealthVault for better healthcare
           </p>
           
@@ -345,7 +345,7 @@ export default function HomePage() {
             </Link>
             
             <Link href="/en/register/provider">
-              <Button variant="outline" size="lg" className="w-full sm:w-auto bg-white/10 backdrop-blur-sm border-2 border-white text-white hover:bg-white hover:text-primary">
+              <Button variant="outline" size="lg" className="w-full sm:w-auto bg-white/10 backdrop-blur-sm border-2 border-white text-gray-800 hover:bg-white hover:text-primary">
                 Register Your Facility
               </Button>
             </Link>

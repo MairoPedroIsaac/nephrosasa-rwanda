@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, QrCode, Shield, Zap, Smartphone, Check, User, FileText, CreditCard } from 'lucide-react';
+import { ArrowRight, QrCode, Shield, Smartphone, Check, User, CreditCard } from 'lucide-react';
 
 export default function PatientRegistrationPage() {
   const router = useRouter();
@@ -38,7 +38,7 @@ export default function PatientRegistrationPage() {
     // Submit logic here
     setTimeout(() => {
       setLoading(false);
-      router.push('/en/register/success');
+      router.push('/en/patient/dashboard');
     }, 1500);
   };
 
@@ -52,9 +52,9 @@ export default function PatientRegistrationPage() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50">
-      {/* Left Side - Hero Image (55%) - SAME AS LOGIN */}
+      {/* Left Side - Hero Image (55%) */}
       <div className="lg:w-[55%] relative min-h-[50vh] lg:min-h-screen">
-        {/* Background Image - Same blue effect as login */}
+        {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/registeration/registeration-image.jpg"
@@ -65,31 +65,14 @@ export default function PatientRegistrationPage() {
             quality={100}
             sizes="55vw"
           />
-          {/* Same blue gradient overlay as login */}
           <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/50 to-transparent"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
         </div>
         
-        {/* Content Overlay - Adjusted for Patient Registration */}
+        {/* Content Overlay */}
         <div className="relative z-10 h-full flex flex-col p-6 md:p-8 lg:p-12 text-white">
-          {/* Top Navigation - Same as login */}
-          <div className="flex justify-start items-start">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-              <div className="w-12 h-12 bg-white/25 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-xl lg:text-2xl font-bold">HealthVault</h1>
-                <p className="text-xs lg:text-sm text-white/90">RWANDA</p>
-              </div>
-            </Link>
-          </div>
-
           {/* Main Hero Content - Desktop */}
           <div className="hidden lg:flex flex-1 flex-col justify-center max-w-xl mx-auto w-full">
-            {/* Patient-specific content */}
             <div className="mb-8 lg:mb-12">
               <h2 className="text-3xl lg:text-4xl font-bold mb-6 leading-tight">
                 Your Health Journey
@@ -97,7 +80,7 @@ export default function PatientRegistrationPage() {
               </h2>
             </div>
 
-            {/* Patient Benefits Grid - Fits within image */}
+            {/* Patient Benefits Grid */}
             <div className="space-y-4 mb-8">
               <div className="bg-white/15 backdrop-blur-sm p-4 rounded-xl border border-white/25">
                 <div className="flex items-start gap-3">
@@ -142,7 +125,7 @@ export default function PatientRegistrationPage() {
               </div>
             </div>
 
-            {/* Trust Indicators - Same style as login */}
+            {/* Trust Indicators */}
             <div className="border-t border-white/25 pt-6">
               <div className="flex flex-wrap items-center gap-4">
                 <div className="flex items-center gap-2">
@@ -157,56 +140,79 @@ export default function PatientRegistrationPage() {
                   <div className="w-2 h-2 bg-green-400 rounded-full"></div>
                   <span className="text-sm text-white/90">Data Protected</span>
                 </div>
-                 <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 mb-4">
+                <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
+                  <div className="flex items-center gap-2">
+                    <Check size={14} className="text-white" />
+                    <span className="text-sm font-medium">Trusted by 1,000+ Rwandans</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Mobile-only content */}
+          <div className="lg:hidden flex-1 flex flex-col items-center justify-center pt-8">
+            <div className="grid grid-cols-1 gap-4 mb-8 w-full max-w-xs mx-auto">
+              <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl border border-white/30">
+                <div className="flex flex-col items-center text-center">
+                  <div className="p-2 bg-white/25 rounded-lg mb-2">
+                    <QrCode size={20} className="text-white" />
+                  </div>
+                  <h3 className="font-bold text-white text-sm mb-1">Your Personal QR Code</h3>
+                  <p className="text-white/90 text-xs">
+                    Instant access at any healthcare facility
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl border border-white/30">
+                <div className="flex flex-col items-center text-center">
+                  <div className="p-2 bg-white/25 rounded-lg mb-2">
+                    <Shield size={20} className="text-white" />
+                  </div>
+                  <h3 className="font-bold text-white text-sm mb-1">Complete Privacy Control</h3>
+                  <p className="text-white/90 text-xs">
+                    You decide who sees your records
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl border border-white/30">
+                <div className="flex flex-col items-center text-center">
+                  <div className="p-2 bg-white/25 rounded-lg mb-2">
+                    <CreditCard size={20} className="text-white" />
+                  </div>
+                  <h3 className="font-bold text-white text-sm mb-1">Always Free for Patients</h3>
+                  <p className="text-white/90 text-xs">
+                    No hidden fees, ever
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* BOTTOM SECTION for Mobile */}
+          <div className="lg:hidden mt-auto pb-6">
+            <div className="flex flex-col items-center">
+              <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 mb-4">
                 <div className="flex items-center gap-2">
                   <Check size={14} className="text-white" />
                   <span className="text-sm font-medium">Trusted by 1,000+ Rwandans</span>
                 </div>
               </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Mobile-only content - Simple like login */}
-          <div className="lg:hidden flex-1 flex flex-col items-center justify-center pt-8">
-            {/* Patient badge */}
-            <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 mb-6">
-              <div className="flex items-center gap-2">
-                <User size={14} className="text-white" />
-                <span className="text-sm font-medium">Patient Registration</span>
-              </div>
-            </div>
-
-            {/* Simple mobile content */}
-            <div className="text-center px-4">
-              <h3 className="text-lg font-bold text-white mb-4">Your Health Journey Starts Here.</h3>
-            </div>
-          </div>
-
-          {/* BOTTOM SECTION for Mobile - Same as login */}
-          <div className="lg:hidden mt-auto pb-6">
-            <div className="flex flex-col items-center space-y-4">
-              {/* Moved the Free Forever, QR Access, Secure content here */}
-              <div className="flex items-center justify-center gap-4">
+              
+              <div className="flex items-center justify-center gap-3">
                 <div className="flex items-center gap-1">
                   <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                  <span className="text-xs text-white/90">Free Forever</span>
+                  <span className="text-xs text-white/90">MoH Approved</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                  <span className="text-xs text-white/90">QR Access</span>
+                  <span className="text-xs text-white/90">RDPA Compliant</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
                   <span className="text-xs text-white/90">Secure</span>
-                </div>
-              </div>
-              
-              {/* Trusted by 1,000+ Rwandans */}
-              <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30">
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-white" />
-                  <span className="text-sm font-medium">Trusted by 1,000+ Rwandans</span>
                 </div>
               </div>
             </div>
@@ -215,19 +221,36 @@ export default function PatientRegistrationPage() {
       </div>
 
       {/* Right Side - Registration Form (45%) */}
-      <div className="lg:w-[45%] flex items-start justify-center pt-12 lg:pt-16 p-6 sm:p-8 lg:p-12 bg-white">
+      <div className="lg:w-[45%] flex items-start justify-center pt-12 lg:pt-24 p-6 sm:p-8 lg:p-14 bg-white">
         <div className="w-full max-w-lg">
-          {/* Mobile Header */}
-          <div className="lg:hidden mb-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center">
-                <User size={24} className="text-white" />
+          {/* Mobile Header - CENTERED ICON LIKE LOGIN */}
+          <div className="lg:hidden mb-10">
+            <div className="flex flex-col items-center text-center mb-8">
+              {/* Centered Blue Icon Container - MATCHED TO LOGIN (mb-3) */}
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                  <User className="text-white" size={24} />
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Patient Registration</h1>
-                <p className="text-sm text-gray-600">Create your HealthVault account</p>
-              </div>
+              
+              {/* Text Content */}
+              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                Patient Registration
+              </h2>
+              <p className="text-gray-600 text-lg">
+                Create your HealthVault account
+              </p>
             </div>
+          </div>
+
+          {/* Desktop Header */}
+          <div className="hidden lg:block mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Patient Registration
+            </h2>
+            <p className="text-gray-600 text-lg">
+              Create your HealthVault account
+            </p>
           </div>
 
           {/* Progress Bar */}
@@ -250,11 +273,11 @@ export default function PatientRegistrationPage() {
 
           {/* Form Header */}
           <div className="mb-8">
-            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+            <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
               {step === 1 && 'Create Your Account'}
               {step === 2 && 'Health Information'}
               {step === 3 && 'Emergency & Terms'}
-            </h2>
+            </h3>
             <p className="text-gray-600">
               {step === 1 && 'Enter your personal information to get started'}
               {step === 2 && 'Help us personalize your health experience'}
@@ -515,7 +538,7 @@ export default function PatientRegistrationPage() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className={`flex-1 bg-primary text-white font-medium py-3 rounded-xl hover:bg-primary-dark transition-colors ${step === 1 ? 'flex-1' : 'flex-1'}`}
+                  className="flex-1 bg-primary text-white font-medium py-3 rounded-xl hover:bg-primary-dark transition-colors"
                 >
                   Continue
                   <ArrowRight className="inline-block ml-2" size={18} />

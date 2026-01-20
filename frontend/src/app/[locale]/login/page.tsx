@@ -35,7 +35,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50">
       {/* Left Side - Hero Image (55%) */}
       <div className="lg:w-[55%] relative min-h-[50vh] lg:min-h-screen">
-        {/* Background Image - Restored blue effect */}
+        {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/registeration/registeration-image.jpg"
@@ -46,28 +46,12 @@ export default function LoginPage() {
             quality={100}
             sizes="55vw"
           />
-          {/* Restored blue gradient overlay */}
           <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/50 to-transparent"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
         </div>
         
         {/* Content Overlay */}
         <div className="relative z-10 h-full flex flex-col p-6 md:p-8 lg:p-12 text-white">
-          {/* Top Navigation - Only logo */}
-          <div className="flex justify-start items-start">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-              <div className="w-12 h-12 bg-white/25 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-xl lg:text-2xl font-bold">HealthVault</h1>
-                <p className="text-xs lg:text-sm text-white/90">RWANDA</p>
-              </div>
-            </Link>
-          </div>
-
           {/* Main Hero Content - Desktop */}
           <div className="hidden lg:flex flex-1 flex-col justify-end pb-12 lg:pb-16 max-w-2xl mx-auto w-full">
             {/* Feature Cards Grid - Desktop only */}
@@ -77,9 +61,9 @@ export default function LoginPage() {
                   <div className="p-3 bg-white/25 rounded-lg mb-3">
                     <Shield size={24} className="text-white" />
                   </div>
-                  <h3 className="font-bold text-white text-lg mb-2">Bank Security</h3>
+                  <h3 className="font-bold text-white text-lg mb-2">Bank-Level Security</h3>
                   <p className="text-white/90 text-sm leading-relaxed">
-                    256-bit encrypted protection
+                    256-bit military-grade encryption
                   </p>
                 </div>
               </div>
@@ -89,9 +73,9 @@ export default function LoginPage() {
                   <div className="p-3 bg-white/25 rounded-lg mb-3">
                     <Zap size={24} className="text-white" />
                   </div>
-                  <h3 className="font-bold text-white text-lg mb-2">Instant Access</h3>
+                  <h3 className="font-bold text-white text-lg mb-2">24/7 Access</h3>
                   <p className="text-white/90 text-sm leading-relaxed">
-                    Records available anytime
+                    Health records available anytime
                   </p>
                 </div>
               </div>
@@ -101,9 +85,9 @@ export default function LoginPage() {
                   <div className="p-3 bg-white/25 rounded-lg mb-3">
                     <Smartphone size={24} className="text-white" />
                   </div>
-                  <h3 className="font-bold text-white text-lg mb-2">Mobile Money</h3>
+                  <h3 className="font-bold text-white text-lg mb-2">Mobile Payments</h3>
                   <p className="text-white/90 text-sm leading-relaxed">
-                    MTN & Airtel payments
+                    MTN & Airtel Money integration
                   </p>
                 </div>
               </div>
@@ -120,11 +104,11 @@ export default function LoginPage() {
               <div className="flex items-center justify-center gap-6 lg:gap-8">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span className="text-white/95 font-medium">Ministry Approved</span>
+                  <span className="text-white/95 font-medium">Ministry of Health Approved</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                  <span className="text-white/95 font-medium">Data Protected</span>
+                  <span className="text-white/95 font-medium">RDPA Compliant</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 bg-green-400 rounded-full"></div>
@@ -134,18 +118,18 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Mobile-only content - Shows feature cards in middle */}
+          {/* Mobile-only content */}
           <div className="lg:hidden flex-1 flex flex-col items-center justify-center pt-8">
-            {/* Feature Cards for Mobile - In the MIDDLE */}
+            {/* Feature Cards for Mobile */}
             <div className="grid grid-cols-1 gap-4 mb-8 w-full max-w-xs mx-auto">
               <div className="bg-white/20 backdrop-blur-sm p-4 rounded-xl border border-white/30">
                 <div className="flex flex-col items-center text-center">
                   <div className="p-2 bg-white/25 rounded-lg mb-2">
                     <Shield size={20} className="text-white" />
                   </div>
-                  <h3 className="font-bold text-white text-sm mb-1">Bank Security</h3>
+                  <h3 className="font-bold text-white text-sm mb-1">Bank-Level Security</h3>
                   <p className="text-white/90 text-xs">
-                    256-bit encrypted protection
+                    256-bit military-grade encryption
                   </p>
                 </div>
               </div>
@@ -155,9 +139,9 @@ export default function LoginPage() {
                   <div className="p-2 bg-white/25 rounded-lg mb-2">
                     <Zap size={20} className="text-white" />
                   </div>
-                  <h3 className="font-bold text-white text-sm mb-1">Instant Access</h3>
+                  <h3 className="font-bold text-white text-sm mb-1">24/7 Access</h3>
                   <p className="text-white/90 text-xs">
-                    Records available anytime
+                    Health records available anytime
                   </p>
                 </div>
               </div>
@@ -167,18 +151,17 @@ export default function LoginPage() {
                   <div className="p-2 bg-white/25 rounded-lg mb-2">
                     <Smartphone size={20} className="text-white" />
                   </div>
-                  <h3 className="font-bold text-white text-sm mb-1">Mobile Money</h3>
+                  <h3 className="font-bold text-white text-sm mb-1">Mobile Payments</h3>
                   <p className="text-white/90 text-xs">
-                    MTN & Airtel payments
+                    MTN & Airtel Money integration
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* BOTTOM SECTION for Mobile - Trust badge and indicators */}
+          {/* BOTTOM SECTION for Mobile */}
           <div className="lg:hidden mt-auto pb-6">
-            {/* Trust Badge - At BOTTOM */}
             <div className="flex flex-col items-center">
               <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 mb-4">
                 <div className="flex items-center gap-2">
@@ -187,15 +170,14 @@ export default function LoginPage() {
                 </div>
               </div>
               
-              {/* Trust Indicators - At BOTTOM */}
               <div className="flex items-center justify-center gap-3">
                 <div className="flex items-center gap-1">
                   <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                  <span className="text-xs text-white/90">Ministry Approved</span>
+                  <span className="text-xs text-white/90">MoH Approved</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
-                  <span className="text-xs text-white/90">Data Protected</span>
+                  <span className="text-xs text-white/90">RDPA Compliant</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-1.5 h-1.5 bg-green-400 rounded-full"></div>
@@ -207,22 +189,37 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* Right Side - Login Form (45%) - Bigger text */}
+      {/* Right Side - Login Form (45%) */}
       <div className="lg:w-[45%] flex items-start justify-center pt-12 lg:pt-24 p-6 sm:p-8 lg:p-14 bg-white">
         <div className="w-full max-w-lg">
-          {/* Mobile Header - Only shows on mobile */}
+          {/* Mobile-only Header with Icon - ADJUSTED SPACING */}
           <div className="lg:hidden mb-10">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-14 h-14 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center">
-                <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
+            <div className="flex flex-col items-center text-center mb-8">
+              {/* Blue Icon Container - Reduced bottom margin from mb-5 to mb-3 */}
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                  <Lock className="text-white" size={24} />
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">HealthVault</h1>
-                <p className="text-sm text-gray-600">RWANDA</p>
-              </div>
+              
+              {/* Text Content */}
+              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                Secure Login
+              </h2>
+              <p className="text-gray-600 text-lg">
+                Sign in to access your health records
+              </p>
             </div>
+          </div>
+
+          {/* Desktop Header (unchanged) */}
+          <div className="hidden lg:block mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Secure Login
+            </h2>
+            <p className="text-gray-600 text-lg">
+              Sign in to access your health records
+            </p>
           </div>
 
           {/* Success Message */}
@@ -233,22 +230,12 @@ export default function LoginPage() {
                   <Check size={20} className="text-green-600" />
                 </div>
                 <div>
-                  <p className="font-semibold text-green-800 text-lg">Account Created!</p>
-                  <p className="text-green-600 text-sm mt-1">Please login to continue</p>
+                  <p className="font-semibold text-green-800 text-lg">Account Created Successfully!</p>
+                  <p className="text-green-600 text-sm mt-1">Please login to access your health records</p>
                 </div>
               </div>
             </div>
           )}
-
-          {/* Form Header - Bigger text */}
-          <div className="mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Login to Your Account
-            </h2>
-            <p className="text-gray-600 text-lg">
-              Enter your credentials to securely access your health records
-            </p>
-          </div>
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-8">
@@ -326,7 +313,7 @@ export default function LoginPage() {
                 </span>
               ) : (
                 <span className="flex items-center justify-center">
-                  Login to HealthVault
+                  Access Health Records
                   <ArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" size={22} />
                 </span>
               )}
@@ -345,7 +332,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Registration Options - Bigger */}
+          {/* Registration Options */}
           <div className="space-y-6">
             <Link href="/en/register">
               <button className="w-full border-2 border-primary text-primary hover:bg-primary/5 font-semibold text-lg py-4 rounded-xl transition-all duration-200">
@@ -360,7 +347,7 @@ export default function LoginPage() {
                     <svg className="w-7 h-7 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
-                    <span className="text-base font-medium">I'm a Patient</span>
+                    <span className="text-base font-medium">Patient Account</span>
                   </div>
                 </button>
               </Link>
@@ -371,25 +358,25 @@ export default function LoginPage() {
                     <svg className="w-7 h-7 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
-                    <span className="text-base font-medium">I'm a Provider</span>
+                    <span className="text-base font-medium">Healthcare Provider</span>
                   </div>
                 </button>
               </Link>
             </div>
           </div>
 
-          {/* Security Assurance - Bottom */}
+          {/* Security Assurance */}
           <div className="mt-14 pt-10 border-t border-gray-200">
             <div className="flex items-center justify-center gap-4 mb-4">
               <div className="p-3 bg-gray-100 rounded-xl">
                 <Shield size={22} className="text-gray-600" />
               </div>
               <p className="text-base text-gray-600 font-semibold">
-                Your health data is 256-bit encrypted
+                256-bit encrypted health data protection
               </p>
             </div>
             <p className="text-sm text-gray-500 text-center">
-              Compliant with Rwanda's Data Protection Law
+              Compliant with Rwanda's Data Protection Law No. 058/2021
             </p>
           </div>
         </div>

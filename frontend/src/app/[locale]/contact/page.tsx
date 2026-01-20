@@ -70,7 +70,7 @@ export default function ContactPage() {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
-            src="/images/others/contact-1.jpg"
+            src="/images/others/contact-2.jpg"
             alt="Contact HealthVault Rwanda"
             fill
             className="object-cover"

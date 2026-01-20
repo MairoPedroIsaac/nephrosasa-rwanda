@@ -12,15 +12,7 @@ export default function RegisterChoicePage() {
       <div className="w-full max-w-6xl">
         {/* Header */}
         <div className="text-center mb-10 md:mb-12">
-          <div className="flex justify-center mb-6">
-            <Image
-              src="/logo.png"
-              alt="HealthVault Rwanda"
-              width={80}
-              height={80}
-              className="h-16 w-16 md:h-20 md:w-20"
-            />
-          </div>
+         
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             Join HealthVault Rwanda
           </h1>

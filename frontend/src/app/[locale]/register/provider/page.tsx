@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, QrCode, Shield, Check, User, Stethoscope, Award, FileText, CreditCard } from 'lucide-react';
+import { ArrowRight, QrCode, Shield, Check, Stethoscope, FileText, CreditCard } from 'lucide-react';
 
 export default function RegisterProviderPage() {
   const router = useRouter();
@@ -37,7 +37,7 @@ export default function RegisterProviderPage() {
     // Submit logic here
     setTimeout(() => {
       setLoading(false);
-      router.push('/en/register/success');
+      router.push('/en/provider/dashboard');
     }, 1500);
   };
 
@@ -51,9 +51,9 @@ export default function RegisterProviderPage() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50">
-      {/* Left Side - Hero Image (55%) - SAME AS LOGIN & PATIENT */}
+      {/* Left Side - Hero Image (55%) */}
       <div className="lg:w-[55%] relative min-h-[50vh] lg:min-h-screen">
-        {/* Background Image - Same blue effect as login */}
+        {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/registeration/registeration-image.jpg"
@@ -64,31 +64,14 @@ export default function RegisterProviderPage() {
             quality={100}
             sizes="55vw"
           />
-          {/* Same blue gradient overlay as login */}
           <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/50 to-transparent"></div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
         </div>
         
-        {/* Content Overlay - Adjusted for Provider Registration */}
+        {/* Content Overlay */}
         <div className="relative z-10 h-full flex flex-col p-6 md:p-8 lg:p-12 text-white">
-          {/* Top Navigation - Same as login */}
-          <div className="flex justify-start items-start">
-            <Link href="/" className="flex items-center gap-3 hover:opacity-90 transition-opacity">
-              <div className="w-12 h-12 bg-white/25 backdrop-blur-sm rounded-xl flex items-center justify-center">
-                <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-xl lg:text-2xl font-bold">HealthVault</h1>
-                <p className="text-xs lg:text-sm text-white/90">RWANDA</p>
-              </div>
-            </Link>
-          </div>
-
           {/* Main Hero Content - Desktop */}
           <div className="hidden lg:flex flex-1 flex-col justify-center max-w-xl mx-auto w-full">
-            {/* Provider-specific content */}
             <div className="mb-8 lg:mb-12">
               <h2 className="text-3xl lg:text-4xl font-bold mb-6 leading-tight">
                 Join Rwanda's
@@ -158,7 +141,7 @@ export default function RegisterProviderPage() {
               </div>
             </div>
 
-            {/* Trust Indicators - Same style as login */}
+            {/* Trust Indicators */}
             <div className="border-t border-white/25 pt-6">
               <div className="flex flex-wrap items-center gap-4">
                 <div className="flex items-center gap-2">
@@ -185,7 +168,6 @@ export default function RegisterProviderPage() {
 
           {/* Mobile-only content */}
           <div className="lg:hidden flex-1 flex flex-col items-center justify-center pt-8">
-            {/* Provider badge */}
             <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 mb-6">
               <div className="flex items-center gap-2">
                 <Stethoscope size={14} className="text-white" />
@@ -193,7 +175,6 @@ export default function RegisterProviderPage() {
               </div>
             </div>
 
-            {/* Simple mobile content */}
             <div className="text-center px-4">
               <h3 className="text-lg font-bold text-white mb-4">Join Rwanda's Healthcare Network</h3>
               <div className="flex items-center justify-center gap-4">
@@ -228,19 +209,36 @@ export default function RegisterProviderPage() {
       </div>
 
       {/* Right Side - Registration Form (45%) */}
-      <div className="lg:w-[45%] flex items-start justify-center pt-12 lg:pt-16 p-6 sm:p-8 lg:p-12 bg-white">
+      <div className="lg:w-[45%] flex items-start justify-center pt-12 lg:pt-24 p-6 sm:p-8 lg:p-14 bg-white">
         <div className="w-full max-w-lg">
-          {/* Mobile Header */}
-          <div className="lg:hidden mb-8">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-dark rounded-xl flex items-center justify-center">
-                <Stethoscope size={24} className="text-white" />
+          {/* Mobile Header - CENTERED ICON LIKE LOGIN */}
+          <div className="lg:hidden mb-10">
+            <div className="flex flex-col items-center text-center mb-8">
+              {/* Centered Blue Icon Container - MATCHED TO LOGIN (mb-3) */}
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mb-3">
+                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+                  <Stethoscope className="text-white" size={24} />
+                </div>
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">Provider Registration</h1>
-                <p className="text-sm text-gray-600">Create your Healthcare Provider account</p>
-              </div>
+              
+              {/* Text Content */}
+              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                Provider Registration
+              </h2>
+              <p className="text-gray-600 text-lg">
+                Create your Healthcare Provider account
+              </p>
             </div>
+          </div>
+
+          {/* Desktop Header */}
+          <div className="hidden lg:block mb-12">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Provider Registration
+            </h2>
+            <p className="text-gray-600 text-lg">
+              Create your Healthcare Provider account
+            </p>
           </div>
 
           {/* Progress Bar */}
@@ -263,11 +261,11 @@ export default function RegisterProviderPage() {
 
           {/* Form Header */}
           <div className="mb-8">
-            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+            <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
               {step === 1 && 'Create Healthcare Provider Account'}
               {step === 2 && 'Professional Information'}
               {step === 3 && 'Security & Terms'}
-            </h2>
+            </h3>
             <p className="text-gray-600">
               {step === 1 && 'Enter your personal information to get started'}
               {step === 2 && 'Enter your professional credentials and details'}
@@ -527,7 +525,7 @@ export default function RegisterProviderPage() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className={`flex-1 bg-primary text-white font-medium py-3 rounded-xl hover:bg-primary-dark transition-colors ${step === 1 ? 'flex-1' : 'flex-1'}`}
+                  className="flex-1 bg-primary text-white font-medium py-3 rounded-xl hover:bg-primary-dark transition-colors"
                 >
                   Continue
                   <ArrowRight className="inline-block ml-2" size={18} />

@@ -59,20 +59,18 @@ const Navbar = () => {
     <nav className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href={`/${currentLocale}`} className="flex items-center space-x-3">
-            <Image
-              src="/logo.png"
-              alt="HealthVault Rwanda Logo"
-              width={40}
-              height={40}
-              className="h-10 w-10"
-            />
-            <span className="text-xl font-bold">
-              <span className="text-primary">Health</span>
-              <span className="text-accent">Vault</span>
-              <span className="text-gray-700"> Rwanda</span>
-            </span>
+          {/* Logo - JUST THE IMAGE */}
+          <Link href={`/${currentLocale}`} className="flex items-center">
+            <div className="h-14 w-52 md:h-16 md:w-64 relative">
+              <Image
+                src="/healthvault-logo.svg"
+                alt="HealthVault Rwanda Logo"
+                fill
+                className="object-contain object-left"
+                sizes="(max-width: 768px) 128px, 160px"
+                priority
+              />
+            </div>
           </Link>
 
           {/* Desktop Navigation */}
@@ -221,7 +219,6 @@ const Navbar = () => {
                     Login
                   </Button>
                 </Link>
-                // To (if it says this, it's already correct):
                 <Link href={`/${currentLocale}/register`}>
                   <Button variant="primary" size="sm" fullWidth>
                     Register

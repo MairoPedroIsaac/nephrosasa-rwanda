@@ -33,13 +33,13 @@ export default function AboutPage() {
     {
       name: 'Dr. Sarah Uwimana',
       role: 'Head of AI & Analytics',
-      image: '/images/doctors/doctor-4.jpg',
+      image: '/images/doctors/doctor-1.jpg',
       bio: 'PhD in Machine Learning applied to healthcare diagnostics.',
     },
     {
       name: 'Dr. Eric Habimana',
       role: 'Patient Experience Director',
-      image: '/images/doctors/doctor-5.jpg',
+      image: '/images/doctors/doctor-4.jpg',
       bio: 'Focused on creating accessible healthcare solutions for all Rwandans.',
     },
   ];
@@ -90,7 +90,7 @@ export default function AboutPage() {
 
   return (
     <div className="bg-white">
-      {/* Hero Section - Same style as Contact page */}
+      {/* Hero Section */}
       <section className="relative h-[500px] overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
@@ -172,7 +172,7 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-96 lg:h-[500px]">
               <Image
-                src="/images/others/about1.jpg"
+                src="/images/others/about-3.jpg"
                 alt="Healthcare in Rwanda"
                 fill
                 className="object-cover rounded-2xl shadow-2xl"
@@ -203,71 +203,70 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Statistics - Now looks like Contact hero with counting animation */}
-      <section ref={statsRef} className="relative py-20 overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/others/about.jpg"
-            alt="Healthcare statistics background"
-            fill
-            className="object-cover"
-          />
-        </div>
-        
-        {/* Gradient Blue Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/60 to-primary-dark/50 z-0"></div>
-        
-        {/* Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-white mb-4">Our Impact in Numbers</h2>
-            <p className="text-xl text-blue-100">Making a real difference in Rwanda's healthcare system</p>
-          </div>
+  {/* Statistics - White background version */}
+<section ref={statsRef} className="py-20 bg-white">
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="text-center mb-16">
+      <h2 className="text-4xl font-bold text-gray-900 mb-4">
+        Our Impact in Numbers
+      </h2>
+      <p className="text-xl text-gray-600">
+        Making a real difference in Rwanda's healthcare system
+      </p>
+    </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            <div className="text-center text-white">
-              <div className="flex justify-center mb-4">
-                <Users size={48} className="text-white" />
-              </div>
-              <h3 className="text-5xl font-bold mb-2">
-                {stats.patients.toLocaleString()}+
-              </h3>
-              <p className="text-blue-100">Patients Protected</p>
-            </div>
-
-            <div className="text-center text-white">
-              <div className="flex justify-center mb-4">
-                <Award size={48} className="text-white" />
-              </div>
-              <h3 className="text-5xl font-bold mb-2">
-                {stats.facilities}+
-              </h3>
-              <p className="text-blue-100">Partner Facilities</p>
-            </div>
-
-            <div className="text-center text-white">
-              <div className="flex justify-center mb-4">
-                <Clock size={48} className="text-white" />
-              </div>
-              <h3 className="text-5xl font-bold mb-2">
-                {stats.records.toLocaleString()}+
-              </h3>
-              <p className="text-blue-100">Records Managed</p>
-            </div>
-
-            <div className="text-center text-white">
-              <div className="flex justify-center mb-4">
-                <Heart size={48} className="text-white" />
-              </div>
-              <h3 className="text-5xl font-bold mb-2">
-                {stats.duplicateTests}%
-              </h3>
-              <p className="text-blue-100">Fewer Duplicate Tests</p>
-            </div>
+    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="text-center">
+        <div className="flex justify-center mb-4">
+          <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-2 rounded-lg">
+            <Users size={48} className="text-white" />
           </div>
         </div>
-      </section>
+        <h3 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-2">
+          {stats.patients.toLocaleString()}+
+        </h3>
+        <p className="text-gray-600">Patients Protected</p>
+      </div>
+
+      <div className="text-center">
+        <div className="flex justify-center mb-4">
+          <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-2 rounded-lg">
+            <Award size={48} className="text-white" />
+          </div>
+        </div>
+        <h3 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-2">
+          {stats.facilities}+
+        </h3>
+        <p className="text-gray-600">Partner Facilities</p>
+      </div>
+
+      <div className="text-center">
+        <div className="flex justify-center mb-4">
+          <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-2 rounded-lg">
+            <Clock size={48} className="text-white" />
+          </div>
+        </div>
+        <h3 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-2">
+          {stats.records.toLocaleString()}+
+        </h3>
+        <p className="text-gray-600">Records Managed</p>
+      </div>
+
+      <div className="text-center">
+        <div className="flex justify-center mb-4">
+          <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-2 rounded-lg">
+            <Heart size={48} className="text-white" />
+          </div>
+        </div>
+        <h3 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-2">
+          {stats.duplicateTests}%
+        </h3>
+        <p className="text-gray-600">Fewer Duplicate Tests</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       {/* Team Section */}
       <section className="py-20 bg-gray-50">
@@ -374,15 +373,7 @@ export default function AboutPage() {
 
       {/* CTA Section - Now looks like Contact hero */}
       <section className="relative py-20 overflow-hidden">
-        {/* Background Image */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/others/about1.jpg"
-            alt="Join our healthcare revolution"
-            fill
-            className="object-cover"
-          />
-        </div>
+       
         
         {/* Gradient Blue Overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/60 to-primary-dark/50 z-0"></div>
