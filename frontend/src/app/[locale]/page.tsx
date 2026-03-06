@@ -495,20 +495,7 @@ export default function HomePage() {
       </section>
 
       {/* Enhanced CTA Section - FIXED image to show full face */}
-      <section className="relative h-[500px] md:h-[600px] overflow-hidden">
-        {/* Background Image - FIXED positioning */}
-        <div className="absolute inset-0 z-0">
-          <Image
-            src="/images/others/cta-healthcare.jpg"
-            alt="Rwandan healthcare professionals"
-            fill
-            className="object-cover object-[center_20%]"
-            sizes="100vw"
-          />
-        </div>
-        
-        {/* Gradient Blue Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/60 to-primary-dark/50 z-0"></div>
+       <section className="relative py-20 overflow-hidden" style={{background: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #1d4ed8 100%)'}}>
         
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center h-full flex flex-col justify-center items-center">
          

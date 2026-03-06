@@ -52,7 +52,6 @@ export default function AboutPage() {
     setCurrentSlide((prev) => (prev - 1 + teamMembers.length) % teamMembers.length);
   };
 
-  // Animated counting effect
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -64,7 +63,6 @@ export default function AboutPage() {
               const progress = Math.min(elapsed / duration, 1);
               const current = Math.floor(start + (end - start) * progress);
               setter(current);
-              
               if (progress < 1) {
                 requestAnimationFrame(updateCount);
               }
@@ -92,7 +90,6 @@ export default function AboutPage() {
     <div className="bg-white">
       {/* Hero Section */}
       <section className="relative h-[500px] overflow-hidden">
-        {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/others/about.jpg"
@@ -102,11 +99,7 @@ export default function AboutPage() {
             priority
           />
         </div>
-        
-        {/* Gradient Blue Overlay */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/60 to-primary-dark/50 z-0"></div>
-        
-        {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
           <div className="max-w-3xl text-white">
             <h1 className="text-5xl lg:text-6xl font-bold mb-6">
@@ -127,8 +120,8 @@ export default function AboutPage() {
             {/* Mission */}
             <Card className="text-center">
               <div className="flex justify-center mb-6">
-                <div className="p-4 bg-primary bg-opacity-10 rounded-2xl">
-                  <Target size={48} className="text-primary" />
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
+                  <Target size={28} className="text-white" />
                 </div>
               </div>
               <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
@@ -140,8 +133,8 @@ export default function AboutPage() {
             {/* Vision */}
             <Card className="text-center">
               <div className="flex justify-center mb-6">
-                <div className="p-4 bg-accent bg-opacity-10 rounded-2xl">
-                  <Eye size={48} className="text-accent" />
+                <div className="w-16 h-16 bg-gradient-to-br from-cyan-400 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-cyan-200">
+                  <Eye size={28} className="text-white" />
                 </div>
               </div>
               <h3 className="text-2xl font-bold mb-4">Our Vision</h3>
@@ -153,8 +146,8 @@ export default function AboutPage() {
             {/* Values */}
             <Card className="text-center">
               <div className="flex justify-center mb-6">
-                <div className="p-4 bg-success bg-opacity-10 rounded-2xl">
-                  <Heart size={48} className="text-success" />
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-200">
+                  <Heart size={28} className="text-white" />
                 </div>
               </div>
               <h3 className="text-2xl font-bold mb-4">Our Values</h3>
@@ -178,7 +171,6 @@ export default function AboutPage() {
                 className="object-cover rounded-2xl shadow-2xl"
               />
             </div>
-
             <div>
               <span className="text-accent font-semibold text-sm uppercase tracking-wider">Our Story</span>
               <h2 className="text-4xl font-bold text-gray-900 mt-4 mb-6">
@@ -203,85 +195,72 @@ export default function AboutPage() {
         </div>
       </section>
 
-  {/* Statistics - White background version */}
-<section ref={statsRef} className="py-20 bg-white">
-  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div className="text-center mb-16">
-      <h2 className="text-4xl font-bold text-gray-900 mb-4">
-        Our Impact in Numbers
-      </h2>
-      <p className="text-xl text-gray-600">
-        Making a real difference in Rwanda's healthcare system
-      </p>
-    </div>
-
-    <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-      <div className="text-center">
-        <div className="flex justify-center mb-4">
-          <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-2 rounded-lg">
-            <Users size={48} className="text-white" />
+      {/* Statistics */}
+      <section ref={statsRef} className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Impact in Numbers</h2>
+            <p className="text-xl text-gray-600">Making a real difference in Rwanda's healthcare system</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-200">
+                  <Users size={28} className="text-white" />
+                </div>
+              </div>
+              <h3 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2">
+                {stats.patients.toLocaleString()}+
+              </h3>
+              <p className="text-gray-600">Patients Protected</p>
+            </div>
+            <div className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-200">
+                  <Award size={28} className="text-white" />
+                </div>
+              </div>
+              <h3 className="text-5xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent mb-2">
+                {stats.facilities}+
+              </h3>
+              <p className="text-gray-600">Partner Facilities</p>
+            </div>
+            <div className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-purple-700 rounded-2xl flex items-center justify-center shadow-lg shadow-violet-200">
+                  <Clock size={28} className="text-white" />
+                </div>
+              </div>
+              <h3 className="text-5xl font-bold bg-gradient-to-r from-violet-500 to-purple-700 bg-clip-text text-transparent mb-2">
+                {stats.records.toLocaleString()}+
+              </h3>
+              <p className="text-gray-600">Records Managed</p>
+            </div>
+            <div className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-400 to-rose-500 rounded-2xl flex items-center justify-center shadow-lg shadow-orange-200">
+                  <Heart size={28} className="text-white" />
+                </div>
+              </div>
+              <h3 className="text-5xl font-bold bg-gradient-to-r from-orange-400 to-rose-500 bg-clip-text text-transparent mb-2">
+                {stats.duplicateTests}%
+              </h3>
+              <p className="text-gray-600">Fewer Duplicate Tests</p>
+            </div>
           </div>
         </div>
-        <h3 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-2">
-          {stats.patients.toLocaleString()}+
-        </h3>
-        <p className="text-gray-600">Patients Protected</p>
-      </div>
-
-      <div className="text-center">
-        <div className="flex justify-center mb-4">
-          <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-2 rounded-lg">
-            <Award size={48} className="text-white" />
-          </div>
-        </div>
-        <h3 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-2">
-          {stats.facilities}+
-        </h3>
-        <p className="text-gray-600">Partner Facilities</p>
-      </div>
-
-      <div className="text-center">
-        <div className="flex justify-center mb-4">
-          <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-2 rounded-lg">
-            <Clock size={48} className="text-white" />
-          </div>
-        </div>
-        <h3 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-2">
-          {stats.records.toLocaleString()}+
-        </h3>
-        <p className="text-gray-600">Records Managed</p>
-      </div>
-
-      <div className="text-center">
-        <div className="flex justify-center mb-4">
-          <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-2 rounded-lg">
-            <Heart size={48} className="text-white" />
-          </div>
-        </div>
-        <h3 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-2">
-          {stats.duplicateTests}%
-        </h3>
-        <p className="text-gray-600">Fewer Duplicate Tests</p>
-      </div>
-    </div>
-  </div>
-</section>
-
+      </section>
 
       {/* Team Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <span className="text-accent font-semibold text-sm uppercase tracking-wider">Our Team</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-4 mb-6">
-              Led by Healthcare Experts
-            </h2>
+            <h2 className="text-4xl font-bold text-gray-900 mt-4 mb-6">Led by Healthcare Experts</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Our team combines deep healthcare expertise with cutting-edge technology skills
             </p>
           </div>
-
-          {/* Team Carousel */}
           <div className="relative max-w-4xl mx-auto">
             <Card className="overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center p-8">
@@ -293,7 +272,6 @@ export default function AboutPage() {
                     className="object-cover rounded-xl"
                   />
                 </div>
-
                 <div>
                   <h3 className="text-3xl font-bold text-gray-900 mb-2">
                     {teamMembers[currentSlide].name}
@@ -307,16 +285,10 @@ export default function AboutPage() {
                 </div>
               </div>
             </Card>
-
-            {/* Navigation */}
             <div className="flex justify-center items-center gap-4 mt-8">
-              <button
-                onClick={prevSlide}
-                className="p-3 rounded-full bg-white shadow-lg hover:bg-gray-100 transition-colors"
-              >
+              <button onClick={prevSlide} className="p-3 rounded-full bg-white shadow-lg hover:bg-gray-100 transition-colors">
                 <ArrowLeft size={24} className="text-primary" />
               </button>
-
               <div className="flex gap-2">
                 {teamMembers.map((_, index) => (
                   <button
@@ -328,11 +300,7 @@ export default function AboutPage() {
                   />
                 ))}
               </div>
-
-              <button
-                onClick={nextSlide}
-                className="p-3 rounded-full bg-white shadow-lg hover:bg-gray-100 transition-colors"
-              >
+              <button onClick={nextSlide} className="p-3 rounded-full bg-white shadow-lg hover:bg-gray-100 transition-colors">
                 <ArrowRight size={24} className="text-primary" />
               </button>
             </div>
@@ -344,25 +312,20 @@ export default function AboutPage() {
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">
-              Aligned with Rwanda's Vision 2050
-            </h2>
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">Aligned with Rwanda's Vision 2050</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Working alongside government initiatives to digitize Rwanda's healthcare system
             </p>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card className="text-center">
               <h4 className="font-bold text-lg mb-2">Ministry of Health</h4>
               <p className="text-gray-600">Supporting Digital Health Blueprint 2024 implementation</p>
             </Card>
-
             <Card className="text-center">
               <h4 className="font-bold text-lg mb-2">Rwanda Biomedical Center</h4>
               <p className="text-gray-600">Collaborating on health data standards and protocols</p>
             </Card>
-
             <Card className="text-center">
               <h4 className="font-bold text-lg mb-2">RISA</h4>
               <p className="text-gray-600">Ensuring data protection and privacy compliance</p>
@@ -371,34 +334,18 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* CTA Section - Now looks like Contact hero */}
-      <section className="relative py-20 overflow-hidden">
-       
-        
-        {/* Gradient Blue Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/60 to-primary-dark/50 z-0"></div>
-        
-        {/* Content */}
+      {/* CTA Section */}
+      <section className="relative py-20 overflow-hidden" style={{background: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #1d4ed8 100%)'}}>
         <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
-            Join Us in Transforming Healthcare
-          </h2>
+          <h2 className="text-4xl font-bold text-white mb-6">Join Us in Transforming Healthcare</h2>
           <p className="text-xl text-blue-100 mb-8">
             Whether you're a patient or a healthcare provider, be part of Rwanda's digital health revolution
           </p>
-          
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button 
-              size="lg" 
-              className="bg-white text-primary hover:bg-gray-100 font-semibold"
-            >
+            <Button size="lg" className="bg-white/20 backdrop-blur-sm border-2 border-white text-white hover:bg-white/30 font-semibold">
               Get Started Today
             </Button>
-            <Button 
-              size="lg" 
-              variant="outline" 
-              className="border-2 border-white text-white hover:bg-white/20 font-semibold"
-            >
+            <Button size="lg" variant="outline" className="border-2 border-white text-white hover:bg-white/20 font-semibold">
               Contact Our Team
             </Button>
           </div>
