@@ -17,7 +17,7 @@ interface RegisterData {
   password: string;
   password_confirm: string;
   phone_number: string;
-  user_type: 'PATIENT' | 'PROVIDER' | 'ADMIN';
+  user_type: 'PATIENT' | 'DOCTOR' | 'ADMIN';
   first_name: string;
   last_name: string;
   date_of_birth?: string;
@@ -31,7 +31,7 @@ export interface User {
   first_name: string;
   last_name: string;
   phone_number: string;
-  user_type: 'PATIENT' | 'PROVIDER' | 'ADMIN';
+  user_type: 'PATIENT' | 'DOCTOR' | 'ADMIN';
   date_of_birth?: string;
   national_id?: string;
 }
@@ -115,7 +115,7 @@ export const getCurrentUser = (): User | null => {
 };
 
 /**
- * Get user type (PATIENT, PROVIDER, ADMIN)
+ * Get user type (PATIENT, DOCTOR, ADMIN)
  */
 export const getUserType = (): string | null => {
   const user = getCurrentUser();

@@ -71,7 +71,7 @@ export default function ContactPage() {
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/others/contact-2.jpg"
-            alt="Contact HealthVault Rwanda"
+            alt="Contact NephroSasa Rwanda"
             fill
             className="object-cover"
             priority
@@ -143,8 +143,8 @@ export default function ContactPage() {
               </div>
               <h3 className="font-bold text-lg mb-2">Email</h3>
               <p className="text-gray-600">
-                info@healthvault.rw<br />
-                support@healthvault.rw
+                info@nephrosasa.rw<br />
+                support@nephrosasa.rw
               </p>
             </Card>
 
@@ -275,19 +275,19 @@ export default function ContactPage() {
                   <div>
                     <h4 className="font-semibold mb-1">For Patients:</h4>
                     <p className="text-gray-600">
-                      Need help accessing your records? Contact support at support@healthvault.rw
+                      Need help accessing your records? Contact support at support@nephrosasa.rw
                     </p>
                   </div>
                   <div>
                     <h4 className="font-semibold mb-1">For Healthcare Providers:</h4>
                     <p className="text-gray-600">
-                      Interested in partnering? Email partnerships@healthvault.rw
+                      Interested in partnering? Email partnerships@nephrosasa.rw
                     </p>
                   </div>
                   <div>
                     <h4 className="font-semibold mb-1">Technical Support:</h4>
                     <p className="text-gray-600">
-                      Report technical issues at tech@healthvault.rw
+                      Report technical issues at tech@nephrosasa.rw
                     </p>
                   </div>
                 </div>

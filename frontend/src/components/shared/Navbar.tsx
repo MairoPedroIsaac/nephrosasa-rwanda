@@ -9,7 +9,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
-import { Menu, X, Globe } from 'lucide-react';
+import { Menu, X, Globe, Moon, Sun } from 'lucide-react';
 import { getCurrentUser, logout, isAuthenticated } from '@/lib/auth';
 import Button from '../ui/Button';
 
@@ -19,6 +19,30 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentLocale, setCurrentLocale] = useState('en');
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  // Initialize theme
+  useEffect(() => {
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      setIsDarkMode(true);
+      document.documentElement.classList.add('dark');
+    } else {
+      setIsDarkMode(false);
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
+  const toggleTheme = () => {
+    if (isDarkMode) {
+      document.documentElement.classList.remove('dark');
+      localStorage.theme = 'light';
+      setIsDarkMode(false);
+    } else {
+      document.documentElement.classList.add('dark');
+      localStorage.theme = 'dark';
+      setIsDarkMode(true);
+    }
+  };
 
   // Check authentication status on component mount
   useEffect(() => {
@@ -56,20 +80,28 @@ const Navbar = () => {
   ];
 
   return (
-    <nav className="bg-white shadow-md sticky top-0 z-50">
+    <nav className="bg-white dark:bg-gray-900 shadow-md sticky top-0 z-50 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo - JUST THE IMAGE */}
-          <Link href={`/${currentLocale}`} className="flex items-center">
-            <div className="h-14 w-52 md:h-16 md:w-64 relative">
+          {/* Logo - Theme Aware */}
+          <Link href={`/${currentLocale}`} className="flex items-center gap-2 md:gap-3">
+            <div className="h-10 w-10 md:h-12 md:w-12 relative flex-shrink-0">
               <Image
-                src="/healthvault-logo.svg"
-                alt="HealthVault Rwanda Logo"
+                src="/nephrosasa-icon.png"
+                alt="NephroSasa Rwanda Logo Icon"
                 fill
-                className="object-contain object-left"
-                sizes="(max-width: 768px) 128px, 160px"
+                className="object-contain"
+                sizes="48px"
                 priority
               />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-lg md:text-xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight">
+                NephroSasa Rwanda
+              </span>
+              <span className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
+                Monitor Your Kidneys. Before It's Too Late.
+              </span>
             </div>
           </Link>
 
@@ -80,8 +112,8 @@ const Navbar = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-gray-700 hover:text-primary transition-colors duration-200 ${
-                  pathname === link.href ? 'text-primary font-semibold' : ''
+                className={`text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors duration-200 ${
+                  pathname === link.href ? 'text-primary dark:text-primary font-semibold' : ''
                 }`}
               >
                 {link.label}
@@ -90,16 +122,16 @@ const Navbar = () => {
 
             {/* Language Switcher */}
             <div className="relative group">
-              <button className="flex items-center space-x-1 text-gray-700 hover:text-primary">
+              <button className="flex items-center space-x-1 text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary">
                 <Globe size={20} />
                 <span className="uppercase">{currentLocale}</span>
               </button>
               
               {/* Dropdown */}
-              <div className="absolute right-0 mt-2 w-32 bg-white rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+              <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                 <button
                   onClick={() => switchLanguage('en')}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded-t-lg"
+                  className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
                 >
                   English
                 </button>
@@ -117,6 +149,15 @@ const Navbar = () => {
                 </button>
               </div>
             </div>
+
+            {/* Theme Toggle */}
+            <button 
+              onClick={toggleTheme}
+              className="p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+              aria-label="Toggle Dark Mode"
+            >
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
 
             {/* Auth Buttons */}
             {isLoggedIn ? (
@@ -146,13 +187,22 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <button
-            onClick={toggleMenu}
-            className="md:hidden text-gray-700 hover:text-primary"
-          >
-            {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
-          </button>
+          <div className="flex items-center space-x-2 md:hidden">
+            <button 
+              onClick={toggleTheme}
+              className="p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+              aria-label="Toggle Dark Mode"
+            >
+              {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
+            {/* Mobile Menu Button */}
+            <button
+              onClick={toggleMenu}
+              className="p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+            >
+              {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}

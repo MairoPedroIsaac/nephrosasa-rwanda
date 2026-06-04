@@ -58,7 +58,7 @@ export default function PatientRegistrationPage() {
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/registeration/registeration-image.jpg"
-            alt="Healthcare professional in Rwanda - HealthVault Rwanda"
+            alt="Healthcare professional in Rwanda - NephroSasa Rwanda"
             fill
             priority
             className="object-cover object-[center_25%]"
@@ -238,7 +238,7 @@ export default function PatientRegistrationPage() {
                 Patient Registration
               </h2>
               <p className="text-gray-600 text-lg">
-                Create your HealthVault account
+                Create your NephroSasa account
               </p>
             </div>
           </div>
@@ -249,7 +249,7 @@ export default function PatientRegistrationPage() {
               Patient Registration
             </h2>
             <p className="text-gray-600 text-lg">
-              Create your HealthVault account
+              Create your NephroSasa account
             </p>
           </div>
 

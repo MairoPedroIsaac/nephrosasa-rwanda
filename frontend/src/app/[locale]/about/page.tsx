@@ -93,7 +93,7 @@ export default function AboutPage() {
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/others/about.jpg"
-            alt="HealthVault Rwanda Team"
+            alt="NephroSasa Rwanda Team"
             fill
             className="object-cover"
             priority
@@ -103,11 +103,11 @@ export default function AboutPage() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
           <div className="max-w-3xl text-white">
             <h1 className="text-5xl lg:text-6xl font-bold mb-6">
-              Building Rwanda's
-              <span className="block mt-2">Digital Health Future</span>
+              Monitoring Your Kidneys.
+              <span className="block mt-2">Before It's Too Late.</span>
             </h1>
             <p className="text-xl text-blue-100">
-              We're on a mission to make quality healthcare accessible to every Rwandan through technology.
+              We're on a mission to detect silent kidney decline early in Rwandan adults with hypertension or Type 2 diabetes.
             </p>
           </div>
         </div>
@@ -126,7 +126,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
               <p className="text-gray-600 leading-relaxed">
-                To connect every Rwandan with their complete medical history, enabling better healthcare decisions and improved patient outcomes across all facilities.
+                To provide longitudinal, AI-powered pre-dialysis kidney monitoring, enabling early detection and intervention before Stage 4 or 5 Chronic Kidney Disease.
               </p>
             </Card>
 
@@ -139,7 +139,7 @@ export default function AboutPage() {
               </div>
               <h3 className="text-2xl font-bold mb-4">Our Vision</h3>
               <p className="text-gray-600 leading-relaxed">
-                A Rwanda where every patient has seamless access to their health records, and every healthcare provider has the information needed to save lives.
+                A Rwanda where no hypertensive or diabetic patient reaches end-stage kidney failure silently, avoiding catastrophic dialysis costs through affordable prevention.
               </p>
             </Card>
 
@@ -178,16 +178,16 @@ export default function AboutPage() {
               </h2>
               <div className="space-y-4 text-gray-600 leading-relaxed">
                 <p>
-                  HealthVault Rwanda was founded after witnessing the challenges families face when medical records are scattered across different facilities. When healthcare providers don't have complete patient history, diagnoses are delayed and treatment is less effective.
+                  NephroSasa Rwanda was founded after a startling realization: over 240 new advanced Chronic Kidney Disease cases appear annually across Rwanda's referral hospitals, typically affecting adults in their most productive years.
                 </p>
                 <p>
-                  In 2024, we set out to solve this problem. We brought together healthcare professionals, technology experts, and policy makers to build a platform that puts patients in control of their own medical data.
+                  We discovered that blood pressure and blood sugar readings were regularly captured at district NCD clinics, but no system analyzed these readings longitudinally over time. Patients were reaching irreversible Stage 5 kidney failure silently.
                 </p>
                 <p>
-                  Today, we're proud to serve over 1,000 patients and 10+ healthcare facilities across Kigali. Our platform has prevented thousands of duplicate tests, saved patients millions of Rwandan Francs, and most importantly, helped doctors detect health issues earlier.
+                  To solve this, we combined unified longitudinal health records with an AI Chronic Kidney Disease risk scoring engine and alert-triggered remote nephrologist consultations.
                 </p>
                 <p className="font-semibold text-gray-900">
-                  This is just the beginning. We're building the foundation for Rwanda's digital health future.
+                  By detecting dangerous trajectories early, we prevent catastrophic dialysis costs and save lives.
                 </p>
               </div>
             </div>

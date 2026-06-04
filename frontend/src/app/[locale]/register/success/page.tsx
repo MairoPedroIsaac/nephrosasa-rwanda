@@ -31,7 +31,7 @@ export default function RegistrationSuccess() {
         </h1>
         
         <p className="text-gray-600 mb-8 text-lg">
-          Welcome to HealthVault Rwanda. Your account has been created and is ready to use.
+          Welcome to NephroSasa Rwanda. Your account has been created and is ready to use.
         </p>
 
         {/* Security Notice */}

@@ -5,6 +5,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: 'class',
   // Tell Tailwind to scan all TypeScript/JavaScript files in these directories
   // for class names like "bg-blue-500" or "text-white"
   content: [

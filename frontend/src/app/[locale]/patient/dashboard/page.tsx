@@ -17,7 +17,9 @@ import {
   AlertCircle,
   CheckCircle,
   Clock,
-  ArrowRight
+  ArrowRight,
+  HeartPulse,
+  Droplet
 } from 'lucide-react';
 import { getCurrentUser, isAuthenticated } from '@/lib/auth';
 import Card from '@/components/ui/Card';
@@ -25,30 +27,15 @@ import Button from '@/components/ui/Button';
 
 /**
  * PATIENT DASHBOARD PAGE
- * Shows overview of patient's health data, recent activity, and quick actions
+ * Shows overview of patient's health data, AI kidney risk score, and quick actions
  */
 
-interface DashboardStats {
-  totalVisits: number;
-  activeMedications: number;
-  chronicConditions: number;
-  pendingAlerts: number;
-}
-
-interface RecentVisit {
+interface VitalsRecord {
   id: number;
   date: string;
-  facility: string;
-  doctor: string;
-  diagnosis: string;
-  status: 'completed' | 'pending';
-}
-
-interface HealthAlert {
-  id: number;
-  type: 'warning' | 'info' | 'danger';
-  message: string;
-  date: string;
+  systolicBP: number;
+  diastolicBP: number;
+  bloodSugar: number;
 }
 
 export default function PatientDashboard() {
@@ -56,55 +43,44 @@ export default function PatientDashboard() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   
-  // Mock data - will be replaced with API calls when backend is ready
-  const [stats, setStats] = useState<DashboardStats>({
-    totalVisits: 12,
-    activeMedications: 3,
-    chronicConditions: 1,
-    pendingAlerts: 2,
-  });
-
-  const [recentVisits, setRecentVisits] = useState<RecentVisit[]>([
+  // Mock data for vitals history
+  const [recentVitals, setRecentVitals] = useState<VitalsRecord[]>([
     {
       id: 1,
-      date: '2025-01-15',
-      facility: 'King Faisal Hospital',
-      doctor: 'Dr. Grace Mukamana',
-      diagnosis: 'Annual checkup - All clear',
-      status: 'completed',
+      date: '2025-10-15T08:30:00Z',
+      systolicBP: 135,
+      diastolicBP: 88,
+      bloodSugar: 6.2,
     },
     {
       id: 2,
-      date: '2025-01-10',
-      facility: 'Polyclinique du Plateau',
-      doctor: 'Dr. Jean-Paul Nsengimana',
-      diagnosis: 'Hypertension follow-up',
-      status: 'completed',
+      date: '2025-10-14T09:15:00Z',
+      systolicBP: 142,
+      diastolicBP: 90,
+      bloodSugar: 6.5,
     },
     {
       id: 3,
-      date: '2025-01-05',
-      facility: 'Legacy Clinics Kimironko',
-      doctor: 'Dr. Sarah Uwimana',
-      diagnosis: 'General consultation',
-      status: 'completed',
+      date: '2025-10-13T07:45:00Z',
+      systolicBP: 138,
+      diastolicBP: 85,
+      bloodSugar: 6.1,
     },
   ]);
 
-  const [healthAlerts, setHealthAlerts] = useState<HealthAlert[]>([
-    {
-      id: 1,
-      type: 'warning',
-      message: 'Blood pressure trending upward over last 3 visits. Schedule follow-up.',
-      date: '2025-01-18',
-    },
-    {
-      id: 2,
-      type: 'info',
-      message: 'Annual checkup due next month. Book appointment now.',
-      date: '2025-01-17',
-    },
-  ]);
+  // Vitals form state
+  const [vitalsForm, setVitalsForm] = useState({
+    systolicBP: '',
+    diastolicBP: '',
+    bloodSugar: '',
+  });
+
+  const handleVitalsSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // In a real app, this would send data to the backend API
+    alert('Vitals logged successfully. Your AI Kidney Risk Score will be updated shortly.');
+    setVitalsForm({ systolicBP: '', diastolicBP: '', bloodSugar: '' });
+  };
 
   // Check authentication on mount
   useEffect(() => {
@@ -115,15 +91,12 @@ export default function PatientDashboard() {
 
     const currentUser = getCurrentUser();
     if (currentUser?.user_type !== 'PATIENT') {
-      router.push('/en/provider/dashboard'); // Redirect if provider
+      router.push('/en/doctor/dashboard'); // Redirect if doctor
       return;
     }
 
     setUser(currentUser);
     setLoading(false);
-
-    // TODO: Fetch real data from API
-    // fetchDashboardData();
   }, [router]);
 
   if (loading) {
@@ -138,7 +111,7 @@ export default function PatientDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pb-12">
       {/* Header Section */}
       <section className="bg-gradient-to-r from-primary to-accent text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -148,7 +121,7 @@ export default function PatientDashboard() {
                 Welcome back, {user?.first_name}!
               </h1>
               <p className="text-white/90 text-lg">
-                Here's your health overview for today
+                Proactively monitoring your kidney health.
               </p>
             </div>
 
@@ -170,130 +143,130 @@ export default function PatientDashboard() {
       </section>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Total Visits */}
-          <Card className="hover:shadow-xl transition-shadow cursor-pointer group">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Total Visits</p>
-                <h3 className="text-3xl font-bold text-gray-900">{stats.totalVisits}</h3>
-                <p className="text-sm text-success mt-2 flex items-center gap-1">
-                  <TrendingUp size={16} />
-                  <span>This year</span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        
+        {/* Top Row: AI Score & Logging Form */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          
+          {/* AI Kidney Risk Score Card */}
+          <Card className="border-t-4 border-warning shadow-lg relative overflow-hidden group">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+              <Activity size={120} />
+            </div>
+            <div className="relative z-10">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <Activity className="text-warning" size={28} />
+                AI Kidney Risk Score
+              </h2>
+              
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <p className="text-gray-600 text-sm mb-1">Current Assessment</p>
+                  <h3 className="text-4xl font-extrabold text-warning tracking-tight">MEDIUM RISK</h3>
+                  <p className="text-sm font-medium text-gray-500 mt-2">Confidence: 53%</p>
+                </div>
+                
+                {/* Visual Indicator */}
+                <div className="w-24 h-24 rounded-full border-8 border-warning flex items-center justify-center bg-warning/10">
+                  <TrendingUp className="text-warning" size={32} />
+                </div>
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-4 mb-4">
+                <h4 className="font-semibold text-yellow-800 flex items-center gap-2 mb-2">
+                  <AlertCircle size={18} />
+                  Action Required
+                </h4>
+                <p className="text-sm text-yellow-700 leading-relaxed">
+                  Your recent blood pressure trends indicate a moderate risk for kidney function decline. Please maintain your prescribed medication and schedule a remote consultation with your nephrologist.
                 </p>
               </div>
-              <div className="p-3 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors">
-                <Activity size={24} className="text-primary" />
+
+              {/* Required Medical Disclaimer */}
+              <div className="bg-gray-100 rounded-lg p-3 border border-gray-200">
+                <p className="text-xs text-gray-500 italic leading-tight">
+                  <span className="font-semibold">Medical Disclaimer:</span> This AI-generated risk score is a screening tool based on the data you provided. It is NOT a clinical diagnosis. Always consult your registered healthcare provider before making any medical decisions.
+                </p>
               </div>
             </div>
           </Card>
 
-          {/* Active Medications */}
-          <Card className="hover:shadow-xl transition-shadow cursor-pointer group">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Active Medications</p>
-                <h3 className="text-3xl font-bold text-gray-900">{stats.activeMedications}</h3>
-                <p className="text-sm text-gray-500 mt-2">Currently taking</p>
-              </div>
-              <div className="p-3 bg-accent/10 rounded-xl group-hover:bg-accent/20 transition-colors">
-                <FileText size={24} className="text-accent" />
-              </div>
-            </div>
-          </Card>
+          {/* Log Vitals Form */}
+          <Card className="shadow-lg">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+              <HeartPulse className="text-primary" size={28} />
+              Log Your Vitals
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Enter your daily readings to update your AI predictive model.
+            </p>
 
-          {/* Chronic Conditions */}
-          <Card className="hover:shadow-xl transition-shadow cursor-pointer group">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-sm text-gray-600 mb-1">Chronic Conditions</p>
-                <h3 className="text-3xl font-bold text-gray-900">{stats.chronicConditions}</h3>
-                <p className="text-sm text-gray-500 mt-2">Being managed</p>
+            <form onSubmit={handleVitalsSubmit} className="space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="systolicBP" className="block text-sm font-medium text-gray-700 mb-2">
+                    Systolic BP (mmHg)
+                  </label>
+                  <input
+                    id="systolicBP"
+                    type="number"
+                    value={vitalsForm.systolicBP}
+                    onChange={(e) => setVitalsForm({ ...vitalsForm, systolicBP: e.target.value })}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                    placeholder="e.g. 120"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="diastolicBP" className="block text-sm font-medium text-gray-700 mb-2">
+                    Diastolic BP (mmHg)
+                  </label>
+                  <input
+                    id="diastolicBP"
+                    type="number"
+                    value={vitalsForm.diastolicBP}
+                    onChange={(e) => setVitalsForm({ ...vitalsForm, diastolicBP: e.target.value })}
+                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                    placeholder="e.g. 80"
+                    required
+                  />
+                </div>
               </div>
-              <div className="p-3 bg-warning/10 rounded-xl group-hover:bg-warning/20 transition-colors">
-                <AlertCircle size={24} className="text-warning" />
-              </div>
-            </div>
-          </Card>
 
-          {/* Pending Alerts */}
-          <Card className="hover:shadow-xl transition-shadow cursor-pointer group">
-            <div className="flex items-start justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Health Alerts</p>
-                <h3 className="text-3xl font-bold text-gray-900">{stats.pendingAlerts}</h3>
-                <p className="text-sm text-danger mt-2">Needs attention</p>
+                <label htmlFor="bloodSugar" className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+                  <Droplet size={16} className="text-red-500" />
+                  Fasting Blood Sugar (mmol/L)
+                </label>
+                <input
+                  id="bloodSugar"
+                  type="number"
+                  step="0.1"
+                  value={vitalsForm.bloodSugar}
+                  onChange={(e) => setVitalsForm({ ...vitalsForm, bloodSugar: e.target.value })}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                  placeholder="e.g. 5.5"
+                  required
+                />
               </div>
-              <div className="p-3 bg-danger/10 rounded-xl group-hover:bg-danger/20 transition-colors">
-                <Bell size={24} className="text-danger" />
-              </div>
-            </div>
+
+              <Button type="submit" variant="primary" fullWidth size="lg" className="mt-4">
+                Save Readings & Update Score
+              </Button>
+            </form>
           </Card>
         </div>
 
-        {/* Two Column Layout */}
+        {/* Bottom Row */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column - Recent Activity */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Health Alerts */}
-            {healthAlerts.length > 0 && (
-              <Card>
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-2">
-                    <Bell size={24} className="text-primary" />
-                    <h2 className="text-xl font-bold text-gray-900">Health Alerts</h2>
-                  </div>
-                  <Link href="/en/patient/records">
-                    <Button variant="outline" size="sm">
-                      View All
-                    </Button>
-                  </Link>
-                </div>
-
-                <div className="space-y-4">
-                  {healthAlerts.map((alert) => (
-                    <div
-                      key={alert.id}
-                      className={`p-4 rounded-lg border-l-4 ${
-                        alert.type === 'danger'
-                          ? 'bg-red-50 border-danger'
-                          : alert.type === 'warning'
-                          ? 'bg-yellow-50 border-warning'
-                          : 'bg-blue-50 border-primary'
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <AlertCircle
-                          size={20}
-                          className={
-                            alert.type === 'danger'
-                              ? 'text-danger'
-                              : alert.type === 'warning'
-                              ? 'text-warning'
-                              : 'text-primary'
-                          }
-                        />
-                        <div className="flex-1">
-                          <p className="text-gray-900 font-medium">{alert.message}</p>
-                          <p className="text-sm text-gray-600 mt-1">
-                            {new Date(alert.date).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </Card>
-            )}
-
-            {/* Recent Visits */}
+          
+          {/* Recent Vitals History */}
+          <div className="lg:col-span-2">
             <Card>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-2">
                   <Clock size={24} className="text-primary" />
-                  <h2 className="text-xl font-bold text-gray-900">Recent Visits</h2>
+                  <h2 className="text-xl font-bold text-gray-900">Recent Vitals History</h2>
                 </div>
                 <Link href="/en/patient/records">
                   <Button variant="outline" size="sm">
@@ -302,91 +275,79 @@ export default function PatientDashboard() {
                 </Link>
               </div>
 
-              <div className="space-y-4">
-                {recentVisits.map((visit) => (
-                  <div
-                    key={visit.id}
-                    className="p-4 border border-gray-200 rounded-lg hover:border-primary hover:shadow-md transition-all cursor-pointer"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <MapPin size={16} className="text-primary" />
-                          <h3 className="font-semibold text-gray-900">{visit.facility}</h3>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                          <User size={14} />
-                          <span>{visit.doctor}</span>
-                        </div>
-                        <p className="text-sm text-gray-700">{visit.diagnosis}</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-medium text-gray-900">
-                          {new Date(visit.date).toLocaleDateString('en-RW', {
-                            month: 'short',
-                            day: 'numeric',
-                          })}
-                        </p>
-                        <span
-                          className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium mt-2 ${
-                            visit.status === 'completed'
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}
-                        >
-                          <CheckCircle size={12} />
-                          {visit.status}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-gray-200 bg-gray-50">
+                      <th className="p-3 text-sm font-semibold text-gray-600 rounded-tl-lg">Date & Time</th>
+                      <th className="p-3 text-sm font-semibold text-gray-600">Blood Pressure</th>
+                      <th className="p-3 text-sm font-semibold text-gray-600 rounded-tr-lg">Blood Sugar</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {recentVitals.map((record) => (
+                      <tr key={record.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <td className="p-3">
+                          <p className="font-medium text-gray-900">
+                            {new Date(record.date).toLocaleDateString('en-RW', { month: 'short', day: 'numeric' })}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(record.date).toLocaleTimeString('en-RW', { hour: '2-digit', minute: '2-digit' })}
+                          </p>
+                        </td>
+                        <td className="p-3">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-sm font-medium ${
+                            record.systolicBP > 140 || record.diastolicBP > 90
+                              ? 'bg-red-100 text-red-800'
+                              : record.systolicBP > 130 || record.diastolicBP > 85
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-green-100 text-green-800'
+                          }`}>
+                            {record.systolicBP} / {record.diastolicBP} mmHg
+                          </span>
+                        </td>
+                        <td className="p-3 text-sm text-gray-700 font-medium">
+                          {record.bloodSugar} mmol/L
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </Card>
           </div>
 
-          {/* Right Column - Quick Actions */}
-          <div className="space-y-6">
-            {/* Quick Actions Card */}
-            <Card className="bg-gradient-to-br from-primary/5 to-accent/5">
+          {/* Quick Actions */}
+          <div>
+            <Card className="bg-gradient-to-br from-primary/5 to-accent/5 mb-6">
               <h2 className="text-xl font-bold text-gray-900 mb-6">Quick Actions</h2>
               
               <div className="space-y-3">
-                <Link href="/en/patient/qr-code">
+                <Link href="#">
                   <Button variant="primary" size="lg" fullWidth className="group justify-between">
                     <span className="flex items-center gap-2">
-                      <QrCode size={20} />
-                      My QR Code
+                      <User size={20} />
+                      Consult Nephrologist
                     </span>
                     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
 
-                <Link href="/en/patient/records">
-                  <Button variant="outline" size="lg" fullWidth className="group justify-between">
+                <Link href="/en/patient/qr-code">
+                  <Button variant="outline" size="lg" fullWidth className="group justify-between bg-white">
                     <span className="flex items-center gap-2">
-                      <FileText size={20} />
-                      Medical Records
+                      <QrCode size={20} />
+                      Share QR Health Record
                     </span>
                     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                   </Button>
                 </Link>
 
                 <Link href="/en/patient/payments">
-                  <Button variant="outline" size="lg" fullWidth className="group justify-between">
+                  <Button variant="outline" size="lg" fullWidth className="group justify-between bg-white">
                     <span className="flex items-center gap-2">
                       <CreditCard size={20} />
-                      Payment History
-                    </span>
-                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-
-                <Link href="/en/patient/profile">
-                  <Button variant="outline" size="lg" fullWidth className="group justify-between">
-                    <span className="flex items-center gap-2">
-                      <User size={20} />
-                      Edit Profile
+                      Mobile Money Payments
                     </span>
                     <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                   </Button>
@@ -394,48 +355,16 @@ export default function PatientDashboard() {
               </div>
             </Card>
 
-            {/* Profile Summary Card */}
             <Card>
-              <div className="text-center mb-4">
-                <div className="w-20 h-20 bg-gradient-to-br from-primary to-accent rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
-                  {user?.first_name?.charAt(0)}{user?.last_name?.charAt(0)}
-                </div>
-                <h3 className="font-bold text-lg text-gray-900">
-                  {user?.first_name} {user?.last_name}
-                </h3>
-                <p className="text-sm text-gray-600">{user?.email}</p>
-                <p className="text-sm text-gray-600">{user?.phone_number}</p>
-              </div>
-
-              <div className="pt-4 border-t border-gray-200">
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Member Since</span>
-                    <span className="font-medium text-gray-900">Jan 2025</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Patient ID</span>
-                    <span className="font-medium text-gray-900">HVR-{user?.id}</span>
-                  </div>
-                </div>
-              </div>
-            </Card>
-
-            {/* Health Tips Card */}
-            <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-l-4 border-primary">
-              <div className="flex items-start gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <Activity size={20} className="text-primary" />
-                </div>
-                <div>
-                  <h3 className="font-bold text-gray-900 mb-2">Health Tip of the Day</h3>
-                  <p className="text-sm text-gray-700">
-                    Drink at least 8 glasses of water daily. Proper hydration helps maintain healthy blood pressure and kidney function.
-                  </p>
-                </div>
+              <div className="text-center">
+                <p className="text-sm text-gray-500 mb-1">Patient ID</p>
+                <p className="font-mono font-bold text-lg text-gray-900 tracking-wider bg-gray-100 py-2 rounded-lg">
+                  NSR-{user?.id || '28471'}
+                </p>
               </div>
             </Card>
           </div>
+          
         </div>
       </div>
     </div>

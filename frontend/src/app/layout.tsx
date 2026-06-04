@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "HealthVault Rwanda - Your Health Records, Securely Connected",
-  description: "Access your complete medical history across all healthcare facilities in Rwanda.",
+  title: "NephroSasa Rwanda - Monitor Your Kidneys. Before It's Too Late.",
+  description: "Longitudinal, AI-powered pre-dialysis kidney health monitoring platform for Rwandan adults.",
   icons: {
     icon: [
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },

@@ -15,11 +15,11 @@ const Footer = () => {
           {/* Column 1: About */}
           <div>
             <h3 className="text-lg font-bold mb-4">
-              <span className="text-primary">Health</span>
-              <span className="text-accent">Vault</span> Rwanda
+              <span className="text-primary">Nephro</span>
+              <span className="text-accent">Sasa</span> Rwanda
             </h3>
             <p className="text-gray-400 text-sm">
-              Your health records, securely connected across all healthcare facilities in Rwanda.
+              Monitor Your Kidneys. Before It's Too Late.
             </p>
           </div>
 
@@ -50,13 +50,13 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Column 3: For Providers */}
+          {/* Column 3: For Doctors */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">For Providers</h4>
+            <h4 className="text-lg font-semibold mb-4">For Doctors</h4>
             <ul className="space-y-2">
               <li>
-                <Link href="/en/register/provider" className="text-gray-400 hover:text-accent transition-colors">
-                  Register Facility
+                <Link href="/en/register/doctor" className="text-gray-400 hover:text-accent transition-colors">
+                  Register as Doctor
                 </Link>
               </li>
               <li>
@@ -91,7 +91,7 @@ const Footer = () => {
               <li className="flex items-center space-x-2">
                 <Mail size={18} className="text-accent flex-shrink-0" />
                 <span className="text-gray-400 text-sm">
-                  info@healthvault.rw
+                  info@nephrosasa.rw
                 </span>
               </li>
             </ul>
@@ -101,7 +101,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
           <p className="text-gray-400 text-sm">
-            © {new Date().getFullYear()} HealthVault Rwanda. All rights reserved.
+            © {new Date().getFullYear()} NephroSasa Rwanda. All rights reserved.
           </p>
         </div>
       </div>

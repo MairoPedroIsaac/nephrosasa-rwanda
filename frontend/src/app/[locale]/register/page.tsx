@@ -14,10 +14,10 @@ export default function RegisterChoicePage() {
         <div className="text-center mb-10 md:mb-12">
          
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
-            Join HealthVault Rwanda
+            Join NephroSasa Rwanda
           </h1>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-            Select your account type to get started. Take control of healthcare in Rwanda.
+            Select your account type to get started. Monitor your kidney health proactively.
           </p>
         </div>
 
@@ -86,12 +86,12 @@ export default function RegisterChoicePage() {
               </div>
               
               <h2 className="text-xl md:text-2xl font-bold text-gray-900 mb-3 md:mb-4">
-                I'm a Healthcare Provider
+                I'm a Doctor / Nephrologist
               </h2>
               
               <p className="text-gray-600 mb-4 md:mb-6 text-sm md:text-base">
-                Register your clinic or hospital to access patient records, 
-                manage consultations, and process payments digitally.
+                Register your RMDC credentials to monitor patient kidney health, 
+                conduct remote consultations, and receive alerts.
               </p>
               
               <div className="space-y-3 md:space-y-4 mb-6 md:mb-8 text-left w-full">
@@ -117,20 +117,20 @@ export default function RegisterChoicePage() {
                 </div>
               </div>
               
-              <Link href="/en/register/provider" className="w-full">
+              <Link href="/en/register/doctor" className="w-full">
                 <Button 
                   variant="primary" 
                   size="lg" 
                   fullWidth 
                   className="group text-sm md:text-base"
                 >
-                  Register as Provider
+                  Register as Doctor
                   <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
                 </Button>
               </Link>
               
               <p className="mt-4 text-xs md:text-sm text-gray-500">
-                For clinics, hospitals & healthcare professionals
+                For registered doctors and nephrologists (RMDC required)
               </p>
             </div>
           </div>

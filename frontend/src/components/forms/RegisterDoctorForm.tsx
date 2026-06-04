@@ -6,7 +6,7 @@ import { register } from '@/lib/auth';
 import Input from '@/components/ui/Input';
 import Button from '@/components/ui/Button';
 
-const RegisterProviderForm = () => {
+const RegisterDoctorForm = () => {
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
@@ -32,7 +32,7 @@ const RegisterProviderForm = () => {
     setLoading(true);
     setError('');
 
-    const result = await register({ ...formData, user_type: 'PROVIDER' });
+    const result = await register({ ...formData, user_type: 'DOCTOR' });
 
     if (result.success) {
       router.push('/en/login?registered=true');
@@ -57,16 +57,16 @@ const RegisterProviderForm = () => {
       
       <Input label="Email" type="email" name="email" value={formData.email} onChange={handleChange} required />
       <Input label="Phone Number" name="phone_number" value={formData.phone_number} onChange={handleChange} required />
-      <Input label="License Number" name="license_number" value={formData.license_number} onChange={handleChange} required />
-      <Input label="Specialization" name="specialization" value={formData.specialization} onChange={handleChange} placeholder="e.g., General Practitioner" required />
+      <Input label="RMDC License Number" name="license_number" value={formData.license_number} onChange={handleChange} placeholder="e.g. RMDC/2024/XXXXX" required />
+      <Input label="Specialization" name="specialization" value={formData.specialization} onChange={handleChange} placeholder="e.g., Nephrologist" required />
       <Input label="Password" type="password" name="password" value={formData.password} onChange={handleChange} required />
       <Input label="Confirm Password" type="password" name="password_confirm" value={formData.password_confirm} onChange={handleChange} required />
 
       <Button type="submit" variant="primary" fullWidth disabled={loading}>
-        {loading ? 'Registering...' : 'Register as Provider'}
+        {loading ? 'Registering...' : 'Register as Doctor'}
       </Button>
     </form>
   );
 };
 
-export default RegisterProviderForm;
+export default RegisterDoctorForm;

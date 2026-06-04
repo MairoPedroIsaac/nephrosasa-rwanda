@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ArrowRight, QrCode, Shield, Check, Stethoscope, FileText, CreditCard } from 'lucide-react';
 
-export default function RegisterProviderPage() {
+export default function RegisterDoctorPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -37,7 +37,7 @@ export default function RegisterProviderPage() {
     // Submit logic here
     setTimeout(() => {
       setLoading(false);
-      router.push('/en/provider/dashboard');
+      router.push('/en/doctor/dashboard');
     }, 1500);
   };
 
@@ -57,7 +57,7 @@ export default function RegisterProviderPage() {
         <div className="absolute inset-0 z-0">
           <Image
             src="/images/registeration/registeration-image.jpg"
-            alt="Healthcare professional in Rwanda - HealthVault Rwanda"
+            alt="Healthcare professional in Rwanda - NephroSasa Rwanda"
             fill
             priority
             className="object-cover object-[center_25%]"
@@ -171,7 +171,7 @@ export default function RegisterProviderPage() {
             <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 mb-6">
               <div className="flex items-center gap-2">
                 <Stethoscope size={14} className="text-white" />
-                <span className="text-sm font-medium">Provider Registration</span>
+                <span className="text-sm font-medium">Doctor Registration</span>
               </div>
             </div>
 
@@ -200,7 +200,7 @@ export default function RegisterProviderPage() {
               <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full border border-white/30 mb-4">
                 <div className="flex items-center gap-2">
                   <Check size={14} className="text-white" />
-                  <span className="text-sm font-medium">Trusted by 200+ Providers</span>
+                  <span className="text-sm font-medium">Trusted by 200+ Doctors</span>
                 </div>
               </div>
             </div>
@@ -223,10 +223,10 @@ export default function RegisterProviderPage() {
               
               {/* Text Content */}
               <h2 className="text-3xl font-bold text-gray-900 mb-3">
-                Provider Registration
+                Doctor Registration
               </h2>
               <p className="text-gray-600 text-lg">
-                Create your Healthcare Provider account
+                Create your NephroSasa Doctor account
               </p>
             </div>
           </div>
@@ -234,10 +234,10 @@ export default function RegisterProviderPage() {
           {/* Desktop Header */}
           <div className="hidden lg:block mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Provider Registration
+              Doctor Registration
             </h2>
             <p className="text-gray-600 text-lg">
-              Create your Healthcare Provider account
+              Create your NephroSasa Doctor account
             </p>
           </div>
 
@@ -262,7 +262,7 @@ export default function RegisterProviderPage() {
           {/* Form Header */}
           <div className="mb-8">
             <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
-              {step === 1 && 'Create Healthcare Provider Account'}
+              {step === 1 && 'Create Doctor Account'}
               {step === 2 && 'Professional Information'}
               {step === 3 && 'Security & Terms'}
             </h3>
@@ -390,7 +390,7 @@ export default function RegisterProviderPage() {
 
                 <div>
                   <label htmlFor="licenseNumber" className="block text-sm font-medium text-gray-700 mb-2">
-                    Medical License Number *
+                    RMDC License Number *
                   </label>
                   <input
                     id="licenseNumber"
@@ -398,7 +398,7 @@ export default function RegisterProviderPage() {
                     value={formData.licenseNumber}
                     onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
-                    placeholder="RMC/2024/XXXXX"
+                    placeholder="RMDC/2024/XXXXX"
                     required
                   />
                 </div>

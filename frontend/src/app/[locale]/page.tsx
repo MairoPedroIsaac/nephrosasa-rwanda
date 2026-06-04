@@ -66,44 +66,44 @@ export default function HomePage() {
 
   const features = [
     {
-      icon: QrCode,
-      title: 'Instant QR Access',
-      description: 'One scan gives doctors your complete medical history instantly',
+      icon: FileText,
+      title: 'Longitudinal Vital Tracking',
+      description: 'Track your blood pressure and blood sugar readings across multiple clinic visits over time',
       color: 'from-blue-500 to-cyan-400',
       bgColor: 'bg-gradient-to-br from-blue-50 to-cyan-50'
     },
     {
-      icon: Smartphone,
-      title: 'Mobile Money Payments',
-      description: 'Seamless MTN & Airtel Money integration with instant receipts',
+      icon: Brain,
+      title: 'AI Kidney Risk Scoring',
+      description: 'Predictive Random Forest machine learning model analyzes your vital trajectory to detect silent kidney decline',
       color: 'from-emerald-500 to-green-400',
       bgColor: 'bg-gradient-to-br from-emerald-50 to-green-50'
     },
     {
-      icon: Brain,
-      title: 'AI Health Insights',
-      description: 'Predictive analytics that detect patterns for early intervention',
+      icon: Stethoscope,
+      title: 'Remote Nephrologist Consultation',
+      description: 'Connect directly with Kigali-based specialists without leaving your district when alerts trigger',
       color: 'from-violet-500 to-purple-400',
       bgColor: 'bg-gradient-to-br from-violet-50 to-purple-50'
     },
     {
-      icon: Shield,
-      title: 'Military-Grade Security',
-      description: '256-bit encryption with patient-controlled access permissions',
+      icon: QrCode,
+      title: 'QR Health Record Sharing',
+      description: 'Securely share your longitudinal health records with any doctor instantly via a QR scan',
       color: 'from-indigo-500 to-blue-400',
       bgColor: 'bg-gradient-to-br from-indigo-50 to-blue-50'
     },
     {
-      icon: FileText,
-      title: 'Digital Records',
-      description: 'Replace paper files with secure, accessible digital records',
+      icon: Smartphone,
+      title: 'Mobile Money Payments',
+      description: 'Pay for remote specialist consultations seamlessly using MTN Mobile Money or Airtel Money',
       color: 'from-amber-500 to-orange-400',
       bgColor: 'bg-gradient-to-br from-amber-50 to-orange-50'
     },
     {
-      icon: Users,
-      title: 'Provider Network',
-      description: 'Connected healthcare ecosystem across Rwanda',
+      icon: Clock,
+      title: 'SMS Reminders',
+      description: 'Automated 7-day and 14-day Africa\'s Talking SMS alerts ensure you never miss logging your vitals',
       color: 'from-rose-500 to-pink-400',
       bgColor: 'bg-gradient-to-br from-rose-50 to-pink-50'
     },
@@ -158,29 +158,28 @@ export default function HomePage() {
             </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-6 md:mb-8">
-              Your Health Records,
+              Monitor Your Kidneys.
               <span className="block mt-2 bg-gradient-to-r from-cyan-300 to-white bg-clip-text text-transparent">
-                Securely Connected
+                Before It's Too Late.
               </span>
             </h1>
             
             <p className="text-lg md:text-xl lg:text-2xl mb-8 md:mb-10 text-blue-100 max-w-3xl leading-relaxed">
-              Access your complete medical history across all healthcare facilities in Rwanda. 
-              One platform. Complete control. Better care outcomes.
+              Longitudinal, AI-powered pre-dialysis kidney health monitoring platform for Rwandan adults with hypertension or Type 2 diabetes.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-8 md:mb-12">
               <Link href="/en/register/patient">
                 <button className="group bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-8 py-4 rounded-xl font-semibold hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 flex items-center justify-center gap-3 hover:-translate-y-0.5 w-full sm:w-auto">
-                  <span>Get Started Free</span>
+                  <span>Register as Patient</span>
                   <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
                 </button>
               </Link>
               
-              <Link href="/en/register/provider">
+              <Link href="/en/register/doctor">
                 <button className="group bg-white/10 backdrop-blur-sm border border-white/30 text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto">
                   <Stethoscope size={20} />
-                  <span>Join as Provider</span>
+                  <span>Register as Doctor</span>
                 </button>
               </Link>
             </div>
@@ -239,7 +238,7 @@ export default function HomePage() {
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-full mb-6">
               <Award size={16} />
-              <span className="text-sm font-semibold">Why Choose HealthVault</span>
+              <span className="text-sm font-semibold">Why Choose NephroSasa</span>
             </div>
             <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
               Transform Healthcare Experience
@@ -501,25 +500,25 @@ export default function HomePage() {
          
           
           <h2 className="text-4xl lg:text-5xl font-bold text-white mb-8">
-            Ready to Transform Healthcare?
+            Ready to Monitor Your Kidney Health?
           </h2>
           
           <p className="text-xl text-blue-100 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Join thousands of Rwandans using HealthVault for fast, secure healthcare.
+            Join thousands of Rwandans using NephroSasa for proactive kidney monitoring.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
             <Link href="/en/register/patient">
               <button className="group bg-white/10 backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto">
-                <span>Start Free as Patient</span>
+                <span>Register as Patient</span>
                 <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
               </button>
             </Link>
             
-            <Link href="/en/register/provider">
+            <Link href="/en/register/doctor">
               <button className="group bg-white/10 backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto">
                 <Stethoscope size={20} />
-                <span>Register as Provider</span>
+                <span>Register as Doctor</span>
               </button>
             </Link>
           </div>

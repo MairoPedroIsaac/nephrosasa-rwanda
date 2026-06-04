@@ -10,7 +10,7 @@ export interface User {
   first_name: string;
   last_name: string;
   phone_number: string;
-  user_type: 'PATIENT' | 'PROVIDER' | 'ADMIN';
+  user_type: 'PATIENT' | 'DOCTOR' | 'ADMIN';
   date_of_birth?: string;
   national_id?: string;
   created_at: string;
@@ -26,8 +26,8 @@ export interface HealthFacility {
   email: string;
 }
 
-// Healthcare Provider
-export interface HealthcareProvider {
+// Doctor
+export interface Doctor {
   id: number;
   user: User;
   facility: HealthFacility;
@@ -40,7 +40,7 @@ export interface HealthcareProvider {
 export interface MedicalRecord {
   id: number;
   patient: User;
-  provider: HealthcareProvider;
+  doctor: Doctor;
   facility: HealthFacility;
   visit_date: string;
   chief_complaint: string;
@@ -51,7 +51,7 @@ export interface MedicalRecord {
   temperature?: number;
   weight?: number;
   medications_prescribed: Medication[];
-  provider_notes: string;
+  doctor_notes: string;
   created_at: string;
   updated_at: string;
 }
@@ -86,7 +86,7 @@ export interface ChronicCondition {
 export interface Payment {
   id: number;
   patient: User;
-  provider: HealthcareProvider;
+  doctor: Doctor;
   facility: HealthFacility;
   medical_record: number; // ID
   amount: number;
@@ -109,7 +109,7 @@ export interface HealthAlert {
   message: string;
   alert_data: any; // JSON data
   created_at: string;
-  acknowledged_by?: HealthcareProvider;
+  acknowledged_by?: Doctor;
   acknowledged_at?: string;
   dismissed: boolean;
 }
@@ -127,7 +127,7 @@ export interface QRCode {
 export interface AccessLog {
   id: number;
   patient: User;
-  provider: HealthcareProvider;
+  doctor: Doctor;
   facility: HealthFacility;
   accessed_at: string;
   access_granted: boolean;
@@ -144,8 +144,8 @@ export interface PatientDashboardStats {
   next_appointment?: string;
 }
 
-// Dashboard Stats (Provider)
-export interface ProviderDashboardStats {
+// Dashboard Stats (Doctor)
+export interface DoctorDashboardStats {
   patients_today: number;
   total_patients: number;
   pending_payments: number;
