@@ -53,6 +53,8 @@ python predict.py
 ## Designs
 Screenshots of the application interface, including the Patient Dashboard and responsive UI layouts, are included in the `docs/designs` folder of this repository.
 
+Figma Design File: [View on Figma](https://www.figma.com/design/iKcVvwWrGPdiyWzr15ZgjT/NephroSasa-Rwanda---UI-Designs?node-id=0-1&t=bQ32MVYbJ755FLuC-1)
+
 ## Deployment Plan
 - **Frontend:** The Next.js frontend is deployed on **Vercel** with continuous 
 deployment from GitHub. Live at: https://nephrosasa-rwanda.vercel.app/en

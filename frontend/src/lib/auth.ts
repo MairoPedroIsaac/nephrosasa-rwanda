@@ -42,9 +42,9 @@ export interface User {
  */
 export const login = async (credentials: LoginCredentials) => {
   // MOCK LOGIN FOR VIDEO DEMO
-  if (credentials.email === 'demo@gmail.com') {
+  if (credentials.email === 'demo@gmail.com' || credentials.email === 'i.pedro@alustudent.com' || credentials.email === 'mairopedroisaac@gmail.com') {
     const mockUser: User = {
-      id: 1, email: 'demo@gmail.com', first_name: 'John', last_name: 'Doe', phone_number: '+250781234567', user_type: 'PATIENT'
+      id: 1, email: credentials.email, first_name: 'Isaac', last_name: 'Pedro', phone_number: '+250781234567', user_type: 'PATIENT'
     };
     localStorage.setItem('access_token', 'mock_token');
     localStorage.setItem('refresh_token', 'mock_refresh');
