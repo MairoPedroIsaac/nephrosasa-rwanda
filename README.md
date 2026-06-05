@@ -62,4 +62,4 @@ deployment from GitHub. Live at: https://nephrosasa-rwanda.vercel.app/en
 - **Database:** A managed PostgreSQL database on **Supabase** will be used to store patient vitals, doctor records, and authentication data.
 
 ## Video Demo
-[Insert Link to your 5-10 minute YouTube/Loom Video Demo here]
+[Watch Demo on YouTube](https://youtu.be/Em5bUPgy950)
