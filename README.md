@@ -12,20 +12,20 @@ NephroSasa Rwanda is a longitudinal, AI-powered, pre-dialysis kidney health moni
 - 📑 **QR Health Records:** Easy scanning for interoperability at local clinics.
 
 ## GitHub Repository
-[Insert Link to your GitHub Repo here]
+https://github.com/MairoPedroIsaac/nephrosasa-rwanda
 
 ## How to Set Up the Environment and the Project
 
 ### Prerequisites
 - Node.js (v18 or higher)
 - npm or yarn
-- Python 3.9+ (For the AI backend/model)
+- Python 3.9+
 
 ### Installation Steps
 
 **1. Clone the repository**
 ```bash
-git clone https://github.com/yourusername/nephrosasa-rwanda.git
+git clone https://github.com/MairoPedroIsaac/nephrosasa-rwanda.git
 cd nephrosasa-rwanda
 ```
 
@@ -51,13 +51,12 @@ python predict.py
 ```
 
 ## Designs
-*Note to reviewer: Screenshots of the application interface, including the Patient Dashboard and responsive UI layouts, are included in the `docs/designs` folder of this repository.*
-- [Insert Link/Image to Figma Mockups here]
-- [Insert Link/Image to Dashboard Screenshot here]
+Screenshots of the application interface, including the Patient Dashboard and responsive UI layouts, are included in the `docs/designs` folder of this repository.
 
 ## Deployment Plan
-- **Frontend:** The Next.js frontend will be deployed on **Vercel**, enabling continuous integration and deployment directly from the GitHub repository. It will be hosted under the `nephrosasa.rw` domain.
-- **Backend/AI Model:** The Python backend and Random Forest model (`nephrosasa_model.pkl`) will be wrapped in a FastAPI or Flask application and deployed on **Render** or **Heroku** as a microservice.
+- **Frontend:** The Next.js frontend is deployed on **Vercel** with continuous 
+deployment from GitHub. Live at: https://nephrosasa-rwanda.vercel.app/en
+- **Backend/AI Model:** The Python backend and Random Forest model (`nephrosasa_model.pkl`) will be wrapped in a Django REST Framework, then deployed on **Render** as a backend microservice.
 - **Database:** A managed PostgreSQL database on **Supabase** will be used to store patient vitals, doctor records, and authentication data.
 
 ## Video Demo

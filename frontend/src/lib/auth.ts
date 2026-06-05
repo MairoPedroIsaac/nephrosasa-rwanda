@@ -41,6 +41,26 @@ export interface User {
  * Sends credentials to backend, stores tokens
  */
 export const login = async (credentials: LoginCredentials) => {
+  // MOCK LOGIN FOR VIDEO DEMO
+  if (credentials.email === 'demo@gmail.com') {
+    const mockUser: User = {
+      id: 1, email: 'demo@gmail.com', first_name: 'John', last_name: 'Doe', phone_number: '+250781234567', user_type: 'PATIENT'
+    };
+    localStorage.setItem('access_token', 'mock_token');
+    localStorage.setItem('refresh_token', 'mock_refresh');
+    localStorage.setItem('user', JSON.stringify(mockUser));
+    return { success: true, user: mockUser };
+  }
+  if (credentials.email === 'doctor@gmail.com') {
+    const mockUser: User = {
+      id: 2, email: 'doctor@gmail.com', first_name: 'Jane', last_name: 'Smith', phone_number: '+250781234568', user_type: 'DOCTOR'
+    };
+    localStorage.setItem('access_token', 'mock_token');
+    localStorage.setItem('refresh_token', 'mock_refresh');
+    localStorage.setItem('user', JSON.stringify(mockUser));
+    return { success: true, user: mockUser };
+  }
+
   try {
     const response = await apiClient.post('/auth/login/', credentials);
     
@@ -67,6 +87,9 @@ export const login = async (credentials: LoginCredentials) => {
  * Creates new user account
  */
 export const register = async (data: RegisterData) => {
+  // MOCK REGISTER FOR VIDEO DEMO
+  return { success: true, data: { ...data, id: Math.floor(Math.random() * 1000) } };
+
   try {
     const response = await apiClient.post('/auth/register/', data);
     
