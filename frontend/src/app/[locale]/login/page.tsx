@@ -25,7 +25,11 @@ export default function LoginPage() {
     const result = await login(formData);
 
     if (result.success) {
-      router.push('/en/dashboard');
+      if (result.user?.user_type === 'DOCTOR') {
+        router.push('/en/doctor/dashboard');
+      } else {
+        router.push('/en/patient/dashboard');
+      }
     } else {
       setError(result.error || 'Login failed. Please check your credentials.');
     }
