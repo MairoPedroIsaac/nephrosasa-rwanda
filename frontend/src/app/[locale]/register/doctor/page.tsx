@@ -64,8 +64,7 @@ export default function RegisterDoctorPage() {
             quality={100}
             sizes="55vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/50 to-transparent"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+          <div className="absolute inset-0 bg-black/40 z-0"></div>
         </div>
         
         {/* Content Overlay */}

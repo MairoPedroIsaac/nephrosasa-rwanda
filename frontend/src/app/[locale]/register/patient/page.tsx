@@ -31,15 +31,34 @@ export default function PatientRegistrationPage() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // Submit logic here
-    setTimeout(() => {
-      setLoading(false);
-      router.push('/en/patient/dashboard');
-    }, 1500);
+    setError('');
+    
+    // Import register function dynamically to avoid circular dependencies if any
+    const { register } = await import('@/lib/auth');
+    
+    const result = await register({
+      email: formData.email,
+      password: 'DefaultPassword123!', // Since the UI doesn't have a password field yet, we use a default or should add one
+      password_confirm: 'DefaultPassword123!',
+      first_name: formData.firstName,
+      last_name: formData.lastName,
+      phone_number: formData.phone,
+      user_type: 'PATIENT',
+      national_id: formData.nationalId,
+      date_of_birth: formData.dateOfBirth
+    });
+
+    if (result.success) {
+      router.push('/en/login?registered=true');
+    } else {
+      setError(result.error || 'Registration failed');
+    }
+    setLoading(false);
   };
 
   const handleNext = () => {
@@ -65,8 +84,7 @@ export default function PatientRegistrationPage() {
             quality={100}
             sizes="55vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/70 via-primary/50 to-transparent"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+          <div className="absolute inset-0 bg-black/40 z-0"></div>
         </div>
         
         {/* Content Overlay */}
@@ -284,6 +302,24 @@ export default function PatientRegistrationPage() {
               {step === 3 && 'Set up emergency contact and accept terms'}
             </p>
           </div>
+
+          {/* Error Handler */}
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm mb-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-red-800">
+                    {error}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-6">

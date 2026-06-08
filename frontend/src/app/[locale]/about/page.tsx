@@ -99,7 +99,7 @@ export default function AboutPage() {
             priority
           />
         </div>
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/60 to-primary-dark/50 z-0"></div>
+        <div className="absolute inset-0 bg-black/40 z-0"></div>
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex items-center">
           <div className="max-w-3xl text-white">
             <h1 className="text-5xl lg:text-6xl font-bold mb-6">

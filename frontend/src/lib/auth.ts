@@ -41,29 +41,14 @@ export interface User {
  * Sends credentials to backend, stores tokens
  */
 export const login = async (credentials: LoginCredentials) => {
-  // MOCK LOGIN FOR VIDEO DEMO
-  if (credentials.email === 'demo@gmail.com' || credentials.email === 'i.pedro@alustudent.com' || credentials.email === 'mairopedroisaac@gmail.com') {
-    const mockUser: User = {
-      id: 1, email: credentials.email, first_name: 'Isaac', last_name: 'Pedro', phone_number: '+250781234567', user_type: 'PATIENT'
-    };
-    localStorage.setItem('access_token', 'mock_token');
-    localStorage.setItem('refresh_token', 'mock_refresh');
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    return { success: true, user: mockUser };
-  }
-  if (credentials.email === 'doctor@gmail.com') {
-    const mockUser: User = {
-      id: 2, email: 'doctor@gmail.com', first_name: 'Jane', last_name: 'Smith', phone_number: '+250781234568', user_type: 'DOCTOR'
-    };
-    localStorage.setItem('access_token', 'mock_token');
-    localStorage.setItem('refresh_token', 'mock_refresh');
-    localStorage.setItem('user', JSON.stringify(mockUser));
-    return { success: true, user: mockUser };
-  }
-
   try {
-    const response = await apiClient.post('/auth/login/', credentials);
+    const payload = {
+      username: credentials.email,
+      password: credentials.password
+    };
+    const response = await apiClient.post('/auth/login/', payload);
     
+    // The CustomTokenObtainPairView returns access, refresh, and user
     const { access, refresh, user } = response.data;
     
     // Store tokens in localStorage
@@ -75,9 +60,10 @@ export const login = async (credentials: LoginCredentials) => {
     
     return { success: true, user };
   } catch (error: any) {
+    const errorMsg = error.response?.data?.detail || error.response?.data?.message || 'Invalid email or password. Please try again.';
     return {
       success: false,
-      error: error.response?.data?.message || 'Login failed. Please try again.',
+      error: errorMsg,
     };
   }
 };
@@ -87,17 +73,27 @@ export const login = async (credentials: LoginCredentials) => {
  * Creates new user account
  */
 export const register = async (data: RegisterData) => {
-  // MOCK REGISTER FOR VIDEO DEMO
-  return { success: true, data: { ...data, id: Math.floor(Math.random() * 1000) } };
-
   try {
     const response = await apiClient.post('/auth/register/', data);
     
     return { success: true, data: response.data };
   } catch (error: any) {
+    let errorMsg = 'Registration failed. Please try again.';
+    
+    if (error.response?.data?.errors) {
+      // Extract the first error message from the object
+      const errors = error.response.data.errors;
+      const firstKey = Object.keys(errors)[0];
+      if (firstKey) {
+        errorMsg = `${firstKey}: ${errors[firstKey][0] || errors[firstKey]}`;
+      }
+    } else if (error.response?.data?.message) {
+      errorMsg = error.response.data.message;
+    }
+    
     return {
       success: false,
-      error: error.response?.data?.message || 'Registration failed. Please try again.',
+      error: errorMsg,
     };
   }
 };

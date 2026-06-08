@@ -53,6 +53,33 @@ const Navbar = () => {
     if (['en', 'rw', 'fr'].includes(locale)) {
       setCurrentLocale(locale);
     }
+    
+    // Add Google Translate Script
+    const addGoogleTranslateScript = () => {
+      if (document.getElementById('google-translate-script')) return;
+      
+      // @ts-ignore
+      window.googleTranslateElementInit = () => {
+        // @ts-ignore
+        if (window.google && window.google.translate) {
+          // @ts-ignore
+          new window.google.translate.TranslateElement({
+            pageLanguage: 'en',
+            includedLanguages: 'en,rw,fr',
+            layout: 1, // InlineLayout.SIMPLE
+            autoDisplay: false
+          }, 'google_translate_element');
+        }
+      };
+
+      const script = document.createElement('script');
+      script.id = 'google-translate-script';
+      script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+      script.async = true;
+      document.body.appendChild(script);
+    };
+
+    addGoogleTranslateScript();
   }, [pathname]);
 
   // Toggle mobile menu
@@ -65,11 +92,25 @@ const Navbar = () => {
     logout();
   };
 
-  // Language switcher
+  // Custom Language switcher via Google Translate
   const switchLanguage = (locale: string) => {
-    const newPathname = pathname.replace(/^\/(en|rw|fr)/, `/${locale}`);
-    router.push(newPathname);
     setCurrentLocale(locale);
+    
+    // Map our locale codes to Google Translate codes
+    const gtLocaleMap: Record<string, string> = {
+      'en': 'en',
+      'rw': 'rw',
+      'fr': 'fr'
+    };
+    
+    const targetLang = gtLocaleMap[locale];
+    
+    // Find the hidden Google Translate select element and trigger a change
+    const selectElement = document.querySelector('.goog-te-combo') as HTMLSelectElement;
+    if (selectElement) {
+      selectElement.value = targetLang;
+      selectElement.dispatchEvent(new Event('change'));
+    }
   };
 
   // Navigation links
@@ -81,6 +122,9 @@ const Navbar = () => {
 
   return (
     <nav className="bg-white dark:bg-gray-900 shadow-md sticky top-0 z-50 transition-colors duration-200">
+      {/* Hidden Google Translate container */}
+      <div id="google_translate_element" className="hidden"></div>
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo - Theme Aware */}
@@ -107,8 +151,8 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {/* Nav Links */}
-            {navLinks.map((link) => (
+            {/* Nav Links (Hidden on Dashboard) */}
+            {!pathname.includes('/dashboard') && navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
@@ -120,7 +164,7 @@ const Navbar = () => {
               </Link>
             ))}
 
-            {/* Language Switcher */}
+            {/* Custom Language Switcher */}
             <div className="relative group">
               <button className="flex items-center space-x-1 text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary">
                 <Globe size={20} />
@@ -128,24 +172,27 @@ const Navbar = () => {
               </button>
               
               {/* Dropdown */}
-              <div className="absolute right-0 mt-2 w-32 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+              <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden border border-gray-100 dark:border-gray-700">
                 <button
                   onClick={() => switchLanguage('en')}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-t-lg"
+                  className="flex items-center space-x-3 w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  English
+                  <img src="https://flagcdn.com/w20/gb.png" srcSet="https://flagcdn.com/w40/gb.png 2x" width="20" alt="English Flag" className="rounded-sm shadow-sm" />
+                  <span className="font-medium text-sm">English</span>
                 </button>
                 <button
                   onClick={() => switchLanguage('rw')}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-100"
+                  className="flex items-center space-x-3 w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  Kinyarwanda
+                  <img src="https://flagcdn.com/w20/rw.png" srcSet="https://flagcdn.com/w40/rw.png 2x" width="20" alt="Rwanda Flag" className="rounded-sm shadow-sm" />
+                  <span className="font-medium text-sm">Kinyarwanda</span>
                 </button>
                 <button
                   onClick={() => switchLanguage('fr')}
-                  className="block w-full text-left px-4 py-2 hover:bg-gray-100 rounded-b-lg"
+                  className="flex items-center space-x-3 w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors border-t-0"
                 >
-                  Français
+                  <img src="https://flagcdn.com/w20/fr.png" srcSet="https://flagcdn.com/w40/fr.png 2x" width="20" alt="France Flag" className="rounded-sm shadow-sm" />
+                  <span className="font-medium text-sm">Français</span>
                 </button>
               </div>
             </div>
@@ -160,18 +207,21 @@ const Navbar = () => {
             </button>
 
             {/* Auth Buttons */}
-            {isLoggedIn ? (
+            {isLoggedIn && (
               <div className="flex items-center space-x-4">
-                <Link href={`/${currentLocale}/dashboard`}>
-                  <Button variant="outline" size="sm">
-                    Dashboard
-                  </Button>
-                </Link>
+                {!pathname.includes('/dashboard') && (
+                  <Link href={`/${currentLocale}/dashboard`}>
+                    <Button variant="outline" size="sm">
+                      Dashboard
+                    </Button>
+                  </Link>
+                )}
                 <Button variant="primary" size="sm" onClick={handleLogout}>
                   Logout
                 </Button>
               </div>
-            ) : (
+            )}
+            {!isLoggedIn && (
               <div className="flex items-center space-x-4">
                 <Link href={`/${currentLocale}/login`}>
                   <Button variant="outline" size="sm">
@@ -207,75 +257,68 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="block py-2 text-gray-700 hover:text-primary"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-            
+          <div className="md:hidden py-4 border-t border-gray-100 dark:border-gray-800 space-y-4">
+            {!pathname.includes('/dashboard') && (
+              <div className="flex flex-col space-y-3 px-2">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="text-gray-700 dark:text-gray-200 font-medium px-2 py-1"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+
             {/* Mobile Language Switcher */}
-            <div className="py-2 border-t border-gray-200 mt-2">
-              <p className="text-sm text-gray-600 mb-2">Language</p>
+            <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-800">
+              <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">Language</p>
               <div className="flex space-x-2">
-                <button
-                  onClick={() => switchLanguage('en')}
-                  className={`px-3 py-1 rounded ${
-                    currentLocale === 'en' ? 'bg-primary text-white' : 'bg-gray-200'
-                  }`}
-                >
-                  EN
+                <button onClick={() => { switchLanguage('en'); setIsMenuOpen(false); }} className={`px-3 py-1.5 text-sm rounded-lg border flex items-center gap-2 ${currentLocale === 'en' ? 'bg-primary text-white border-primary' : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200'}`}>
+                  <img src="https://flagcdn.com/w20/gb.png" srcSet="https://flagcdn.com/w40/gb.png 2x" width="16" alt="EN" className="rounded-sm" /> EN
                 </button>
-                <button
-                  onClick={() => switchLanguage('rw')}
-                  className={`px-3 py-1 rounded ${
-                    currentLocale === 'rw' ? 'bg-primary text-white' : 'bg-gray-200'
-                  }`}
-                >
-                  RW
+                <button onClick={() => { switchLanguage('rw'); setIsMenuOpen(false); }} className={`px-3 py-1.5 text-sm rounded-lg border flex items-center gap-2 ${currentLocale === 'rw' ? 'bg-primary text-white border-primary' : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200'}`}>
+                  <img src="https://flagcdn.com/w20/rw.png" srcSet="https://flagcdn.com/w40/rw.png 2x" width="16" alt="RW" className="rounded-sm" /> RW
                 </button>
-                <button
-                  onClick={() => switchLanguage('fr')}
-                  className={`px-3 py-1 rounded ${
-                    currentLocale === 'fr' ? 'bg-primary text-white' : 'bg-gray-200'
-                  }`}
-                >
-                  FR
+                <button onClick={() => { switchLanguage('fr'); setIsMenuOpen(false); }} className={`px-3 py-1.5 text-sm rounded-lg border flex items-center gap-2 ${currentLocale === 'fr' ? 'bg-primary text-white border-primary' : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200'}`}>
+                  <img src="https://flagcdn.com/w20/fr.png" srcSet="https://flagcdn.com/w40/fr.png 2x" width="16" alt="FR" className="rounded-sm" /> FR
                 </button>
               </div>
             </div>
 
             {/* Mobile Auth Buttons */}
-            {isLoggedIn ? (
-              <div className="mt-4 space-y-2">
-                <Link href={`/${currentLocale}/dashboard`}>
-                  <Button variant="outline" size="sm" fullWidth>
-                    Dashboard
+            <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-800 flex flex-col space-y-3">
+              {isLoggedIn ? (
+                <>
+                  {!pathname.includes('/dashboard') && (
+                    <Link href={`/${currentLocale}/dashboard`} onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="outline" fullWidth>
+                        Dashboard
+                      </Button>
+                    </Link>
+                  )}
+                  <Button variant="primary" fullWidth onClick={() => { handleLogout(); setIsMenuOpen(false); }}>
+                    Logout
                   </Button>
-                </Link>
-                <Button variant="primary" size="sm" fullWidth onClick={handleLogout}>
-                  Logout
-                </Button>
-              </div>
-            ) : (
-              <div className="mt-4 space-y-2">
-                <Link href={`/${currentLocale}/login`}>
-                  <Button variant="outline" size="sm" fullWidth>
-                    Login
-                  </Button>
-                </Link>
-                <Link href={`/${currentLocale}/register`}>
-                  <Button variant="primary" size="sm" fullWidth>
-                    Register
-                  </Button>
-                </Link>
-              </div>
-            )}
+                </>
+              ) : (
+                <>
+                  <Link href={`/${currentLocale}/login`} onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" fullWidth>
+                      Login
+                    </Button>
+                  </Link>
+                  <Link href={`/${currentLocale}/register`} onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="primary" fullWidth>
+                      Register
+                    </Button>
+                  </Link>
+                </>
+              )}
+            </div>
           </div>
         )}
       </div>

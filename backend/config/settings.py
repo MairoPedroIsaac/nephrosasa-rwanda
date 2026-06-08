@@ -121,8 +121,8 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Custom user model (we'll create this)
-# AUTH_USER_MODEL = 'api.User'  # We'll add this later when we create the User model
+# Custom user model
+AUTH_USER_MODEL = 'api.CustomUser'
 
 
 # REST Framework settings
@@ -146,6 +146,11 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
+
+AUTHENTICATION_BACKENDS = [
+    'api.backends.EmailOrUsernameModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 
 # CORS settings - allows frontend to access backend

@@ -112,23 +112,27 @@ export default function PatientDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50 pb-12">
-      {/* Header Section */}
-      <section className="bg-gradient-to-r from-primary to-accent text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+      {/* Modernized Floating Header Section */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
+        <div className="bg-gradient-to-br from-primary via-primary-dark to-accent text-white rounded-3xl p-8 shadow-2xl shadow-primary/20 relative overflow-hidden">
+          {/* Decorative glass elements */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent opacity-20 rounded-full blur-2xl translate-y-1/3 -translate-x-1/4"></div>
+
+          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">
+              <h1 className="text-3xl md:text-4xl font-bold mb-2 tracking-tight">
                 Welcome back, {user?.first_name}!
               </h1>
-              <p className="text-white/90 text-lg">
+              <p className="text-white/90 text-lg font-medium">
                 Proactively monitoring your kidney health.
               </p>
             </div>
 
-            <div className="mt-4 md:mt-0">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-4 py-3 border border-white/20">
-                <div className="flex items-center gap-2 text-sm">
-                  <Calendar size={18} />
+            <div className="mt-6 md:mt-0">
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-4 border border-white/20 shadow-inner">
+                <div className="flex items-center gap-3 font-medium">
+                  <Calendar size={20} className="text-accent-light" />
                   <span>{new Date().toLocaleDateString('en-RW', { 
                     weekday: 'long', 
                     year: 'numeric', 

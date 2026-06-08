@@ -1,9 +1,44 @@
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from .models import VitalLog, PatientProfile
+from rest_framework import status
+from .models import VitalLog, PatientProfile, CustomUser
+from .serializers import RegisterSerializer, UserSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 import joblib
 import os
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+        # Add user data to the response
+        user_serializer = UserSerializer(self.user)
+        data['user'] = user_serializer.data
+        return data
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def register_user(request):
+    serializer = RegisterSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        # Return tokens and user data upon successful registration
+        refresh = CustomTokenObtainPairSerializer.get_token(user)
+        return Response({
+            'success': True,
+            'user': UserSerializer(user).data,
+            'access': str(refresh.access_token),
+            'refresh': str(refresh)
+        }, status=status.HTTP_201_CREATED)
+    return Response({
+        'success': False,
+        'message': 'Registration failed',
+        'errors': serializer.errors
+    }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 # @permission_classes([IsAuthenticated]) # Disabled for testing/demo purposes

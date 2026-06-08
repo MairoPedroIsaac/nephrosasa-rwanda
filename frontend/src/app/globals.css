@@ -5,15 +5,15 @@
 
 /* Global CSS variables (from your brand colors) */
 :root {
-  /* Primary Colors */
-  --primary-blue: #2563EB;
-  --primary-blue-light: #3B82F6;
-  --primary-blue-dark: #1E40AF;
+  /* Primary Colors (Nephro Azure) */
+  --primary-blue: #3B82F6;
+  --primary-blue-light: #60A5FA;
+  --primary-blue-dark: #2563EB;
   
-  /* Accent Colors */
-  --accent-teal: #06B6D4;
-  --accent-teal-light: #22D3EE;
-  --accent-teal-dark: #0891B2;
+  /* Accent Colors (Soft Mint) */
+  --accent-teal: #34D399;
+  --accent-teal-light: #6EE7B7;
+  --accent-teal-dark: #10B981;
   
   /* Status Colors */
   --success: #10B981;
@@ -27,9 +27,16 @@
   --border: #E5E7EB;
 }
 
-/* Dark mode (optional - for future) */
+/* Dark mode (Supports the class toggle and system preference) */
+.dark {
+  --background: #111827;
+  --foreground: #F9FAFB;
+  --card-bg: #1F2937;
+  --border: #374151;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not(.light) {
     --background: #111827;
     --foreground: #F9FAFB;
     --card-bg: #1F2937;
@@ -85,4 +92,23 @@ html {
   .alert-danger {
     @apply bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg;
   }
+}
+
+/* Google Translate Overrides */
+body {
+  top: 0 !important;
+}
+
+.skiptranslate iframe {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+#goog-gt-tt, .goog-te-balloon-frame {
+  display: none !important;
+}
+
+.goog-text-highlight {
+  background-color: transparent !important;
+  box-shadow: none !important;
 }

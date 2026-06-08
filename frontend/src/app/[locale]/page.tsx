@@ -147,8 +147,8 @@ export default function HomePage() {
           />
         </div>
         
-        {/* Gradient Blue Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/60 to-primary-dark/50 z-0"></div>
+        {/* Dark Overlay for text readability (no blue tint) */}
+        <div className="absolute inset-0 bg-black/40 z-0"></div>
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 flex items-center min-h-[600px] md:min-h-[700px]">
           <div className="max-w-4xl text-white">
@@ -487,14 +487,17 @@ export default function HomePage() {
                 className="object-cover rounded-3xl"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-blue-900/50 to-transparent rounded-3xl" />
+              <div className="absolute inset-0 bg-black/20 rounded-3xl" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Enhanced CTA Section - FIXED image to show full face */}
-       <section className="relative py-20 overflow-hidden" style={{background: 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 50%, #1d4ed8 100%)'}}>
+      {/* Enhanced CTA Section - Nephro Azure Theme */}
+       <section className="relative py-24 overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-primary">
+        {/* Modern decorative glassmorphism elements */}
+        <div className="absolute top-0 left-0 w-64 h-64 bg-accent opacity-20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl translate-x-1/4 translate-y-1/4"></div>
         
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center h-full flex flex-col justify-center items-center">
          

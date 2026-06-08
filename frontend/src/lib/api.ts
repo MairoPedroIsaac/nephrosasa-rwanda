@@ -42,7 +42,9 @@ apiClient.interceptors.response.use(
     const originalRequest = error.config;
     
     // If error is 401 (Unauthorized) and we haven't tried to refresh yet
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    const isAuthRoute = originalRequest.url?.includes('/auth/login') || originalRequest.url?.includes('/auth/register');
+    
+    if (error.response?.status === 401 && !originalRequest._retry && !isAuthRoute) {
       originalRequest._retry = true;
       
       try {
