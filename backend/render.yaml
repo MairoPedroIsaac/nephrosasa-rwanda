@@ -1,7 +1,7 @@
 databases:
   - name: nephrosasa-db
-    databaseName: postgres
-    user: postgres
+    databaseName: nephrosasa
+    user: nephrosasa_user
     plan: free
 
 services:
