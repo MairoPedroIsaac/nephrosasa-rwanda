@@ -1,109 +1,126 @@
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.response import Response
-from rest_framework import status
-from .models import VitalLog, PatientProfile, CustomUser
-from .serializers import RegisterSerializer, UserSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-import joblib
 import os
+import joblib
+import pandas as pd
+import resend
+from django.conf import settings
+from rest_framework import status, views
+from rest_framework.response import Response
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from .models import PatientProfile, VitalLog
+from .serializers import UserSerializer, PatientProfileSerializer, VitalLogSerializer
+from django.contrib.auth import get_user_model
 
-class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    def validate(self, attrs):
-        data = super().validate(attrs)
-        # Add user data to the response
-        user_serializer = UserSerializer(self.user)
-        data['user'] = user_serializer.data
-        return data
+User = get_user_model()
 
-class CustomTokenObtainPairView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
+# Configure Resend
+resend.api_key = settings.RESEND_API_KEY
 
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def register_user(request):
-    serializer = RegisterSerializer(data=request.data)
-    if serializer.is_valid():
-        user = serializer.save()
-        # Return tokens and user data upon successful registration
-        refresh = CustomTokenObtainPairSerializer.get_token(user)
-        return Response({
-            'success': True,
-            'user': UserSerializer(user).data,
-            'access': str(refresh.access_token),
-            'refresh': str(refresh)
-        }, status=status.HTTP_201_CREATED)
-    return Response({
-        'success': False,
-        'message': 'Registration failed',
-        'errors': serializer.errors
-    }, status=status.HTTP_400_BAD_REQUEST)
+# Load ML Models
+MODEL_PATH = os.path.join(settings.BASE_DIR, 'api', 'ml_models', 'nephrosasa_model.pkl')
+SCALER_PATH = os.path.join(settings.BASE_DIR, 'api', 'ml_models', 'nephrosasa_scaler.pkl')
 
-@api_view(['POST'])
-# @permission_classes([IsAuthenticated]) # Disabled for testing/demo purposes
-def predict_kidney_risk(request):
-    """
-    Endpoint to log patient vitals and predict kidney risk using the trained AI model.
-    Accepts: { 'systolic_bp': 130, 'diastolic_bp': 85, 'blood_sugar': 110, 'patient_id': 1 }
-    Returns: Risk score and confidence.
-    """
-    try:
-        data = request.data
-        systolic = float(data.get('systolic_bp'))
-        diastolic = float(data.get('diastolic_bp'))
-        blood_sugar = float(data.get('blood_sugar'))
-        patient_id = data.get('patient_id')
-        
-        # 1. Load the AI Model
-        model_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'nephrosasa-ai', 'models', 'nephrosasa_model.pkl')
-        model = joblib.load(model_path)
-        
-        # 2. Run Prediction (Mock logic wrapping the actual model inference)
-        # Note: The actual model expects specific features based on the training data.
-        # This is a representation of how the vitals map to the model input.
-        features = [[systolic, diastolic, blood_sugar]]
-        prediction = model.predict(features)[0]
-        
-        # Depending on the model output, map it to our labels
-        risk_map = {0: 'LOW', 1: 'MEDIUM', 2: 'HIGH'}
-        risk_level = risk_map.get(prediction, 'UNKNOWN')
-        
-        # 3. Calculate Confidence
-        probabilities = model.predict_proba(features)[0]
-        confidence = max(probabilities) * 100
-        
-        # 4. Save to Database (If patient is provided)
-        if patient_id:
+try:
+    rf_model = joblib.load(MODEL_PATH)
+    rf_scaler = joblib.load(SCALER_PATH)
+except Exception as e:
+    print(f"Warning: ML models not loaded. {e}")
+    rf_model = None
+    rf_scaler = None
+
+def get_risk_label(probability):
+    if probability < 0.3:
+        return "LOW", probability
+    elif probability < 0.6:
+        return "MEDIUM", probability
+    else:
+        return "HIGH", probability
+
+class RegisterPatientView(views.APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        user_serializer = UserSerializer(data=request.data)
+        if user_serializer.is_valid():
+            user = user_serializer.save()
+            PatientProfile.objects.create(user=user)
+            
+            # Send Welcome Email via Resend
             try:
-                patient = PatientProfile.objects.get(id=patient_id)
-                VitalLog.objects.create(
-                    patient=patient,
-                    systolic_bp=systolic,
-                    diastolic_bp=diastolic,
-                    blood_sugar=blood_sugar,
-                    ai_risk_score=risk_level,
-                    confidence_percentage=confidence
-                )
-            except PatientProfile.DoesNotExist:
-                pass # Skip saving if patient doesn't exist for demo
-                
-        # 5. Return JSON Response
-        return Response({
-            'status': 'success',
-            'vitals': {
-                'systolic_bp': systolic,
-                'diastolic_bp': diastolic,
-                'blood_sugar': blood_sugar
-            },
-            'ai_analysis': {
-                'risk_level': risk_level,
-                'confidence_percentage': round(confidence, 1)
-            }
-        })
+                resend.Emails.send({
+                    "from": "NephroSasa <onboarding@resend.dev>",
+                    "to": user.email,
+                    "subject": "Welcome to NephroSasa Rwanda",
+                    "html": f"<h1>Hello {user.first_name},</h1><p>Welcome to NephroSasa Rwanda. Your account has been successfully created. Remember to log your vitals regularly!</p>"
+                })
+            except Exception as e:
+                print(f"Failed to send email: {e}")
+
+            return Response({"message": "Patient registered successfully", "user": user_serializer.data}, status=status.HTTP_201_CREATED)
+        return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class LogVitalsView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            patient = request.user.patient_profile
+        except PatientProfile.DoesNotExist:
+            return Response({"error": "User is not a registered patient"}, status=status.HTTP_403_FORBIDDEN)
+
+        data = request.data
+        data['patient'] = patient.id
+        serializer = VitalLogSerializer(data=data)
         
-    except Exception as e:
-        return Response({
-            'status': 'error',
-            'message': str(e)
-        }, status=400)
+        if serializer.is_valid():
+            vital_log = serializer.save()
+
+            # Prepare data for ML Model
+            # The model expects: SystolicBP, DiastolicBP, FastingBloodSugar, HbA1c, SerumCreatinine, GFR, BUNLevels, Age, Smoking, FamilyHistoryKidneyDisease
+            # We use default values for fields not provided in standard vital logs for demo purposes
+            patient_data = {
+                'SystolicBP': float(vital_log.systolic_bp),
+                'DiastolicBP': float(vital_log.diastolic_bp),
+                'FastingBloodSugar': float(vital_log.blood_sugar),
+                'HbA1c': float(data.get('hba1c', 5.5)),
+                'SerumCreatinine': float(data.get('creatinine', 1.0)),
+                'GFR': float(data.get('gfr', 90.0)),
+                'BUNLevels': float(data.get('bun', 15.0)),
+                'Age': float(data.get('age', 45.0)),
+                'Smoking': int(data.get('smoking', 0)),
+                'FamilyHistoryKidneyDisease': int(data.get('family_history', 0))
+            }
+
+            if rf_model and rf_scaler:
+                df = pd.DataFrame([patient_data])
+                scaled_input = rf_scaler.transform(df)
+                probability = rf_model.predict_proba(scaled_input)[0][1]
+                risk_level, _ = get_risk_label(probability)
+                
+                vital_log.ai_risk_score = risk_level
+                vital_log.confidence_percentage = round(probability * 100, 2)
+                vital_log.save()
+            
+            # Send Confirmation Email via Resend
+            try:
+                resend.Emails.send({
+                    "from": "NephroSasa <updates@resend.dev>",
+                    "to": request.user.email,
+                    "subject": "Vitals Logged - NephroSasa",
+                    "html": f"<h3>Vitals Recorded</h3><p>Your blood pressure and sugar levels have been recorded.</p><p>Current AI Risk Assessment: <strong>{vital_log.ai_risk_score}</strong></p>"
+                })
+            except Exception as e:
+                print(f"Failed to send email: {e}")
+
+            return Response(VitalLogSerializer(vital_log).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class PatientHistoryView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            patient = request.user.patient_profile
+            logs = VitalLog.objects.filter(patient=patient).order_by('-recorded_at')
+            return Response(VitalLogSerializer(logs, many=True).data)
+        except PatientProfile.DoesNotExist:
+            return Response({"error": "User is not a registered patient"}, status=status.HTTP_403_FORBIDDEN)

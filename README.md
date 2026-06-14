@@ -1,65 +1,61 @@
-# NephroSasa Rwanda 🩺🇷🇼
-> Monitor Your Kidneys. Before It's Too Late.
+# NephroSasa Rwanda
+**Longitudinal AI-Powered Kidney Health Monitoring Platform**
 
-## Description
-NephroSasa Rwanda is a longitudinal, AI-powered, pre-dialysis kidney health monitoring platform designed specifically for Rwandan adults diagnosed with hypertension or Type 2 diabetes. The platform serves as an early-warning system that tracks vitals, generates AI-driven kidney risk scores, and connects patients directly with nephrologists before irreversible kidney damage occurs.
+## Project Overview
+NephroSasa is an AI-powered early detection platform designed to tackle the late detection of chronic kidney disease among adults with hypertension and diabetes in Rwanda. It tracks vital readings across multiple clinic visits and uses a Random Forest machine learning model to predict silent kidney decline trajectories before symptoms become fatal.
 
-**Features:**
-- 📊 **Longitudinal Vital Tracking:** Patients log daily blood pressure and blood sugar.
-- 🤖 **AI Kidney Risk Scoring:** A Random Forest model generates risk predictions (Low, Medium, High).
-- 🏥 **Nephrologist Dashboard:** Doctors can monitor patient trajectories remotely.
-- 📱 **Mobile Money & SMS Integration:** Native payments via MTN MoMo and Airtel Money, plus SMS reminders for logging vitals.
-- 📑 **QR Health Records:** Easy scanning for interoperability at local clinics.
+## Links & Demo
+- **Live Frontend (Vercel):** `https://nephrosasa-frontend.vercel.app` (Replace with your actual Vercel link)
+- **Live API Backend (Render):** `https://nephrosasa-api.onrender.com/api/` (Replace with actual Render link)
+- **5-Minute Demo Video:** [Click here to watch the core functionality demo](#) (Insert your video link here)
 
-## GitHub Repository
-https://github.com/MairoPedroIsaac/nephrosasa-rwanda
+## Technology Stack
+- **Frontend:** Next.js 14, TailwindCSS, TypeScript
+- **Backend:** Django, Django REST Framework, scikit-learn (Python)
+- **Database:** PostgreSQL (managed by Supabase)
+- **Email/Alerts:** Resend API
 
-## How to Set Up the Environment and the Project
+## Installation and Setup Instructions (Step-by-Step)
 
 ### Prerequisites
-- Node.js (v18 or higher)
-- npm or yarn
-- Python 3.9+
+- Node.js (v18+)
+- Python (3.10+)
+- PostgreSQL Database (or Supabase account)
 
-### Installation Steps
+### 1. Backend Setup (Django)
+1. Navigate to the backend directory:
+   `cd backend`
+2. Create and activate a virtual environment:
+   `python -m venv venv`
+   `source venv/bin/activate` (Mac/Linux) or `.\venv\Scripts\activate` (Windows)
+3. Install dependencies:
+   `pip install -r requirements.txt`
+4. Set up environment variables:
+   Create a `.env` file in the `backend` folder and add your credentials:
+   ```
+   DATABASE_URL=postgresql://user:password@host:port/dbname
+   SECRET_KEY=your_secret_key
+   RESEND_API_KEY=your_resend_api_key
+   ```
+5. Run migrations:
+   `python manage.py migrate`
+6. Start the server:
+   `python manage.py runserver`
 
-**1. Clone the repository**
-```bash
-git clone https://github.com/MairoPedroIsaac/nephrosasa-rwanda.git
-cd nephrosasa-rwanda
-```
+### 2. Frontend Setup (Next.js)
+1. Navigate to the frontend directory:
+   `cd frontend`
+2. Install dependencies:
+   `npm install`
+3. Set up environment variables:
+   Create a `.env.local` file in the `frontend` folder:
+   ```
+   NEXT_PUBLIC_API_URL=http://localhost:8000/api
+   ```
+4. Start the development server:
+   `npm run dev`
 
-**2. Setup the Frontend (Next.js)**
-```bash
-cd frontend
-npm install
-npm run dev
-```
-The frontend will be accessible at `http://localhost:3000`.
-
-**3. Setup the AI Model/Backend (Python)**
-```bash
-cd ../nephrosasa-ai
-# Create a virtual environment
-python -m venv venv
-# Activate virtual environment (Windows)
-venv\Scripts\activate
-# Activate virtual environment (Mac/Linux)
-# source venv/bin/activate
-pip install -r requirements.txt
-python predict.py
-```
-
-## Designs
-Screenshots of the application interface, including the Patient Dashboard and responsive UI layouts, are included in the `docs/designs` folder of this repository.
-
-Figma Design File: [View on Figma](https://www.figma.com/design/iKcVvwWrGPdiyWzr15ZgjT/NephroSasa-Rwanda---UI-Designs?node-id=0-1&t=bQ32MVYbJ755FLuC-1)
-
-## Deployment Plan
-- **Frontend:** The Next.js frontend is deployed on **Vercel** with continuous 
-deployment from GitHub. Live at: https://nephrosasa-rwanda.vercel.app/en
-- **Backend/AI Model:** The Python backend and Random Forest model (`nephrosasa_model.pkl`) will be wrapped in a Django REST Framework, then deployed on **Render** as a backend microservice.
-- **Database:** A managed PostgreSQL database on **Supabase** will be used to store patient vitals, doctor records, and authentication data.
-
-## Video Demo
-[Watch Demo on YouTube](https://youtu.be/Em5bUPgy950)
+## Related Files
+- `docs/Mairo_Pedro_Isaac_NephroSasa_Rwanda_Capstone_Proposal.pdf`: Original project proposal.
+- `docs/TESTING_REPORT.md`: Detailed analysis of testing results, discussion, and recommendations.
+- `backend/api/ml_models/nephrosasa_model.pkl`: The trained Random Forest risk prediction model.
