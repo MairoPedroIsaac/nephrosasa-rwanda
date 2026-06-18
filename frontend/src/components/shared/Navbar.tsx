@@ -13,6 +13,27 @@ import { Menu, X, Globe, Moon, Sun } from 'lucide-react';
 import { getCurrentUser, logout, isAuthenticated } from '@/lib/auth';
 import Button from '../ui/Button';
 
+// Fix for Google Translate crashing React apps during DOM reconciliation
+if (typeof window !== 'undefined' && typeof Node !== 'undefined' && Node.prototype) {
+  const originalRemoveChild = Node.prototype.removeChild;
+  Node.prototype.removeChild = function(child: any) {
+    if (child.parentNode !== this) {
+      if (console) console.warn('Cannot remove a child from a different parent', child, this);
+      return child;
+    }
+    return originalRemoveChild.apply(this, arguments as any);
+  };
+  
+  const originalInsertBefore = Node.prototype.insertBefore;
+  Node.prototype.insertBefore = function(newNode: any, referenceNode: any) {
+    if (referenceNode && referenceNode.parentNode !== this) {
+      if (console) console.warn('Cannot insert before a reference node from a different parent', referenceNode, this);
+      return newNode;
+    }
+    return originalInsertBefore.apply(this, arguments as any);
+  };
+}
+
 const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
@@ -44,9 +65,15 @@ const Navbar = () => {
     }
   };
 
+  const [userType, setUserType] = useState<string | null>(null);
+
   // Check authentication status on component mount
   useEffect(() => {
     setIsLoggedIn(isAuthenticated());
+    const user = getCurrentUser();
+    if (user) {
+      setUserType(user.user_type);
+    }
     
     // Get current locale from pathname
     const locale = pathname.split('/')[1];
@@ -119,6 +146,10 @@ const Navbar = () => {
     { href: `/${currentLocale}/about`, label: 'About' },
     { href: `/${currentLocale}/contact`, label: 'Contact' },
   ];
+
+  if (pathname.includes('/patient/dashboard') || pathname.includes('/doctor/dashboard') || pathname.includes('/admin')) {
+    return null;
+  }
 
   return (
     <nav className="bg-white dark:bg-gray-900 shadow-md sticky top-0 z-50 transition-colors duration-200">
@@ -210,7 +241,7 @@ const Navbar = () => {
             {isLoggedIn && (
               <div className="flex items-center space-x-4">
                 {!pathname.includes('/dashboard') && (
-                  <Link href={`/${currentLocale}/dashboard`}>
+                  <Link href={`/${currentLocale}/${userType === 'DOCTOR' ? 'doctor' : 'patient'}/dashboard`}>
                     <Button variant="outline" size="sm">
                       Dashboard
                     </Button>
@@ -294,7 +325,7 @@ const Navbar = () => {
               {isLoggedIn ? (
                 <>
                   {!pathname.includes('/dashboard') && (
-                    <Link href={`/${currentLocale}/dashboard`} onClick={() => setIsMenuOpen(false)}>
+                    <Link href={`/${currentLocale}/${userType === 'DOCTOR' ? 'doctor' : 'patient'}/dashboard`} onClick={() => setIsMenuOpen(false)}>
                       <Button variant="outline" fullWidth>
                         Dashboard
                       </Button>

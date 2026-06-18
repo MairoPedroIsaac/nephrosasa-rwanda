@@ -64,7 +64,7 @@ export default function ContactPage() {
   ];
 
   return (
-    <div className="bg-white">
+    <div className="bg-white dark:bg-gray-900 transition-colors">
       {/* Hero Section - Clean rectangle with straight bottom edge */}
       <section className="relative h-[500px] overflow-hidden">
         {/* Background Image */}
@@ -103,7 +103,7 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Info Cards - FROM YOUR ORIGINAL CODE */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50 dark:bg-gray-800 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Location */}
@@ -114,7 +114,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <h3 className="font-bold text-lg mb-2">Office Location</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 KG 11 Ave, Kigali<br />
                 Kigali, Rwanda
               </p>
@@ -128,7 +128,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <h3 className="font-bold text-lg mb-2">Phone</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 +250 788 123 456<br />
                 +250 788 789 012
               </p>
@@ -142,7 +142,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <h3 className="font-bold text-lg mb-2">Email</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 info@nephrosasa.rw<br />
                 support@nephrosasa.rw
               </p>
@@ -156,7 +156,7 @@ export default function ContactPage() {
                 </div>
               </div>
               <h3 className="font-bold text-lg mb-2">Working Hours</h3>
-              <p className="text-gray-600">
+              <p className="text-gray-600 dark:text-gray-400">
                 Mon - Fri: 8AM - 6PM<br />
                 Sat: 9AM - 2PM
               </p>
@@ -166,17 +166,17 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Form & Image - FROM YOUR ORIGINAL CODE */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-gray-900 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
             {/* Contact Form */}
             <div>
               <div className="mb-8">
                 <span className="text-accent font-semibold text-sm uppercase tracking-wider">Send us a message</span>
-                <h2 className="text-4xl font-bold text-gray-900 mt-4 mb-4">
+                <h2 className="text-4xl font-bold text-gray-900 dark:text-white mt-4 mb-4">
                   We'd Love to Hear from You
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-gray-600 dark:text-gray-400">
                   Fill out the form below and our team will get back to you within 24 hours.
                 </p>
               </div>
@@ -226,7 +226,7 @@ export default function ContactPage() {
                 />
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Message
                     <span className="text-danger ml-1">*</span>
                   </label>
@@ -236,7 +236,7 @@ export default function ContactPage() {
                     onChange={handleChange}
                     rows={6}
                     required
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all duration-200"
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all duration-200"
                     placeholder="Tell us how we can help you..."
                   />
                 </div>
@@ -274,19 +274,19 @@ export default function ContactPage() {
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-semibold mb-1">For Patients:</h4>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-gray-400">
                       Need help accessing your records? Contact support at support@nephrosasa.rw
                     </p>
                   </div>
                   <div>
                     <h4 className="font-semibold mb-1">For Healthcare Providers:</h4>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-gray-400">
                       Interested in partnering? Email partnerships@nephrosasa.rw
                     </p>
                   </div>
                   <div>
                     <h4 className="font-semibold mb-1">Technical Support:</h4>
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-gray-400">
                       Report technical issues at tech@nephrosasa.rw
                     </p>
                   </div>
@@ -298,15 +298,15 @@ export default function ContactPage() {
       </section>
 
       {/* Map Placeholder - FROM YOUR ORIGINAL CODE */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50 dark:bg-gray-800 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Find Us</h2>
-            <p className="text-gray-600">Visit our office in Kigali</p>
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Find Us</h2>
+            <p className="text-gray-600 dark:text-gray-400">Visit our office in Kigali</p>
           </div>
 
-          <div className="bg-gray-300 rounded-2xl overflow-hidden shadow-xl" style={{ height: '400px' }}>
-            <div className="w-full h-full flex items-center justify-center text-gray-600">
+          <div className="bg-gray-300 dark:bg-gray-700 rounded-2xl overflow-hidden shadow-xl" style={{ height: '400px' }}>
+            <div className="w-full h-full flex items-center justify-center text-gray-600 dark:text-gray-400">
               <div className="text-center">
                 <MapPin size={48} className="mx-auto mb-4 text-primary" />
                 <p className="text-lg font-semibold">Interactive Map</p>
@@ -318,13 +318,13 @@ export default function ContactPage() {
       </section>
 
       {/* FAQ Preview - WITH TOGGLE BUTTONS */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-gray-900 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
               Frequently Asked Questions
             </h2>
-            <p className="text-gray-600">Quick answers to common questions</p>
+            <p className="text-gray-600 dark:text-gray-400">Quick answers to common questions</p>
           </div>
 
           <div className="max-w-3xl mx-auto space-y-4">
@@ -357,7 +357,7 @@ export default function ContactPage() {
                   openFAQ === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                 }`}>
                   <div className="px-6 pb-6 pt-2">
-                    <p className="text-gray-600">
+                    <p className="text-gray-600 dark:text-gray-400">
                       {item.answer}
                     </p>
                   </div>

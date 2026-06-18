@@ -70,42 +70,42 @@ export default function HomePage() {
       title: 'Longitudinal Vital Tracking',
       description: 'Track your blood pressure and blood sugar readings across multiple clinic visits over time',
       color: 'from-blue-500 to-cyan-400',
-      bgColor: 'bg-gradient-to-br from-blue-50 to-cyan-50'
+      bgColor: 'bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/80 dark:to-cyan-900/80'
     },
     {
       icon: Brain,
       title: 'AI Kidney Risk Scoring',
       description: 'Predictive Random Forest machine learning model analyzes your vital trajectory to detect silent kidney decline',
       color: 'from-emerald-500 to-green-400',
-      bgColor: 'bg-gradient-to-br from-emerald-50 to-green-50'
+      bgColor: 'bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/80 dark:to-green-900/80'
     },
     {
       icon: Stethoscope,
       title: 'Remote Nephrologist Consultation',
       description: 'Connect directly with Kigali-based specialists without leaving your district when alerts trigger',
       color: 'from-violet-500 to-purple-400',
-      bgColor: 'bg-gradient-to-br from-violet-50 to-purple-50'
+      bgColor: 'bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-900/80 dark:to-purple-900/80'
     },
     {
       icon: QrCode,
       title: 'QR Health Record Sharing',
       description: 'Securely share your longitudinal health records with any doctor instantly via a QR scan',
       color: 'from-indigo-500 to-blue-400',
-      bgColor: 'bg-gradient-to-br from-indigo-50 to-blue-50'
+      bgColor: 'bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/80 dark:to-blue-900/80'
     },
     {
       icon: Smartphone,
       title: 'Mobile Money Payments',
       description: 'Pay for remote specialist consultations seamlessly using MTN Mobile Money or Airtel Money',
       color: 'from-amber-500 to-orange-400',
-      bgColor: 'bg-gradient-to-br from-amber-50 to-orange-50'
+      bgColor: 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/80 dark:to-orange-900/80'
     },
     {
       icon: Clock,
       title: 'SMS Reminders',
       description: 'Automated 7-day and 14-day Africa\'s Talking SMS alerts ensure you never miss logging your vitals',
       color: 'from-rose-500 to-pink-400',
-      bgColor: 'bg-gradient-to-br from-rose-50 to-pink-50'
+      bgColor: 'bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-900/80 dark:to-pink-900/80'
     },
   ];
 
@@ -133,7 +133,7 @@ export default function HomePage() {
   };
 
   return (
-    <div className="bg-white">
+    <div className="bg-white dark:bg-gray-900 transition-colors">
       {/* Enhanced Hero Section */}
       <section className="relative min-h-[600px] md:min-h-[700px] overflow-hidden">
         {/* Background Image */}
@@ -215,7 +215,7 @@ export default function HomePage() {
       </section>
 
       {/* Stats Section - FIXED to white background with dark text */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-white dark:bg-gray-900 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
@@ -225,7 +225,7 @@ export default function HomePage() {
                   suffix={stat.suffix} 
                   duration={2000 + index * 500}
                 />
-                <p className="text-gray-600 font-medium">{stat.label}</p>
+                <p className="text-gray-600 dark:text-gray-400 font-medium">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -233,17 +233,17 @@ export default function HomePage() {
       </section>
 
       {/* Features Grid with Mobile Carousel */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-24 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-full mb-6">
               <Award size={16} />
               <span className="text-sm font-semibold">Why Choose NephroSasa</span>
             </div>
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
               Transform Healthcare Experience
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-600 dark:text-gray-400">
               Combining cutting-edge technology with Rwanda's healthcare vision
             </p>
           </div>
@@ -253,17 +253,14 @@ export default function HomePage() {
             {features.map((feature, index) => (
               <div 
                 key={index} 
-                className={`${feature.bgColor} p-8 rounded-2xl border border-gray-100 hover:border-transparent hover:shadow-2xl transition-all duration-300 hover:-translate-y-1`}
+                className={`${feature.bgColor} p-8 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-transparent hover:shadow-2xl transition-all duration-300 hover:-translate-y-1`}
               >
                 <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${feature.color} mb-6`}>
                   <feature.icon size={28} className="text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">{feature.title}</h3>
-                <p className="text-gray-600 mb-6">{feature.description}</p>
-                <div className="flex items-center gap-2 text-blue-600 font-semibold">
-                  <span>Learn more</span>
-                  <ArrowRight size={16} />
-                </div>
+                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{feature.title}</h3>
+                <p className="text-gray-600 dark:text-gray-200 mb-6">{feature.description}</p>
+                
               </div>
             ))}
           </div>
@@ -285,7 +282,7 @@ export default function HomePage() {
                   <button
                     key={index}
                     onClick={() => scrollToFeature(index)}
-                    className={`w-2 h-2 rounded-full ${currentFeature === index ? 'bg-blue-600' : 'bg-gray-300'}`}
+                    className={`w-2 h-2 rounded-full ${currentFeature === index ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
                   />
                 ))}
               </div>
@@ -310,23 +307,20 @@ export default function HomePage() {
                   key={index}
                   className="flex-shrink-0 w-[calc(100vw-4rem)] snap-center"
                 >
-                  <div className={`${feature.bgColor} p-8 rounded-2xl border border-gray-100`}>
+                  <div className={`${feature.bgColor} p-8 rounded-2xl border border-gray-100 dark:border-gray-700`}>
                     <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${feature.color} mb-6`}>
                       <feature.icon size={28} className="text-white" />
                     </div>
-                    <h3 className="text-2xl font-bold text-gray-900 mb-4">{feature.title}</h3>
-                    <p className="text-gray-600 mb-6">{feature.description}</p>
-                    <div className="flex items-center gap-2 text-blue-600 font-semibold">
-                      <span>Learn more</span>
-                      <ArrowRight size={16} />
-                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{feature.title}</h3>
+                    <p className="text-gray-600 dark:text-gray-200 mb-6">{feature.description}</p>
+                    
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Mobile Indicator */}
-            <div className="text-center mt-4 text-sm text-gray-500">
+            <div className="text-center mt-4 text-sm text-gray-500 dark:text-gray-400">
               {currentFeature + 1} / {features.length}
             </div>
           </div>
@@ -334,13 +328,13 @@ export default function HomePage() {
       </section>
 
       {/* How It Works - Enhanced with Fixed Images */}
-      <section className="py-24 bg-gradient-to-b from-white to-gray-50">
+      <section className="py-24 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
               Simple, Secure Process
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl text-gray-600 dark:text-gray-400">
               Three steps to better healthcare management
             </p>
           </div>
@@ -354,7 +348,7 @@ export default function HomePage() {
                   <span className="font-bold">STEP 1</span>
                 </div>
                 <h3 className="text-3xl lg:text-4xl font-bold mb-6">Register & Get Your Personal QR Code</h3>
-                <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
                   Create your free account in under 2 minutes. We verify your identity and 
                   generate a unique QR code that securely represents your medical identity.
                 </p>
@@ -362,7 +356,7 @@ export default function HomePage() {
                   {['Free forever for patients', '2-minute registration', 'Secure identity verification', 'Instant QR generation'].map((item, i) => (
                     <li key={i} className="flex items-center gap-3">
                       <Check size={20} className="text-green-500" />
-                      <span className="text-gray-700">{item}</span>
+                      <span className="text-gray-700 dark:text-gray-300 dark:text-gray-300">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -397,7 +391,7 @@ export default function HomePage() {
                   <span className="font-bold">STEP 2</span>
                 </div>
                 <h3 className="text-3xl lg:text-4xl font-bold mb-6">Visit Any Healthcare Facility</h3>
-                <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
                   Show your QR code at any registered clinic or hospital. The doctor scans it, 
                   requests access to your records, and you approve instantly from your phone.
                 </p>
@@ -405,7 +399,7 @@ export default function HomePage() {
                   {['Works at any registered facility', 'Patient-controlled access', 'Real-time approval', 'Audit trail for privacy'].map((item, i) => (
                     <li key={i} className="flex items-center gap-3">
                       <Check size={20} className="text-green-500" />
-                      <span className="text-gray-700">{item}</span>
+                      <span className="text-gray-700 dark:text-gray-300 dark:text-gray-300">{item}</span>
                     </li>
                   ))}
                 </ul>
@@ -420,7 +414,7 @@ export default function HomePage() {
                   <span className="font-bold">STEP 3</span>
                 </div>
                 <h3 className="text-3xl lg:text-4xl font-bold mb-6">Seamless Care & Payment</h3>
-                <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
                   Doctor sees your complete history, provides informed care. Pay instantly via 
                   mobile money, receive digital receipts, and your records are updated automatically.
                 </p>
@@ -428,7 +422,7 @@ export default function HomePage() {
                   {['Complete medical history view', 'Mobile money payments', 'Digital receipts', 'Auto-updated records'].map((item, i) => (
                     <li key={i} className="flex items-center gap-3">
                       <Check size={20} className="text-green-500" />
-                      <span className="text-gray-700">{item}</span>
+                      <span className="text-gray-700 dark:text-gray-300 dark:text-gray-300">{item}</span>
                     </li>
                   ))}
                 </ul>

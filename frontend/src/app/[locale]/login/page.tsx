@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -16,6 +16,20 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem('nephrosasa_remembered_credentials');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        setFormData({ email: parsed.email, password: parsed.password });
+        setRememberMe(true);
+      } catch (e) {
+        // ignore
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +39,12 @@ export default function LoginPage() {
     const result = await login(formData);
 
     if (result.success) {
+      if (rememberMe) {
+        localStorage.setItem('nephrosasa_remembered_credentials', JSON.stringify(formData));
+      } else {
+        localStorage.removeItem('nephrosasa_remembered_credentials');
+      }
+
       if (result.user?.user_type === 'DOCTOR') {
         router.push('/en/doctor/dashboard');
       } else {
@@ -37,7 +57,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Left Side - Hero Image (55%) */}
       <div className="lg:w-[55%] relative min-h-[50vh] lg:min-h-screen">
         {/* Background Image */}
@@ -194,7 +214,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right Side - Login Form (45%) */}
-      <div className="lg:w-[45%] flex items-start justify-center pt-12 lg:pt-24 p-6 sm:p-8 lg:p-14 bg-white">
+      <div className="lg:w-[45%] flex items-start justify-center pt-12 lg:pt-24 p-6 sm:p-8 lg:p-14 bg-white dark:bg-gray-800 transition-colors relative">
         <div className="w-full max-w-lg">
           {/* Mobile-only Header with Icon - ADJUSTED SPACING */}
           <div className="lg:hidden mb-10">
@@ -207,10 +227,10 @@ export default function LoginPage() {
               </div>
               
               {/* Text Content */}
-              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
                 Secure Login
               </h2>
-              <p className="text-gray-600 text-lg">
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
                 Sign in to access your health records
               </p>
             </div>
@@ -218,10 +238,10 @@ export default function LoginPage() {
 
           {/* Desktop Header (unchanged) */}
           <div className="hidden lg:block mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Secure Login
             </h2>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
               Sign in to access your health records
             </p>
           </div>
@@ -256,7 +276,7 @@ export default function LoginPage() {
 
             <div className="space-y-7">
               <div>
-                <label htmlFor="email" className="block text-base font-medium text-gray-700 mb-3">
+                <label htmlFor="email" className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-3">
                   Email Address *
                 </label>
                 <div className="relative">
@@ -268,7 +288,7 @@ export default function LoginPage() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full pl-14 pr-4 py-4 bg-gray-50 border border-gray-300 rounded-xl focus:ring-3 focus:ring-primary/30 focus:border-primary transition-all duration-200 placeholder:text-gray-400 text-base"
+                    className="w-full pl-14 pr-4 py-4 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-3 focus:ring-primary/30 focus:border-primary transition-all duration-200 placeholder:text-gray-400 text-base"
                     placeholder="you@example.com"
                     required
                   />
@@ -277,7 +297,7 @@ export default function LoginPage() {
 
               <div>
                 <div className="flex justify-between items-center mb-3">
-                  <label htmlFor="password" className="block text-base font-medium text-gray-700">
+                  <label htmlFor="password" className="block text-base font-medium text-gray-700 dark:text-gray-300">
                     Password *
                   </label>
                   <Link 
@@ -296,7 +316,7 @@ export default function LoginPage() {
                     type={showPassword ? 'text' : 'password'}
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full pl-14 pr-12 py-4 bg-gray-50 border border-gray-300 rounded-xl focus:ring-3 focus:ring-primary/30 focus:border-primary transition-all duration-200 placeholder:text-gray-400 text-base"
+                    className="w-full pl-14 pr-12 py-4 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-3 focus:ring-primary/30 focus:border-primary transition-all duration-200 placeholder:text-gray-400 text-base"
                     placeholder="Enter your password"
                     required
                   />
@@ -308,6 +328,19 @@ export default function LoginPage() {
                     {showPassword ? <EyeOff size={22} /> : <Eye size={22} />}
                   </button>
                 </div>
+              </div>
+              
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="h-5 w-5 text-primary focus:ring-primary border-gray-300 rounded cursor-pointer"
+                />
+                <label htmlFor="remember-me" className="ml-3 block text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                  Remember me
+                </label>
               </div>
             </div>
 
@@ -338,7 +371,7 @@ export default function LoginPage() {
                 <div className="w-full border-t border-gray-300"></div>
               </div>
               <div className="relative flex justify-center">
-                <span className="px-4 bg-white text-gray-500 text-base">New to NephroSasa?</span>
+                <span className="px-4 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-base transition-colors">New to NephroSasa?</span>
               </div>
             </div>
           </div>

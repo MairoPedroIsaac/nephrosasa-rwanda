@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowRight, QrCode, Shield, Smartphone, Check, User, CreditCard } from 'lucide-react';
+import { ArrowRight, QrCode, Shield, Smartphone, Check, User, CreditCard, Eye, EyeOff, CheckCircle } from 'lucide-react';
 
 export default function PatientRegistrationPage() {
   const router = useRouter();
@@ -15,8 +15,11 @@ export default function PatientRegistrationPage() {
     lastName: '',
     email: '',
     phone: '',
+    password: '',
+    passwordConfirm: '',
     
     // Step 2
+    idType: 'national_id',
     nationalId: '',
     dateOfBirth: '',
     gender: '',
@@ -32,6 +35,9 @@ export default function PatientRegistrationPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,8 +49,8 @@ export default function PatientRegistrationPage() {
     
     const result = await register({
       email: formData.email,
-      password: 'DefaultPassword123!', // Since the UI doesn't have a password field yet, we use a default or should add one
-      password_confirm: 'DefaultPassword123!',
+      password: formData.password,
+      password_confirm: formData.passwordConfirm,
       first_name: formData.firstName,
       last_name: formData.lastName,
       phone_number: formData.phone,
@@ -54,14 +60,45 @@ export default function PatientRegistrationPage() {
     });
 
     if (result.success) {
-      router.push('/en/login?registered=true');
+      setSuccessMsg('Account created successfully! Welcome to NephroSasa.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      
+      setTimeout(async () => {
+        if (result.data?.access && result.data?.refresh) {
+          localStorage.setItem('access_token', result.data.access);
+          localStorage.setItem('refresh_token', result.data.refresh);
+          localStorage.setItem('user', JSON.stringify(result.data.user || {}));
+          router.push('/en/patient/dashboard');
+        } else {
+          const { login } = await import('@/lib/auth');
+          const loginResult = await login({ email: formData.email, password: formData.password });
+          if (loginResult.success) {
+            router.push('/en/patient/dashboard');
+          } else {
+            router.push('/en/login?registered=true');
+          }
+        }
+      }, 3000);
     } else {
       setError(result.error || 'Registration failed');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setLoading(false);
     }
-    setLoading(false);
   };
 
+  const isIdValid = formData.idType === 'national_id' 
+    ? /^\d{16}$/.test(formData.nationalId)
+    : /^[a-zA-Z0-9]{6,}$/.test(formData.nationalId);
+
   const handleNext = () => {
+    if (step === 1 && formData.password !== formData.passwordConfirm) {
+      setError("Passwords do not match");
+      return;
+    }
+    if (step === 2 && !isIdValid) {
+      return; // Handled by button disable state, but keeping logic just in case
+    }
+    setError('');
     if (step < 3) setStep(step + 1);
   };
 
@@ -70,7 +107,7 @@ export default function PatientRegistrationPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Left Side - Hero Image (55%) */}
       <div className="lg:w-[55%] relative min-h-[50vh] lg:min-h-screen">
         {/* Background Image */}
@@ -239,7 +276,7 @@ export default function PatientRegistrationPage() {
       </div>
 
       {/* Right Side - Registration Form (45%) */}
-      <div className="lg:w-[45%] flex items-start justify-center pt-12 lg:pt-24 p-6 sm:p-8 lg:p-14 bg-white">
+      <div className="lg:w-[45%] flex items-start justify-center pt-12 lg:pt-24 p-6 sm:p-8 lg:p-14 bg-white dark:bg-gray-800 transition-colors relative">
         <div className="w-full max-w-lg">
           {/* Mobile Header - CENTERED ICON LIKE LOGIN */}
           <div className="lg:hidden mb-10">
@@ -252,10 +289,10 @@ export default function PatientRegistrationPage() {
               </div>
               
               {/* Text Content */}
-              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
                 Patient Registration
               </h2>
-              <p className="text-gray-600 text-lg">
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
                 Create your NephroSasa account
               </p>
             </div>
@@ -263,10 +300,10 @@ export default function PatientRegistrationPage() {
 
           {/* Desktop Header */}
           <div className="hidden lg:block mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Patient Registration
             </h2>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
               Create your NephroSasa account
             </p>
           </div>
@@ -274,8 +311,8 @@ export default function PatientRegistrationPage() {
           {/* Progress Bar */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-gray-700">Step {step} of 3</span>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Step {step} of 3</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {step === 1 && 'Personal Info'}
                 {step === 2 && 'Health Details'}
                 {step === 3 && 'Emergency & Terms'}
@@ -291,17 +328,33 @@ export default function PatientRegistrationPage() {
 
           {/* Form Header */}
           <div className="mb-8">
-            <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+            <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">
               {step === 1 && 'Create Your Account'}
               {step === 2 && 'Health Information'}
               {step === 3 && 'Emergency & Terms'}
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               {step === 1 && 'Enter your personal information to get started'}
               {step === 2 && 'Help us personalize your health experience'}
               {step === 3 && 'Set up emergency contact and accept terms'}
             </p>
           </div>
+
+          {/* Success Handler */}
+          {successMsg && (
+            <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg shadow-sm mb-6">
+              <div className="flex items-center">
+                <div className="flex-shrink-0">
+                  <CheckCircle className="h-5 w-5 text-green-500" />
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-green-800">
+                    {successMsg}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Error Handler */}
           {error && (
@@ -328,7 +381,7 @@ export default function PatientRegistrationPage() {
               <div className="space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       First Name *
                     </label>
                     <input
@@ -336,13 +389,13 @@ export default function PatientRegistrationPage() {
                       type="text"
                       value={formData.firstName}
                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       placeholder="John"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Last Name *
                     </label>
                     <input
@@ -350,7 +403,7 @@ export default function PatientRegistrationPage() {
                       type="text"
                       value={formData.lastName}
                       onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       placeholder="Doe"
                       required
                     />
@@ -358,7 +411,7 @@ export default function PatientRegistrationPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Email Address *
                   </label>
                   <div className="relative">
@@ -372,7 +425,7 @@ export default function PatientRegistrationPage() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                      className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       placeholder="you@example.com"
                       required
                     />
@@ -380,7 +433,7 @@ export default function PatientRegistrationPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Phone Number *
                   </label>
                   <div className="relative">
@@ -394,10 +447,58 @@ export default function PatientRegistrationPage() {
                       type="tel"
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                      className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                      className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       placeholder="078 123 4567"
                       required
                     />
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Password *
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="password"
+                      type={showPassword ? "text" : "password"}
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                      placeholder="Enter your password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-400"
+                    >
+                      {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
+                  </div>
+                </div>
+
+                <div>
+                  <label htmlFor="passwordConfirm" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Confirm Password *
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="passwordConfirm"
+                      type={showPasswordConfirm ? "text" : "password"}
+                      value={formData.passwordConfirm}
+                      onChange={(e) => setFormData({ ...formData, passwordConfirm: e.target.value })}
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                      placeholder="Confirm your password"
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
+                      className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-400"
+                    >
+                      {showPasswordConfirm ? <EyeOff size={20} /> : <Eye size={20} />}
+                    </button>
                   </div>
                 </div>
               </div>
@@ -407,23 +508,69 @@ export default function PatientRegistrationPage() {
             {step === 2 && (
               <div className="space-y-5">
                 <div>
-                  <label htmlFor="nationalId" className="block text-sm font-medium text-gray-700 mb-2">
-                    National ID / Passport Number *
-                  </label>
+                  <div className="flex gap-6 mb-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input 
+                        type="radio" 
+                        checked={formData.idType === 'national_id'} 
+                        onChange={() => setFormData({...formData, idType: 'national_id', nationalId: ''})}
+                        className="text-primary focus:ring-primary/30 w-4 h-4"
+                      />
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">National ID</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input 
+                        type="radio" 
+                        checked={formData.idType === 'passport'} 
+                        onChange={() => setFormData({...formData, idType: 'passport', nationalId: ''})}
+                        className="text-primary focus:ring-primary/30 w-4 h-4"
+                      />
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Passport</span>
+                    </label>
+                  </div>
+
+                  <div className="flex justify-between items-center mb-2">
+                    <label htmlFor="nationalId" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                      {formData.idType === 'national_id' ? 'National ID Number *' : 'Passport Number *'}
+                    </label>
+                    {formData.idType === 'national_id' && (
+                      <span className={`text-xs font-medium ${formData.nationalId.length === 16 ? 'text-green-600' : 'text-gray-500 dark:text-gray-400'}`}>
+                        {formData.nationalId.length}/16
+                      </span>
+                    )}
+                  </div>
                   <input
                     id="nationalId"
                     type="text"
                     value={formData.nationalId}
-                    onChange={(e) => setFormData({ ...formData, nationalId: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
-                    placeholder="11998800112233"
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (formData.idType === 'national_id') {
+                        if (/^\d*$/.test(val) && val.length <= 16) {
+                          setFormData({ ...formData, nationalId: val });
+                        }
+                      } else {
+                        setFormData({ ...formData, nationalId: val });
+                      }
+                    }}
+                    className={`w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border rounded-xl focus:ring-2 focus:ring-primary/30 transition-all duration-200 text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500 ${
+                      formData.nationalId.length > 0 && !isIdValid ? 'border-red-500 focus:border-red-500' : 'border-gray-300 dark:border-gray-700 focus:border-primary dark:focus:border-primary'
+                    }`}
+                    placeholder={formData.idType === 'national_id' ? "1199880011223344" : "PC123456"}
                     required
                   />
+                  {formData.nationalId.length > 0 && !isIdValid && (
+                    <p className="mt-1.5 text-sm text-red-500">
+                      {formData.idType === 'national_id' 
+                        ? 'Rwanda National ID must be exactly 16 digits.' 
+                        : 'Please enter a valid passport number.'}
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Date of Birth *
                     </label>
                     <input
@@ -431,19 +578,19 @@ export default function PatientRegistrationPage() {
                       type="date"
                       value={formData.dateOfBirth}
                       onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="gender" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Gender *
                     </label>
                     <select
                       id="gender"
                       value={formData.gender}
                       onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       required
                     >
                       <option value="">Select</option>
@@ -456,14 +603,14 @@ export default function PatientRegistrationPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="bloodGroup" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="bloodGroup" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Blood Group
                     </label>
                     <select
                       id="bloodGroup"
                       value={formData.bloodGroup}
                       onChange={(e) => setFormData({ ...formData, bloodGroup: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     >
                       <option value="">Optional</option>
                       <option value="A+">A+</option>
@@ -477,14 +624,14 @@ export default function PatientRegistrationPage() {
                     </select>
                   </div>
                   <div>
-                    <label htmlFor="province" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="province" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Province *
                     </label>
                     <select
                       id="province"
                       value={formData.province}
                       onChange={(e) => setFormData({ ...formData, province: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       required
                     >
                       <option value="">Select Province</option>
@@ -503,7 +650,7 @@ export default function PatientRegistrationPage() {
             {step === 3 && (
               <div className="space-y-5">
                 <div>
-                  <label htmlFor="emergencyContact" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="emergencyContact" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Emergency Contact Name *
                   </label>
                   <input
@@ -511,14 +658,14 @@ export default function PatientRegistrationPage() {
                     type="text"
                     value={formData.emergencyContact}
                     onChange={(e) => setFormData({ ...formData, emergencyContact: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     placeholder="Full name"
                     required
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="emergencyPhone" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="emergencyPhone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Emergency Contact Phone *
                   </label>
                   <input
@@ -526,13 +673,13 @@ export default function PatientRegistrationPage() {
                     type="tel"
                     value={formData.emergencyPhone}
                     onChange={(e) => setFormData({ ...formData, emergencyPhone: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     placeholder="078 123 4567"
                     required
                   />
                 </div>
 
-                <div className="pt-4 border-t border-gray-200">
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <div className="flex items-start gap-3">
                     <input
                       id="acceptTerms"
@@ -542,7 +689,7 @@ export default function PatientRegistrationPage() {
                       className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary/30"
                       required
                     />
-                    <label htmlFor="acceptTerms" className="text-sm text-gray-700">
+                    <label htmlFor="acceptTerms" className="text-sm text-gray-700 dark:text-gray-300">
                       I agree to the{' '}
                       <Link href="/en/terms" className="text-primary font-medium hover:text-primary-dark">
                         Terms of Service
@@ -564,7 +711,7 @@ export default function PatientRegistrationPage() {
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="flex-1 border border-gray-300 text-gray-700 font-medium py-3 rounded-xl hover:bg-gray-50 transition-colors"
+                  className="flex-1 border border-gray-300 text-gray-700 dark:text-gray-300 font-medium py-3 rounded-xl hover:bg-gray-50 transition-colors"
                 >
                   Back
                 </button>
@@ -574,7 +721,8 @@ export default function PatientRegistrationPage() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="flex-1 bg-primary text-white font-medium py-3 rounded-xl hover:bg-primary-dark transition-colors"
+                  disabled={step === 2 && !isIdValid}
+                  className="flex-1 bg-primary text-white font-medium py-3 rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Continue
                   <ArrowRight className="inline-block ml-2" size={18} />
@@ -599,8 +747,8 @@ export default function PatientRegistrationPage() {
           </form>
 
           {/* Already have account */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <p className="text-center text-gray-600">
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <p className="text-center text-gray-600 dark:text-gray-400">
               Already have an account?{' '}
               <Link href="/en/login" className="text-primary font-medium hover:text-primary-dark">
                 Sign in here
@@ -609,16 +757,16 @@ export default function PatientRegistrationPage() {
           </div>
 
           {/* Security Assurance */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-center gap-3 mb-2">
               <div className="p-2 bg-gray-100 rounded-lg">
-                <Shield size={16} className="text-gray-600" />
+                <Shield size={16} className="text-gray-600 dark:text-gray-400" />
               </div>
-              <p className="text-sm text-gray-600 font-medium">
+              <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                 Your data is protected with 256-bit encryption
               </p>
             </div>
-            <p className="text-xs text-gray-500 text-center">
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
               Compliant with Rwanda's Data Protection Law
             </p>
           </div>

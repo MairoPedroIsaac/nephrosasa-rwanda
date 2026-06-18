@@ -87,7 +87,7 @@ export default function AboutPage() {
   }, []);
 
   return (
-    <div className="bg-white">
+    <div className="bg-white dark:bg-gray-900 transition-colors">
       {/* Hero Section */}
       <section className="relative h-[500px] overflow-hidden">
         <div className="absolute inset-0 z-0">
@@ -114,7 +114,7 @@ export default function AboutPage() {
       </section>
 
       {/* Mission, Vision, Values */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50 dark:bg-gray-800 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Mission */}
@@ -125,7 +125,7 @@ export default function AboutPage() {
                 </div>
               </div>
               <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                 To provide longitudinal, AI-powered pre-dialysis kidney monitoring, enabling early detection and intervention before Stage 4 or 5 Chronic Kidney Disease.
               </p>
             </Card>
@@ -138,7 +138,7 @@ export default function AboutPage() {
                 </div>
               </div>
               <h3 className="text-2xl font-bold mb-4">Our Vision</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                 A Rwanda where no hypertensive or diabetic patient reaches end-stage kidney failure silently, avoiding catastrophic dialysis costs through affordable prevention.
               </p>
             </Card>
@@ -151,7 +151,7 @@ export default function AboutPage() {
                 </div>
               </div>
               <h3 className="text-2xl font-bold mb-4">Our Values</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                 Privacy first. Patient empowerment. Innovation for impact. Building trust through transparency and security in everything we do.
               </p>
             </Card>
@@ -160,7 +160,7 @@ export default function AboutPage() {
       </section>
 
       {/* Story Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-gray-900 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-96 lg:h-[500px]">
@@ -173,10 +173,10 @@ export default function AboutPage() {
             </div>
             <div>
               <span className="text-accent font-semibold text-sm uppercase tracking-wider">Our Story</span>
-              <h2 className="text-4xl font-bold text-gray-900 mt-4 mb-6">
+              <h2 className="text-4xl font-bold text-gray-900 dark:text-white mt-4 mb-6">
                 Born from Personal Experience
               </h2>
-              <div className="space-y-4 text-gray-600 leading-relaxed">
+              <div className="space-y-4 text-gray-600 dark:text-gray-400 leading-relaxed">
                 <p>
                   NephroSasa Rwanda was founded after a startling realization: over 240 new advanced Chronic Kidney Disease cases appear annually across Rwanda's referral hospitals, typically affecting adults in their most productive years.
                 </p>
@@ -186,7 +186,7 @@ export default function AboutPage() {
                 <p>
                   To solve this, we combined unified longitudinal health records with an AI Chronic Kidney Disease risk scoring engine and alert-triggered remote nephrologist consultations.
                 </p>
-                <p className="font-semibold text-gray-900">
+                <p className="font-semibold text-gray-900 dark:text-white">
                   By detecting dangerous trajectories early, we prevent catastrophic dialysis costs and save lives.
                 </p>
               </div>
@@ -196,11 +196,11 @@ export default function AboutPage() {
       </section>
 
       {/* Statistics */}
-      <section ref={statsRef} className="py-20 bg-white">
+      <section ref={statsRef} className="py-20 bg-white dark:bg-gray-900 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">Our Impact in Numbers</h2>
-            <p className="text-xl text-gray-600">Making a real difference in Rwanda's healthcare system</p>
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Our Impact in Numbers</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400">Making a real difference in Rwanda's healthcare system</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             <div className="text-center">
@@ -212,7 +212,7 @@ export default function AboutPage() {
               <h3 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent mb-2">
                 {stats.patients.toLocaleString()}+
               </h3>
-              <p className="text-gray-600">Patients Protected</p>
+              <p className="text-gray-600 dark:text-gray-400">Patients Protected</p>
             </div>
             <div className="text-center">
               <div className="flex justify-center mb-4">
@@ -223,7 +223,7 @@ export default function AboutPage() {
               <h3 className="text-5xl font-bold bg-gradient-to-r from-emerald-500 to-emerald-700 bg-clip-text text-transparent mb-2">
                 {stats.facilities}+
               </h3>
-              <p className="text-gray-600">Partner Facilities</p>
+              <p className="text-gray-600 dark:text-gray-400">Partner Facilities</p>
             </div>
             <div className="text-center">
               <div className="flex justify-center mb-4">
@@ -234,7 +234,7 @@ export default function AboutPage() {
               <h3 className="text-5xl font-bold bg-gradient-to-r from-violet-500 to-purple-700 bg-clip-text text-transparent mb-2">
                 {stats.records.toLocaleString()}+
               </h3>
-              <p className="text-gray-600">Records Managed</p>
+              <p className="text-gray-600 dark:text-gray-400">Records Managed</p>
             </div>
             <div className="text-center">
               <div className="flex justify-center mb-4">
@@ -245,19 +245,19 @@ export default function AboutPage() {
               <h3 className="text-5xl font-bold bg-gradient-to-r from-orange-400 to-rose-500 bg-clip-text text-transparent mb-2">
                 {stats.duplicateTests}%
               </h3>
-              <p className="text-gray-600">Fewer Duplicate Tests</p>
+              <p className="text-gray-600 dark:text-gray-400">Fewer Duplicate Tests</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Team Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-gray-50 dark:bg-gray-800 transition-colors duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <span className="text-accent font-semibold text-sm uppercase tracking-wider">Our Team</span>
-            <h2 className="text-4xl font-bold text-gray-900 mt-4 mb-6">Led by Healthcare Experts</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mt-4 mb-6">Led by Healthcare Experts</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Our team combines deep healthcare expertise with cutting-edge technology skills
             </p>
           </div>
@@ -273,20 +273,20 @@ export default function AboutPage() {
                   />
                 </div>
                 <div>
-                  <h3 className="text-3xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
                     {teamMembers[currentSlide].name}
                   </h3>
                   <p className="text-accent font-semibold mb-4">
                     {teamMembers[currentSlide].role}
                   </p>
-                  <p className="text-gray-600 leading-relaxed">
+                  <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
                     {teamMembers[currentSlide].bio}
                   </p>
                 </div>
               </div>
             </Card>
             <div className="flex justify-center items-center gap-4 mt-8">
-              <button onClick={prevSlide} className="p-3 rounded-full bg-white shadow-lg hover:bg-gray-100 transition-colors">
+              <button onClick={prevSlide} className="p-3 rounded-full bg-white dark:bg-gray-900 transition-colors shadow-lg hover:bg-gray-100 dark:bg-gray-700 transition-colors">
                 <ArrowLeft size={24} className="text-primary" />
               </button>
               <div className="flex gap-2">
@@ -295,12 +295,12 @@ export default function AboutPage() {
                     key={index}
                     onClick={() => setCurrentSlide(index)}
                     className={`w-3 h-3 rounded-full transition-all ${
-                      index === currentSlide ? 'bg-primary w-8' : 'bg-gray-300'
+                      index === currentSlide ? 'bg-primary w-8' : 'bg-gray-300 dark:bg-gray-700'
                     }`}
                   />
                 ))}
               </div>
-              <button onClick={nextSlide} className="p-3 rounded-full bg-white shadow-lg hover:bg-gray-100 transition-colors">
+              <button onClick={nextSlide} className="p-3 rounded-full bg-white dark:bg-gray-900 transition-colors shadow-lg hover:bg-gray-100 dark:bg-gray-700 transition-colors">
                 <ArrowRight size={24} className="text-primary" />
               </button>
             </div>
@@ -309,26 +309,26 @@ export default function AboutPage() {
       </section>
 
       {/* Partners Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-white dark:bg-gray-900 transition-colors">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-4xl font-bold text-gray-900 mb-6">Aligned with Rwanda's Vision 2050</h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-6">Aligned with Rwanda's Vision 2050</h2>
+            <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
               Working alongside government initiatives to digitize Rwanda's healthcare system
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <Card className="text-center">
               <h4 className="font-bold text-lg mb-2">Ministry of Health</h4>
-              <p className="text-gray-600">Supporting Digital Health Blueprint 2024 implementation</p>
+              <p className="text-gray-600 dark:text-gray-400">Supporting Digital Health Blueprint 2024 implementation</p>
             </Card>
             <Card className="text-center">
               <h4 className="font-bold text-lg mb-2">Rwanda Biomedical Center</h4>
-              <p className="text-gray-600">Collaborating on health data standards and protocols</p>
+              <p className="text-gray-600 dark:text-gray-400">Collaborating on health data standards and protocols</p>
             </Card>
             <Card className="text-center">
               <h4 className="font-bold text-lg mb-2">RISA</h4>
-              <p className="text-gray-600">Ensuring data protection and privacy compliance</p>
+              <p className="text-gray-600 dark:text-gray-400">Ensuring data protection and privacy compliance</p>
             </Card>
           </div>
         </div>

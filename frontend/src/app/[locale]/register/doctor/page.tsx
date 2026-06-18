@@ -50,7 +50,7 @@ export default function RegisterDoctorPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Left Side - Hero Image (55%) */}
       <div className="lg:w-[55%] relative min-h-[50vh] lg:min-h-screen">
         {/* Background Image */}
@@ -208,7 +208,7 @@ export default function RegisterDoctorPage() {
       </div>
 
       {/* Right Side - Registration Form (45%) */}
-      <div className="lg:w-[45%] flex items-start justify-center pt-12 lg:pt-24 p-6 sm:p-8 lg:p-14 bg-white">
+      <div className="lg:w-[45%] flex items-start justify-center pt-12 lg:pt-24 p-6 sm:p-8 lg:p-14 bg-white dark:bg-gray-800 transition-colors relative">
         <div className="w-full max-w-lg">
           {/* Mobile Header - CENTERED ICON LIKE LOGIN */}
           <div className="lg:hidden mb-10">
@@ -221,10 +221,10 @@ export default function RegisterDoctorPage() {
               </div>
               
               {/* Text Content */}
-              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+              <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-3">
                 Doctor Registration
               </h2>
-              <p className="text-gray-600 text-lg">
+              <p className="text-gray-600 dark:text-gray-400 text-lg">
                 Create your NephroSasa Doctor account
               </p>
             </div>
@@ -232,10 +232,10 @@ export default function RegisterDoctorPage() {
 
           {/* Desktop Header */}
           <div className="hidden lg:block mb-12">
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-4">
               Doctor Registration
             </h2>
-            <p className="text-gray-600 text-lg">
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
               Create your NephroSasa Doctor account
             </p>
           </div>
@@ -243,8 +243,8 @@ export default function RegisterDoctorPage() {
           {/* Progress Bar */}
           <div className="mb-8">
             <div className="flex justify-between items-center mb-2">
-              <span className="text-sm font-medium text-gray-700">Step {step} of 3</span>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Step {step} of 3</span>
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {step === 1 && 'Personal Info'}
                 {step === 2 && 'Professional Details'}
                 {step === 3 && 'Security & Terms'}
@@ -260,12 +260,12 @@ export default function RegisterDoctorPage() {
 
           {/* Form Header */}
           <div className="mb-8">
-            <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+            <h3 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-2">
               {step === 1 && 'Create Doctor Account'}
               {step === 2 && 'Professional Information'}
               {step === 3 && 'Security & Terms'}
             </h3>
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               {step === 1 && 'Enter your personal information to get started'}
               {step === 2 && 'Enter your professional credentials and details'}
               {step === 3 && 'Set up your account security'}
@@ -279,7 +279,7 @@ export default function RegisterDoctorPage() {
               <div className="space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       First Name *
                     </label>
                     <input
@@ -287,13 +287,13 @@ export default function RegisterDoctorPage() {
                       type="text"
                       value={formData.firstName}
                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       placeholder="John"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Last Name *
                     </label>
                     <input
@@ -301,7 +301,7 @@ export default function RegisterDoctorPage() {
                       type="text"
                       value={formData.lastName}
                       onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       placeholder="Doe"
                       required
                     />
@@ -309,7 +309,7 @@ export default function RegisterDoctorPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Email Address *
                   </label>
                   <div className="relative">
@@ -323,7 +323,7 @@ export default function RegisterDoctorPage() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                      className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       placeholder="you@example.com"
                       required
                     />
@@ -336,7 +336,7 @@ export default function RegisterDoctorPage() {
             {step === 2 && (
               <div className="space-y-5">
                 <div>
-                  <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Phone Number *
                   </label>
                   <div className="relative">
@@ -350,7 +350,7 @@ export default function RegisterDoctorPage() {
                       type="tel"
                       value={formData.phoneNumber}
                       onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                      className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                      className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       placeholder="078 123 4567"
                       required
                     />
@@ -359,7 +359,7 @@ export default function RegisterDoctorPage() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="dateOfBirth" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       Date of Birth *
                     </label>
                     <input
@@ -367,12 +367,12 @@ export default function RegisterDoctorPage() {
                       type="date"
                       value={formData.dateOfBirth}
                       onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       required
                     />
                   </div>
                   <div>
-                    <label htmlFor="nationalId" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="nationalId" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                       National ID *
                     </label>
                     <input
@@ -380,7 +380,7 @@ export default function RegisterDoctorPage() {
                       type="text"
                       value={formData.nationalId}
                       onChange={(e) => setFormData({ ...formData, nationalId: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                      className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       placeholder="11998800112233"
                       required
                     />
@@ -388,7 +388,7 @@ export default function RegisterDoctorPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="licenseNumber" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="licenseNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     RMDC License Number *
                   </label>
                   <input
@@ -396,21 +396,21 @@ export default function RegisterDoctorPage() {
                     type="text"
                     value={formData.licenseNumber}
                     onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     placeholder="RMDC/2024/XXXXX"
                     required
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="specialization" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="specialization" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Specialization *
                   </label>
                   <select
                     id="specialization"
                     value={formData.specialization}
                     onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     required
                   >
                     <option value="">Select Specialization</option>
@@ -428,14 +428,14 @@ export default function RegisterDoctorPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="province" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="province" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Practice Province *
                   </label>
                   <select
                     id="province"
                     value={formData.province}
                     onChange={(e) => setFormData({ ...formData, province: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     required
                   >
                     <option value="">Select Province</option>
@@ -453,7 +453,7 @@ export default function RegisterDoctorPage() {
             {step === 3 && (
               <div className="space-y-5">
                 <div>
-                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Password *
                   </label>
                   <input
@@ -461,14 +461,14 @@ export default function RegisterDoctorPage() {
                     type="password"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     placeholder="At least 8 characters"
                     required
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Confirm Password *
                   </label>
                   <input
@@ -476,13 +476,13 @@ export default function RegisterDoctorPage() {
                     type="password"
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200"
+                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     placeholder="Re-enter your password"
                     required
                   />
                 </div>
 
-                <div className="pt-4 border-t border-gray-200">
+                <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                   <div className="flex items-start gap-3">
                     <input
                       id="acceptTerms"
@@ -492,7 +492,7 @@ export default function RegisterDoctorPage() {
                       className="mt-1 w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary/30"
                       required
                     />
-                    <label htmlFor="acceptTerms" className="text-sm text-gray-700">
+                    <label htmlFor="acceptTerms" className="text-sm text-gray-700 dark:text-gray-300">
                       I agree to the{' '}
                       <Link href="/en/terms" className="text-primary font-medium hover:text-primary-dark">
                         Terms of Service
@@ -514,7 +514,7 @@ export default function RegisterDoctorPage() {
                 <button
                   type="button"
                   onClick={handleBack}
-                  className="flex-1 border border-gray-300 text-gray-700 font-medium py-3 rounded-xl hover:bg-gray-50 transition-colors"
+                  className="flex-1 border border-gray-300 text-gray-700 dark:text-gray-300 font-medium py-3 rounded-xl hover:bg-gray-50 transition-colors"
                 >
                   Back
                 </button>
@@ -549,8 +549,8 @@ export default function RegisterDoctorPage() {
           </form>
 
           {/* Already have account */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <p className="text-center text-gray-600">
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <p className="text-center text-gray-600 dark:text-gray-400">
               Already have an account?{' '}
               <Link href="/en/login" className="text-primary font-medium hover:text-primary-dark">
                 Sign in here
@@ -559,16 +559,16 @@ export default function RegisterDoctorPage() {
           </div>
 
           {/* Security Assurance */}
-          <div className="mt-8 pt-6 border-t border-gray-200">
+          <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-center gap-3 mb-2">
               <div className="p-2 bg-gray-100 rounded-lg">
-                <Shield size={16} className="text-gray-600" />
+                <Shield size={16} className="text-gray-600 dark:text-gray-400" />
               </div>
-              <p className="text-sm text-gray-600 font-medium">
+              <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                 All data is protected with 256-bit encryption
               </p>
             </div>
-            <p className="text-xs text-gray-500 text-center">
+            <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
               Compliant with Rwanda's Data Protection Law & Medical Ethics
             </p>
           </div>

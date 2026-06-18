@@ -8,7 +8,9 @@ class CustomUser(AbstractUser):
         ('ADMIN', 'Admin'),
     )
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, default='PATIENT')
+    email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
+    profile_picture = models.ImageField(upload_to='profiles/', null=True, blank=True)
 
 class PatientProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='patient_profile')
