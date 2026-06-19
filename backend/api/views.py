@@ -194,7 +194,7 @@ class LogVitalsView(views.APIView):
             # Send Confirmation Email via Resend
             try:
                 resend.Emails.send({
-                    "from": "NephroSasa <updates@resend.dev>",
+                    "from": "NephroSasa <onboarding@resend.dev>",
                     "to": request.user.email,
                     "subject": "Vitals Logged - NephroSasa",
                     "html": f"<h3>Vitals Recorded</h3><p>Your blood pressure and sugar levels have been recorded.</p><p>Current AI Risk Assessment: <strong>{vital_log.ai_risk_score}</strong></p>"
