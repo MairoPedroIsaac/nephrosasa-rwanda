@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Clock, TrendingUp, Filter, Download } from 'lucide-react';
+import { Clock, TrendingUp, Filter, Download, CheckCircle } from 'lucide-react';
 import apiClient from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -20,6 +20,8 @@ export default function HealthHistoryPage() {
   const [records, setRecords] = useState<VitalsRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [riskFilter, setRiskFilter] = useState('ALL');
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportSuccess, setExportSuccess] = useState(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -49,25 +51,34 @@ export default function HealthHistoryPage() {
   const handleExportCSV = () => {
     if (filteredRecords.length === 0) return;
     
-    const headers = ['Date', 'Systolic BP (mmHg)', 'Diastolic BP (mmHg)', 'Blood Sugar (mmol/L)', 'AI Risk Score', 'Confidence %'];
-    const csvRows = [headers.join(',')];
+    setIsExporting(true);
+    setExportSuccess(false);
     
-    filteredRecords.forEach(record => {
-      const date = new Date(record.recorded_at).toLocaleDateString('en-RW', {
-        year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
-      }).replace(/,/g, '');
-      csvRows.push(`${date},${record.systolic_bp},${record.diastolic_bp},${record.blood_sugar},${record.ai_risk_score},${record.confidence_percentage}`);
-    });
-    
-    const csvString = csvRows.join('\n');
-    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', 'NephroSasa_Vitals_History.csv');
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    setTimeout(() => {
+      const headers = ['Date', 'Systolic BP (mmHg)', 'Diastolic BP (mmHg)', 'Blood Sugar (mmol/L)', 'AI Risk Score', 'Confidence %'];
+      const csvRows = [headers.join(',')];
+      
+      filteredRecords.forEach(record => {
+        const date = new Date(record.recorded_at).toLocaleDateString('en-RW', {
+          year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        }).replace(/,/g, '');
+        csvRows.push(`${date},${record.systolic_bp},${record.diastolic_bp},${record.blood_sugar},${record.ai_risk_score},${record.confidence_percentage}`);
+      });
+      
+      const csvString = csvRows.join('\n');
+      const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'NephroSasa_Vitals_History.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      setIsExporting(false);
+      setExportSuccess(true);
+      setTimeout(() => setExportSuccess(false), 3000);
+    }, 800);
   };
 
   if (loading) {
@@ -101,9 +112,23 @@ export default function HealthHistoryPage() {
             <option value="MEDIUM">Medium Risk</option>
             <option value="HIGH">High Risk</option>
           </select>
-          <Button variant="primary" onClick={handleExportCSV}>
-            <Download size={18} className="mr-2" />
-            Export CSV
+          <Button variant="primary" onClick={handleExportCSV} disabled={isExporting}>
+            {isExporting ? (
+              <span className="flex items-center gap-2">
+                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                Exporting...
+              </span>
+            ) : exportSuccess ? (
+              <span className="flex items-center gap-2">
+                <CheckCircle size={18} className="text-white" />
+                Downloaded!
+              </span>
+            ) : (
+              <span className="flex items-center gap-2">
+                <Download size={18} />
+                Export CSV
+              </span>
+            )}
           </Button>
         </div>
       </div>

@@ -6,7 +6,10 @@
 import axios from 'axios';
 
 // Get API URL from environment variable
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const RAW_API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const API_URL = (!RAW_API_URL.endsWith('/api') && !RAW_API_URL.endsWith('/api/')) 
+  ? `${RAW_API_URL.replace(/\/$/, '')}/api` 
+  : RAW_API_URL;
 
 // Create axios instance with default config
 const apiClient = axios.create({

@@ -64,6 +64,20 @@ export default function PatientLayout({
     const segments = pathname.split('/');
     segments[1] = lang;
     router.push(segments.join('/'));
+    
+    // Trigger Google Translate widget to translate dynamically
+    const gtLocaleMap: Record<string, string> = {
+      'en': 'en',
+      'rw': 'rw',
+      'fr': 'fr'
+    };
+    
+    const targetLang = gtLocaleMap[lang];
+    const selectElement = document.querySelector('.goog-te-combo') as HTMLSelectElement;
+    if (selectElement) {
+      selectElement.value = targetLang;
+      selectElement.dispatchEvent(new Event('change'));
+    }
   };
 
   const navItems = [

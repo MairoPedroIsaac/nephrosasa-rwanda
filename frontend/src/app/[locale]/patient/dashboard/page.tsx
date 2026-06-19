@@ -5,7 +5,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
-  Activity, 
+  Activity,
+  Info, 
   FileText, 
   QrCode, 
   CreditCard, 
@@ -48,6 +49,7 @@ export default function PatientDashboard() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [recentVitals, setRecentVitals] = useState<VitalsRecord[]>([]);
+  const [isInfoExpanded, setIsInfoExpanded] = useState(false);
 
   // Form moved to separate page
 
@@ -136,10 +138,19 @@ export default function PatientDashboard() {
               <Activity size={120} />
             </div>
             <div className="relative z-10">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-                <Activity className="text-primary" size={24} />
-                AI Kidney Risk Assessment
-              </h2>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                  <Activity className="text-primary" size={24} />
+                  AI Kidney Risk Assessment
+                </h2>
+                <button 
+                  onClick={() => setIsInfoExpanded(!isInfoExpanded)} 
+                  className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 hover:text-primary transition-colors"
+                  title="Toggle Information"
+                >
+                  <Info size={20} />
+                </button>
+              </div>
               
               {recentVitals.length === 0 ? (
                 /* Friendly Empty State */
@@ -170,7 +181,7 @@ export default function PatientDashboard() {
                     </div>
                   </div>
 
-                  {recentVitals[0]?.ai_risk_score !== 'LOW' && (
+                  {recentVitals[0]?.ai_risk_score !== 'LOW' && isInfoExpanded && (
                     <div className={`rounded-xl p-4 mb-4 border ${recentVitals[0]?.ai_risk_score === 'HIGH' ? 'bg-red-50 border-red-200 dark:bg-red-900/20 dark:border-red-800/50' : 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800/50'}`}>
                       <h4 className={`font-semibold flex items-center gap-2 mb-2 ${recentVitals[0]?.ai_risk_score === 'HIGH' ? 'text-red-800 dark:text-red-400' : 'text-amber-800 dark:text-amber-400'}`}>
                         <AlertCircle size={18} />
@@ -185,11 +196,13 @@ export default function PatientDashboard() {
               )}
 
               {/* Required Medical Disclaimer */}
-              <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-200 dark:border-gray-700 mt-6">
-                <p className="text-xs text-gray-500 dark:text-gray-400 italic leading-tight">
-                  <span className="font-semibold text-gray-600 dark:text-gray-300">Medical Disclaimer:</span> This AI-generated risk score is a screening tool based on the data you provided. It is NOT a clinical diagnosis. Always consult your registered healthcare provider before making any medical decisions.
-                </p>
-              </div>
+              {isInfoExpanded && (
+                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 border border-gray-200 dark:border-gray-700 mt-6">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 italic leading-tight">
+                    <span className="font-semibold text-gray-600 dark:text-gray-300">Medical Disclaimer:</span> This AI-generated risk score is a screening tool based on the data you provided. It is NOT a clinical diagnosis. Always consult your registered healthcare provider before making any medical decisions.
+                  </p>
+                </div>
+              )}
             </div>
           </Card>
 
