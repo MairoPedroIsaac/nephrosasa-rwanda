@@ -34,6 +34,9 @@ export interface User {
   user_type: 'PATIENT' | 'DOCTOR' | 'ADMIN';
   date_of_birth?: string;
   national_id?: string;
+  date_joined?: string;
+  last_login?: string;
+  is_first_login?: boolean;
 }
 
 /**
@@ -49,16 +52,19 @@ export const login = async (credentials: LoginCredentials) => {
     const response = await apiClient.post('/auth/login/', payload);
     
     // The CustomTokenObtainPairView returns access, refresh, and user
-    const { access, refresh, user } = response.data;
+    const { access, refresh, user, is_first_login } = response.data;
     
     // Store tokens in localStorage
     localStorage.setItem('access_token', access);
     localStorage.setItem('refresh_token', refresh);
     
-    // Store user data
-    localStorage.setItem('user', JSON.stringify(user));
+    // Attach is_first_login to user object so the dashboard can read it
+    const userWithLoginStatus = { ...user, is_first_login };
     
-    return { success: true, user };
+    // Store user data
+    localStorage.setItem('user', JSON.stringify(userWithLoginStatus));
+    
+    return { success: true, user: userWithLoginStatus };
   } catch (error: any) {
     const errorMsg = error.response?.data?.detail || error.response?.data?.message || 'Invalid email or password. Please try again.';
     return {

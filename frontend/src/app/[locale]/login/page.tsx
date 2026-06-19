@@ -280,7 +280,7 @@ export default function LoginPage() {
                   Email Address *
                 </label>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 pointer-events-none flex items-center justify-center">
                     <Mail size={22} className="text-gray-400" />
                   </div>
                   <input
@@ -308,7 +308,7 @@ export default function LoginPage() {
                   </Link>
                 </div>
                 <div className="relative">
-                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2 pointer-events-none flex items-center justify-center">
                     <Lock size={22} className="text-gray-400" />
                   </div>
                   <input

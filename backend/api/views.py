@@ -131,12 +131,20 @@ class LoginView(views.APIView):
             return Response({"error": "Email or username is required"}, status=status.HTTP_400_BAD_REQUEST)
         
         if user is not None:
+            is_first_login = user.last_login is None
+            
+            # Manually update last_login to ensure it's recorded for future logins
+            from django.utils.timezone import now
+            user.last_login = now()
+            user.save(update_fields=['last_login'])
+            
             refresh = RefreshToken.for_user(user)
             user_serializer = UserSerializer(user)
             return Response({
                 "access": str(refresh.access_token),
                 "refresh": str(refresh),
-                "user": user_serializer.data
+                "user": user_serializer.data,
+                "is_first_login": is_first_login
             }, status=status.HTTP_200_OK)
         else:
             return Response({"error": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)

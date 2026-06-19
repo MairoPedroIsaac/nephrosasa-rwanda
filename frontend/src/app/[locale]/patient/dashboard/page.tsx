@@ -102,7 +102,7 @@ export default function PatientDashboard() {
           <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between">
             <div className="mb-6 md:mb-0">
               <h1 className="text-3xl sm:text-4xl font-extrabold mb-2 tracking-tight">
-                {recentVitals.length === 0 ? "Welcome to NephroSasa" : "Welcome back"}, {user?.first_name}!
+                {user?.is_first_login || !user?.last_login ? "Welcome to NephroSasa" : "Welcome back"}, {user?.first_name}!
               </h1>
               <p className="text-blue-100 text-lg flex items-center gap-2">
                 Proactively monitoring your kidney health.
