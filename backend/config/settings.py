@@ -157,6 +157,7 @@ AUTHENTICATION_BACKENDS = [
 
 # CORS settings - allows frontend to access backend
 CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
     os.getenv('FRONTEND_URL', 'http://localhost:3000'),
 ]
 
