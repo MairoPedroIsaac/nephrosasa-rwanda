@@ -61,7 +61,12 @@ export default function PatientRegistrationPage() {
 
     if (result.success) {
       setSuccessMsg('Account created successfully! Welcome to NephroSasa.');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const formEl = document.getElementById('registration-form-container');
+      if (formEl) {
+        formEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       
       setTimeout(async () => {
         if (result.data?.access && result.data?.refresh) {
@@ -81,7 +86,12 @@ export default function PatientRegistrationPage() {
       }, 3000);
     } else {
       setError(result.error || 'Registration failed');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      const formEl = document.getElementById('registration-form-container');
+      if (formEl) {
+        formEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       setLoading(false);
     }
   };
@@ -277,7 +287,7 @@ export default function PatientRegistrationPage() {
 
       {/* Right Side - Registration Form (45%) */}
       <div className="lg:w-[45%] flex items-start justify-center pt-12 lg:pt-24 p-6 sm:p-8 lg:p-14 bg-white dark:bg-gray-800 transition-colors relative">
-        <div className="w-full max-w-lg">
+        <div id="registration-form-container" className="w-full max-w-lg">
           {/* Mobile Header - CENTERED ICON LIKE LOGIN */}
           <div className="lg:hidden mb-10">
             <div className="flex flex-col items-center text-center mb-8">

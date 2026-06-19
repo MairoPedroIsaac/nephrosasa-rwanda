@@ -67,7 +67,25 @@ class RegisterPatientView(views.APIView):
                     "from": "NephroSasa <onboarding@resend.dev>",
                     "to": user.email,
                     "subject": "Welcome to NephroSasa Rwanda",
-                    "html": f"<h1>Hello {user.first_name},</h1><p>Welcome to NephroSasa Rwanda. Your account has been successfully created. Remember to log your vitals regularly!</p>"
+                    "html": f"""
+            <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                <h2 style="color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px;">Welcome to NephroSasa Rwanda</h2>
+                <p style="font-size: 16px;">Dear {user.first_name} {user.last_name},</p>
+                <p style="font-size: 16px; line-height: 1.5;">
+                    Your patient account has been successfully created. We are honored to be part of your health journey.
+                </p>
+                <p style="font-size: 16px; line-height: 1.5;">
+                    With NephroSasa, you can securely access your personal health records, track your vital signs, and receive AI-driven risk assessments to help manage your kidney health proactively.
+                </p>
+                <p style="font-size: 16px; line-height: 1.5;">
+                    To get started, please log in to your dashboard and log your first set of vital readings.
+                </p>
+                <p style="font-size: 16px; margin-top: 30px;">
+                    Best regards,<br>
+                    <strong>The NephroSasa Rwanda Team</strong>
+                </p>
+            </div>
+            """
                 })
             except Exception as e:
                 print(f"Failed to send email: {e}")
