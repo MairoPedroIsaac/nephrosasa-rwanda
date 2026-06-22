@@ -1,7 +1,8 @@
 import os
 import joblib
 import pandas as pd
-import resend
+import sendgrid
+from sendgrid.helpers.mail import Mail, Email, To, Content
 from django.conf import settings
 from rest_framework import status, views
 from rest_framework.response import Response
@@ -15,8 +16,7 @@ from django.contrib.auth import get_user_model, authenticate
 
 User = get_user_model()
 
-# Configure Resend
-resend.api_key = settings.RESEND_API_KEY
+# Configure SendGrid (client initialized locally per request)
 
 # Load ML Models
 MODEL_PATH = os.path.join(settings.BASE_DIR, 'api', 'ml_models', 'nephrosasa_model.pkl')
@@ -61,13 +61,13 @@ class RegisterPatientView(views.APIView):
             except Exception as e:
                 return Response({"error": "Failed to create user and profile."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-            # Send Welcome Email via Resend
+            # Send Welcome Email via SendGrid
             try:
-                resend.Emails.send({
-                    "from": "NephroSasa <onboarding@resend.dev>",
-                    "to": user.email,
-                    "subject": "Welcome to NephroSasa Rwanda",
-                    "html": f"""
+                sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
+                from_email = Email("isaacmairopedro@gmail.com", "NephroSasa Rwanda")
+                to_email = To(user.email)
+                subject = "Welcome to NephroSasa Rwanda"
+                html_content = f"""
             <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
                 <h2 style="color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px;">Welcome to NephroSasa Rwanda</h2>
                 <p style="font-size: 16px;">Dear {user.first_name} {user.last_name},</p>
@@ -86,7 +86,8 @@ class RegisterPatientView(views.APIView):
                 </p>
             </div>
             """
-                })
+                mail = Mail(from_email, to_email, subject, html_content=html_content)
+                sg.client.mail.send.post(request_body=mail.get())
             except Exception as e:
                 print(f"Failed to send email: {e}")
 
@@ -191,14 +192,15 @@ class LogVitalsView(views.APIView):
                 vital_log.confidence_percentage = round(probability * 100, 2)
                 vital_log.save()
             
-            # Send Confirmation Email via Resend
+            # Send Confirmation Email via SendGrid
             try:
-                resend.Emails.send({
-                    "from": "NephroSasa <onboarding@resend.dev>",
-                    "to": request.user.email,
-                    "subject": "Vitals Logged - NephroSasa",
-                    "html": f"<h3>Vitals Recorded</h3><p>Your blood pressure and sugar levels have been recorded.</p><p>Current AI Risk Assessment: <strong>{vital_log.ai_risk_score}</strong></p>"
-                })
+                sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
+                from_email = Email("isaacmairopedro@gmail.com", "NephroSasa Rwanda")
+                to_email = To(request.user.email)
+                subject = "Vitals Logged - NephroSasa"
+                html_content = f"<h3>Vitals Recorded</h3><p>Your blood pressure and sugar levels have been recorded.</p><p>Current AI Risk Assessment: <strong>{vital_log.ai_risk_score}</strong></p>"
+                mail = Mail(from_email, to_email, subject, html_content=html_content)
+                sg.client.mail.send.post(request_body=mail.get())
             except Exception as e:
                 print(f"Failed to send email: {e}")
 

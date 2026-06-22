@@ -173,5 +173,5 @@ MTN_API_SECRET = os.getenv('MTN_API_SECRET', '')
 AIRTEL_API_KEY = os.getenv('AIRTEL_API_KEY', '')
 AIRTEL_API_SECRET = os.getenv('AIRTEL_API_SECRET', '')
 
-# Resend Email API Settings
-RESEND_API_KEY = os.getenv('RESEND_API_KEY', '')
+# SendGrid Email API Settings
+SENDGRID_API_KEY = os.getenv('SENDGRID_API_KEY', '')
