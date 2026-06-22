@@ -1,8 +1,7 @@
 import os
 import joblib
 import pandas as pd
-import sendgrid
-from sendgrid.helpers.mail import Mail, Email, To, Content
+import requests
 from django.conf import settings
 from rest_framework import status, views
 from rest_framework.response import Response
@@ -61,11 +60,13 @@ class RegisterPatientView(views.APIView):
             except Exception as e:
                 return Response({"error": "Failed to create user and profile."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-            # Send Welcome Email via SendGrid
+            # Send Welcome Email via SendGrid API HTTP request
             try:
-                sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
-                from_email = Email("isaacmairopedro@gmail.com", "NephroSasa Rwanda")
-                to_email = To(user.email)
+                url = "https://api.sendgrid.com/v3/mail/send"
+                headers = {
+                    "Authorization": f"Bearer {settings.SENDGRID_API_KEY}",
+                    "Content-Type": "application/json"
+                }
                 subject = "Welcome to NephroSasa Rwanda"
                 html_content = f"""
             <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
@@ -89,10 +90,16 @@ class RegisterPatientView(views.APIView):
                 </p>
             </div>
             """
-                mail = Mail(from_email, to_email, subject, html_content=html_content)
-                sg.client.mail.send.post(request_body=mail.get())
+                payload = {
+                    "personalizations": [{"to": [{"email": user.email}], "subject": subject}],
+                    "from": {"email": "isaacmairopedro@gmail.com", "name": "NephroSasa Rwanda"},
+                    "content": [{"type": "text/html", "value": html_content}]
+                }
+                response = requests.post(url, json=payload, headers=headers)
+                if response.status_code >= 400:
+                    print(f"Failed to send email. Status Code: {response.status_code}, Body: {response.text}")
             except Exception as e:
-                print(f"Failed to send email: {e}")
+                print(f"Exception sending email: {e}")
 
             refresh = RefreshToken.for_user(user)
             return Response({
@@ -195,11 +202,13 @@ class LogVitalsView(views.APIView):
                 vital_log.confidence_percentage = round(probability * 100, 2)
                 vital_log.save()
             
-            # Send Confirmation Email via SendGrid
+            # Send Confirmation Email via SendGrid API HTTP request
             try:
-                sg = sendgrid.SendGridAPIClient(api_key=settings.SENDGRID_API_KEY)
-                from_email = Email("isaacmairopedro@gmail.com", "NephroSasa Rwanda")
-                to_email = To(request.user.email)
+                url = "https://api.sendgrid.com/v3/mail/send"
+                headers = {
+                    "Authorization": f"Bearer {settings.SENDGRID_API_KEY}",
+                    "Content-Type": "application/json"
+                }
                 subject = "Vitals Logged - NephroSasa"
                 html_content = f"""
             <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
@@ -211,10 +220,16 @@ class LogVitalsView(views.APIView):
                 <p>Current AI Risk Assessment: <strong>{vital_log.ai_risk_score}</strong></p>
             </div>
             """
-                mail = Mail(from_email, to_email, subject, html_content=html_content)
-                sg.client.mail.send.post(request_body=mail.get())
+                payload = {
+                    "personalizations": [{"to": [{"email": request.user.email}], "subject": subject}],
+                    "from": {"email": "isaacmairopedro@gmail.com", "name": "NephroSasa Rwanda"},
+                    "content": [{"type": "text/html", "value": html_content}]
+                }
+                response = requests.post(url, json=payload, headers=headers)
+                if response.status_code >= 400:
+                    print(f"Failed to send email. Status Code: {response.status_code}, Body: {response.text}")
             except Exception as e:
-                print(f"Failed to send email: {e}")
+                print(f"Exception sending email: {e}")
 
             return Response(VitalLogSerializer(vital_log).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
