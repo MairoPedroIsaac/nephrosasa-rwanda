@@ -69,6 +69,9 @@ class RegisterPatientView(views.APIView):
                 subject = "Welcome to NephroSasa Rwanda"
                 html_content = f"""
             <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="https://nephrosasa-rwanda.vercel.app/apple-touch-icon.png" width="80" alt="NephroSasa Logo" style="display: inline-block;">
+                </div>
                 <h2 style="color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px;">Welcome to NephroSasa Rwanda</h2>
                 <p style="font-size: 16px;">Dear {user.first_name} {user.last_name},</p>
                 <p style="font-size: 16px; line-height: 1.5;">
@@ -198,7 +201,16 @@ class LogVitalsView(views.APIView):
                 from_email = Email("isaacmairopedro@gmail.com", "NephroSasa Rwanda")
                 to_email = To(request.user.email)
                 subject = "Vitals Logged - NephroSasa"
-                html_content = f"<h3>Vitals Recorded</h3><p>Your blood pressure and sugar levels have been recorded.</p><p>Current AI Risk Assessment: <strong>{vital_log.ai_risk_score}</strong></p>"
+                html_content = f"""
+            <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="https://nephrosasa-rwanda.vercel.app/apple-touch-icon.png" width="80" alt="NephroSasa Logo" style="display: inline-block;">
+                </div>
+                <h3 style="color: #2563eb; border-bottom: 1px solid #e0e0e0; padding-bottom: 10px;">Vitals Recorded</h3>
+                <p>Your blood pressure and sugar levels have been recorded.</p>
+                <p>Current AI Risk Assessment: <strong>{vital_log.ai_risk_score}</strong></p>
+            </div>
+            """
                 mail = Mail(from_email, to_email, subject, html_content=html_content)
                 sg.client.mail.send.post(request_body=mail.get())
             except Exception as e:
