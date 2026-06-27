@@ -1,4 +1,5 @@
 import os
+import uuid
 import joblib
 import pandas as pd
 import requests
@@ -8,8 +9,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .models import PatientProfile, VitalLog
-from .serializers import UserSerializer, PatientProfileSerializer, VitalLogSerializer
+from .models import PatientProfile, VitalLog, DoctorProfile, HealthRecordShare, Consultation
+from .serializers import UserSerializer, PatientProfileSerializer, VitalLogSerializer, DoctorProfileSerializer
 from django.db import transaction
 from django.contrib.auth import get_user_model, authenticate
 
@@ -30,9 +31,9 @@ except Exception as e:
     rf_scaler = None
 
 def get_risk_label(probability):
-    if probability < 0.3:
+    if probability < 0.45:
         return "LOW", probability
-    elif probability < 0.6:
+    elif probability < 0.70:
         return "MEDIUM", probability
     else:
         return "HIGH", probability
@@ -183,10 +184,10 @@ class LogVitalsView(views.APIView):
                 'SystolicBP': float(vital_log.systolic_bp),
                 'DiastolicBP': float(vital_log.diastolic_bp),
                 'FastingBloodSugar': float(vital_log.blood_sugar),
-                'HbA1c': float(data.get('hba1c', 5.5)),
-                'SerumCreatinine': float(data.get('creatinine', 1.0)),
-                'GFR': float(data.get('gfr', 90.0)),
-                'BUNLevels': float(data.get('bun', 15.0)),
+                'HbA1c': float(vital_log.hba1c) if vital_log.hba1c is not None else float(data.get('hba1c', 5.5)),
+                'SerumCreatinine': float(vital_log.creatinine) if vital_log.creatinine is not None else float(data.get('creatinine', 1.0)),
+                'GFR': float(vital_log.gfr) if vital_log.gfr is not None else float(data.get('gfr', 90.0)),
+                'BUNLevels': float(vital_log.bun) if vital_log.bun is not None else float(data.get('bun', 15.0)),
                 'Age': float(data.get('age', 45.0)),
                 'Smoking': int(data.get('smoking', 0)),
                 'FamilyHistoryKidneyDisease': int(data.get('family_history', 0))
@@ -288,3 +289,262 @@ class ChangePasswordView(views.APIView):
         user.set_password(new_password)
         user.save()
         return Response({'message': 'Password updated successfully'})
+
+class RegisterDoctorView(views.APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        data = request.data.copy() if hasattr(request.data, 'copy') else dict(request.data)
+        if 'username' not in data and 'email' in data:
+            base_username = data['email'].split('@')[0]
+            username = base_username
+            counter = 1
+            while User.objects.filter(username=username).exists():
+                username = f"{base_username}{counter}"
+                counter += 1
+            data['username'] = username
+
+        # Ensure role is set to doctor
+        data['role'] = 'doctor'
+
+        user_serializer = UserSerializer(data=data)
+        if user_serializer.is_valid():
+            try:
+                with transaction.atomic():
+                    user = user_serializer.save()
+                    DoctorProfile.objects.create(
+                        user=user,
+                        full_name=data.get('full_name', ''),
+                        rmdc_number=data.get('rmdc_number', ''),
+                        specialty=data.get('specialty', 'Nephrology'),
+                        phone_number=data.get('phone_number', '')
+                    )
+            except Exception as e:
+                return Response({"error": "Failed to create user and profile."}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+            # Send Welcome Email via SendGrid API HTTP request
+            try:
+                url = "https://api.sendgrid.com/v3/mail/send"
+                headers = {
+                    "Authorization": f"Bearer {settings.SENDGRID_API_KEY}",
+                    "Content-Type": "application/json"
+                }
+                subject = "Welcome to NephroSasa Provider Network"
+                html_content = f"""
+            <div style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="https://nephrosasa-rwanda.vercel.app/apple-touch-icon.png" width="80" alt="NephroSasa Logo" style="display: inline-block;">
+                </div>
+                <h2 style="color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px;">Welcome to NephroSasa Provider Network</h2>
+                <p style="font-size: 16px;">Dear Dr. {data.get('last_name', user.last_name)},</p>
+                <p style="font-size: 16px; line-height: 1.5;">
+                    Your doctor account has been successfully created. We are excited to have you join our network.
+                </p>
+                <p style="font-size: 16px; line-height: 1.5;">
+                    With NephroSasa, you can manage your patients securely, access their medical records and vitals instantly via QR code, and streamline your practice.
+                </p>
+                <p style="font-size: 16px; line-height: 1.5;">
+                    Please note that your RMDC License Number ({data.get('rmdc_number', '')}) is currently pending verification. You will gain full access to accept new patients once verified.
+                </p>
+                <p style="font-size: 16px; margin-top: 30px;">
+                    Best regards,<br>
+                    <strong>The NephroSasa Rwanda Team</strong>
+                </p>
+            </div>
+            """
+                payload = {
+                    "personalizations": [{"to": [{"email": user.email}], "subject": subject}],
+                    "from": {"email": "isaacmairopedro@gmail.com", "name": "NephroSasa Rwanda"},
+                    "content": [{"type": "text/html", "value": html_content}]
+                }
+                response = requests.post(url, json=payload, headers=headers)
+                if response.status_code >= 400:
+                    print(f"Failed to send email. Status Code: {response.status_code}, Body: {response.text}")
+            except Exception as e:
+                print(f"Exception sending email: {e}")
+
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                "message": "Doctor registered successfully", 
+                "user": user_serializer.data,
+                "access": str(refresh.access_token),
+                "refresh": str(refresh)
+            }, status=status.HTTP_201_CREATED)
+        return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class DoctorDashboardView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can access this dashboard'}, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            profile = request.user.doctor_profile
+        except DoctorProfile.DoesNotExist:
+            return Response({'error': 'Doctor profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({
+            "full_name": profile.full_name,
+            "rmdc_number": profile.rmdc_number,
+            "specialty": profile.specialty,
+            "phone_number": profile.phone_number,
+            "is_verified": profile.is_verified,
+            "total_patients": 0,
+            "recent_alerts": [],
+            "upcoming_consultations": []
+        })
+
+class GenerateShareTokenView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if request.user.role != 'patient':
+            return Response({'error': 'Only patients can generate share tokens'}, status=status.HTTP_403_FORBIDDEN)
+        
+        # Deactivate existing tokens
+        HealthRecordShare.objects.filter(patient=request.user, is_active=True).update(is_active=False)
+        
+        # Generate new token
+        token = str(uuid.uuid4())
+        share = HealthRecordShare.objects.create(patient=request.user, token=token)
+        
+        return Response({
+            "token": token,
+            "share_url": f"/shared-record/{token}",
+            "created_at": share.created_at
+        })
+
+class GetShareTokenView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'patient':
+            return Response({'error': 'Only patients can access share tokens'}, status=status.HTTP_403_FORBIDDEN)
+        
+        active_share = HealthRecordShare.objects.filter(patient=request.user, is_active=True).first()
+        if active_share:
+            return Response({
+                "token": active_share.token,
+                "share_url": f"/shared-record/{active_share.token}",
+                "created_at": active_share.created_at
+            })
+        return Response(None)
+
+class SharedRecordView(views.APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request, token):
+        try:
+            share = HealthRecordShare.objects.get(token=token, is_active=True)
+        except HealthRecordShare.DoesNotExist:
+            return Response({"error": "Record not found or link expired"}, status=status.HTTP_404_NOT_FOUND)
+            
+        patient = share.patient
+        try:
+            profile = patient.patient_profile
+        except PatientProfile.DoesNotExist:
+            return Response({"error": "Patient profile not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+        vitals = VitalLog.objects.filter(patient=profile).order_by('-recorded_at')
+        
+        recent_vitals = []
+        for v in vitals[:5]:
+            recent_vitals.append({
+                "recorded_at": v.recorded_at,
+                "systolic_bp": v.systolic_bp,
+                "diastolic_bp": v.diastolic_bp,
+                "blood_sugar": v.blood_sugar,
+                "source": "Home"
+            })
+            
+        latest_vital = vitals.first()
+        latest_risk_score = None
+        if latest_vital and latest_vital.ai_risk_score:
+            latest_risk_score = {
+                "risk_level": latest_vital.ai_risk_score,
+                "confidence": latest_vital.confidence_percentage,
+                "scored_at": latest_vital.recorded_at
+            }
+            
+        return Response({
+            "patient_name": f"{patient.first_name} {patient.last_name}",
+            "diagnosis_type": "Hypertension",
+            "latest_risk_score": latest_risk_score,
+            "recent_vitals": recent_vitals,
+            "total_entries": vitals.count(),
+            "generated_at": share.created_at
+        })
+
+class AvailableDoctorsView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'patient':
+            return Response({'error': 'Only patients can access available doctors'}, status=status.HTTP_403_FORBIDDEN)
+        
+        doctors = DoctorProfile.objects.filter(is_verified=True)
+        data = []
+        for doctor in doctors:
+            data.append({
+                "id": doctor.id,
+                "full_name": doctor.full_name,
+                "rmdc_number": doctor.rmdc_number,
+                "specialty": doctor.specialty,
+                "phone_number": doctor.phone_number
+            })
+        return Response(data)
+
+class BookConsultationView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if request.user.role != 'patient':
+            return Response({'error': 'Only patients can book consultations'}, status=status.HTTP_403_FORBIDDEN)
+        
+        doctor_id = request.data.get('doctor_id')
+        consultation_type = request.data.get('consultation_type')
+        scheduled_date = request.data.get('scheduled_date')
+        scheduled_time = request.data.get('scheduled_time')
+        notes = request.data.get('notes', '')
+        
+        try:
+            doctor = DoctorProfile.objects.get(id=doctor_id)
+        except DoctorProfile.DoesNotExist:
+            return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
+            
+        consultation = Consultation.objects.create(
+            patient=request.user,
+            doctor=doctor,
+            consultation_type=consultation_type,
+            scheduled_date=scheduled_date,
+            scheduled_time=scheduled_time,
+            notes=notes
+        )
+        
+        return Response({
+            "id": consultation.id,
+            "status": consultation.status,
+            "message": "Consultation request sent!"
+        }, status=status.HTTP_201_CREATED)
+
+class MyConsultationsView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'patient':
+            return Response({'error': 'Only patients can access their consultations'}, status=status.HTTP_403_FORBIDDEN)
+            
+        consultations = Consultation.objects.filter(patient=request.user).order_by('-booked_at')
+        data = []
+        for c in consultations:
+            data.append({
+                "id": c.id,
+                "doctor_name": c.doctor.full_name,
+                "consultation_type": c.consultation_type,
+                "scheduled_date": c.scheduled_date,
+                "scheduled_time": c.scheduled_time,
+                "status": c.status,
+                "notes": c.notes
+            })
+        return Response(data)

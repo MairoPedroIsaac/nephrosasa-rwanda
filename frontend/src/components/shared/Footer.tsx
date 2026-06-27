@@ -12,7 +12,7 @@ import { Mail, Phone, MapPin } from 'lucide-react';
 const Footer = () => {
   const pathname = usePathname();
 
-  if (pathname.includes('/patient')) {
+  if (pathname.includes('/patient') || pathname.includes('/doctor') || pathname.includes('/shared-record')) {
     return null;
   }
 

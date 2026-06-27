@@ -20,7 +20,7 @@ export default function RegisterDoctorPage() {
     dateOfBirth: '',
     nationalId: '',
     licenseNumber: '',
-    specialization: '',
+    specialization: 'Nephrology',
     province: '',
     
     // Step 3
@@ -30,15 +30,58 @@ export default function RegisterDoctorPage() {
   });
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
     setLoading(true);
-    // Submit logic here
-    setTimeout(() => {
+    setError('');
+    
+    try {
+      const response = await fetch('http://localhost:8000/api/auth/register/doctor/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          full_name: `${formData.firstName} ${formData.lastName}`,
+          rmdc_number: formData.licenseNumber,
+          specialty: formData.specialization,
+          phone_number: formData.phoneNumber,
+        }),
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        setSuccessMsg('Account created successfully!');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (data.access && data.refresh) {
+          localStorage.setItem('access_token', data.access);
+          localStorage.setItem('refresh_token', data.refresh);
+          localStorage.setItem('user', JSON.stringify(data.user || {}));
+        }
+        setTimeout(() => {
+          setLoading(false);
+          router.push('/en/doctor/dashboard');
+        }, 1500);
+      } else {
+        setError(typeof data === 'object' ? JSON.stringify(data) : 'Registration failed');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        setLoading(false);
+      }
+    } catch (err) {
+      setError('An error occurred during registration.');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       setLoading(false);
-      router.push('/en/doctor/dashboard');
-    }, 1500);
+    }
   };
 
   const handleNext = () => {
@@ -272,6 +315,32 @@ export default function RegisterDoctorPage() {
             </p>
           </div>
 
+          {/* Success Handler */}
+          {successMsg && (
+            <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg shadow-sm mb-6">
+              <div className="flex items-center">
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-green-800">
+                    {successMsg}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Error Handler */}
+          {error && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg shadow-sm mb-6">
+              <div className="flex items-center">
+                <div className="ml-3">
+                  <p className="text-sm font-medium text-red-800">
+                    {error}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Registration Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Step 1: Personal Information */}
@@ -323,7 +392,7 @@ export default function RegisterDoctorPage() {
                       type="email"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                      className="w-full pl-14 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       placeholder="you@example.com"
                       required
                     />
@@ -350,7 +419,7 @@ export default function RegisterDoctorPage() {
                       type="tel"
                       value={formData.phoneNumber}
                       onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                      className="w-full pl-12 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                      className="w-full pl-14 pr-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       placeholder="078 123 4567"
                       required
                     />
@@ -379,7 +448,13 @@ export default function RegisterDoctorPage() {
                       id="nationalId"
                       type="text"
                       value={formData.nationalId}
-                      onChange={(e) => setFormData({ ...formData, nationalId: e.target.value })}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, '');
+                        if (val.length <= 16) {
+                          setFormData({ ...formData, nationalId: val });
+                        }
+                      }}
+                      maxLength={16}
                       className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                       placeholder="11998800112233"
                       required
@@ -395,36 +470,32 @@ export default function RegisterDoctorPage() {
                     id="licenseNumber"
                     type="text"
                     value={formData.licenseNumber}
-                    onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value.toUpperCase() })}
                     className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
                     placeholder="RMDC/2024/XXXXX"
+                    pattern="RMDC/\d{4}/.+"
+                    title="Format must be RMDC/YYYY/XXXXX"
                     required
                   />
+                  <p className="text-xs text-gray-500 mt-2">Format: RMDC/YYYY/XXXXX (e.g. RMDC/2024/12345)</p>
                 </div>
 
                 <div>
                   <label htmlFor="specialization" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     Specialization *
                   </label>
-                  <select
+                  <input
                     id="specialization"
+                    type="text"
                     value={formData.specialization}
-                    onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200 placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                    readOnly
+                    disabled
+                    className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-gray-600 dark:text-gray-400 rounded-xl cursor-not-allowed"
                     required
-                  >
-                    <option value="">Select Specialization</option>
-                    <option value="general">General Practitioner</option>
-                    <option value="pediatrics">Pediatrics</option>
-                    <option value="surgery">Surgery</option>
-                    <option value="cardiology">Cardiology</option>
-                    <option value="orthopedics">Orthopedics</option>
-                    <option value="gynecology">Gynecology</option>
-                    <option value="dentistry">Dentistry</option>
-                    <option value="ophthalmology">Ophthalmology</option>
-                    <option value="dermatology">Dermatology</option>
-                    <option value="other">Other</option>
-                  </select>
+                  />
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                    NephroSasa Rwanda is exclusively for verified nephrologists.
+                  </p>
                 </div>
 
                 <div>

@@ -7,7 +7,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'user_type', 'phone_number', 'password', 'profile_picture', 'date_joined', 'last_login')
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'user_type', 'role', 'phone_number', 'password', 'profile_picture', 'date_joined', 'last_login')
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -19,6 +19,13 @@ class PatientProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = PatientProfile
+        fields = '__all__'
+
+class DoctorProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    
+    class Meta:
+        model = DoctorProfile
         fields = '__all__'
 
 class VitalLogSerializer(serializers.ModelSerializer):

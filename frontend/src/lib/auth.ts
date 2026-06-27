@@ -32,6 +32,7 @@ export interface User {
   last_name: string;
   phone_number: string;
   user_type: 'PATIENT' | 'DOCTOR' | 'ADMIN';
+  role?: 'patient' | 'doctor';
   date_of_birth?: string;
   national_id?: string;
   date_joined?: string;

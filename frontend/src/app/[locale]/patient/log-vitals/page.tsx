@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { HeartPulse, Droplet, CheckCircle } from 'lucide-react';
+import { HeartPulse, Droplet, CheckCircle, Home, Hospital } from 'lucide-react';
 import { getCurrentUser, isAuthenticated } from '@/lib/auth';
 import apiClient from '@/lib/api';
 import Card from '@/components/ui/Card';
@@ -15,10 +15,19 @@ export default function LogVitalsPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
 
+  const [mode, setMode] = useState<'home' | 'clinic'>('home');
+
   const [vitalsForm, setVitalsForm] = useState({
     systolicBP: '',
     diastolicBP: '',
     bloodSugar: '',
+    hba1c: '',
+    creatinine: '',
+    bun: '',
+    gfr: '',
+    sodium: '',
+    potassium: '',
+    hemoglobin: ''
   });
 
   useEffect(() => {
@@ -31,21 +40,55 @@ export default function LogVitalsPage() {
       router.push('/en/doctor/dashboard');
       return;
     }
+    
+    const saved = localStorage.getItem('nephrosasa_vitals_form');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (parsed.vitalsForm) setVitalsForm(parsed.vitalsForm);
+        if (parsed.mode) setMode(parsed.mode);
+      } catch (e) {
+        console.error('Failed to parse saved vitals form', e);
+      }
+    }
+    
     setLoading(false);
   }, [router]);
+
+  useEffect(() => {
+    if (loading || success) return;
+    localStorage.setItem('nephrosasa_vitals_form', JSON.stringify({ vitalsForm, mode }));
+  }, [vitalsForm, mode, loading, success]);
 
   const handleVitalsSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setError('');
     try {
-      await apiClient.post('/vitals/log/', {
+      const payload: any = {
         systolic_bp: vitalsForm.systolicBP,
         diastolic_bp: vitalsForm.diastolicBP,
         blood_sugar: vitalsForm.bloodSugar
-      });
+      };
+      
+      if (mode === 'clinic') {
+        if (vitalsForm.hba1c) payload.hba1c = vitalsForm.hba1c;
+        if (vitalsForm.creatinine) payload.creatinine = vitalsForm.creatinine;
+        if (vitalsForm.bun) payload.bun = vitalsForm.bun;
+        if (vitalsForm.gfr) payload.gfr = vitalsForm.gfr;
+        if (vitalsForm.sodium) payload.sodium = vitalsForm.sodium;
+        if (vitalsForm.potassium) payload.potassium = vitalsForm.potassium;
+        if (vitalsForm.hemoglobin) payload.hemoglobin = vitalsForm.hemoglobin;
+      }
+
+      await apiClient.post('/vitals/log/', payload);
       setSuccess(true);
-      setVitalsForm({ systolicBP: '', diastolicBP: '', bloodSugar: '' });
+      localStorage.removeItem('nephrosasa_vitals_form');
+      setVitalsForm({ 
+        systolicBP: '', diastolicBP: '', bloodSugar: '', 
+        hba1c: '', creatinine: '', bun: '', gfr: '', 
+        sodium: '', potassium: '', hemoglobin: '' 
+      });
       setTimeout(() => {
         router.push('/en/patient/dashboard');
       }, 2000);
@@ -109,6 +152,35 @@ export default function LogVitalsPage() {
             </div>
           )}
 
+          <div className="flex justify-center mb-8">
+            <div className="inline-flex bg-gray-100 dark:bg-gray-800 rounded-full p-1 shadow-inner">
+              <button
+                type="button"
+                onClick={() => setMode('home')}
+                className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all ${
+                  mode === 'home' 
+                    ? 'bg-white dark:bg-gray-700 text-primary shadow-sm' 
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                }`}
+              >
+                <Home size={18} />
+                Home Monitoring
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('clinic')}
+                className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-semibold transition-all ${
+                  mode === 'clinic' 
+                    ? 'bg-white dark:bg-gray-700 text-primary shadow-sm' 
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
+                }`}
+              >
+                <Hospital size={18} />
+                Clinic Visit
+              </button>
+            </div>
+          </div>
+
           <form onSubmit={handleVitalsSubmit} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
@@ -157,6 +229,119 @@ export default function LogVitalsPage() {
                 required
               />
             </div>
+
+            {mode === 'clinic' && (
+              <div className="border-t border-gray-200 dark:border-gray-700 pt-8 mt-8">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">Clinic Lab Results (Optional)</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label htmlFor="hba1c" className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      HbA1c (%)
+                    </label>
+                    <p className="text-xs text-gray-500 mb-2">Get this value from your clinic lab results</p>
+                    <input
+                      id="hba1c"
+                      type="number"
+                      step="0.1"
+                      value={vitalsForm.hba1c}
+                      onChange={(e) => setVitalsForm({ ...vitalsForm, hba1c: e.target.value })}
+                      className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 placeholder:text-gray-400 text-lg"
+                      placeholder="e.g. 5.5"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="creatinine" className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Serum Creatinine (mg/dL)
+                    </label>
+                    <p className="text-xs text-gray-500 mb-2">Get this value from your clinic lab results</p>
+                    <input
+                      id="creatinine"
+                      type="number"
+                      step="0.01"
+                      value={vitalsForm.creatinine}
+                      onChange={(e) => setVitalsForm({ ...vitalsForm, creatinine: e.target.value })}
+                      className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 placeholder:text-gray-400 text-lg"
+                      placeholder="e.g. 1.0"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="bun" className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      BUN (mg/dL)
+                    </label>
+                    <p className="text-xs text-gray-500 mb-2">Get this value from your clinic lab results</p>
+                    <input
+                      id="bun"
+                      type="number"
+                      step="0.1"
+                      value={vitalsForm.bun}
+                      onChange={(e) => setVitalsForm({ ...vitalsForm, bun: e.target.value })}
+                      className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 placeholder:text-gray-400 text-lg"
+                      placeholder="e.g. 15.0"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="gfr" className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      eGFR (mL/min)
+                    </label>
+                    <p className="text-xs text-gray-500 mb-2">Get this value from your clinic lab results</p>
+                    <input
+                      id="gfr"
+                      type="number"
+                      step="0.1"
+                      value={vitalsForm.gfr}
+                      onChange={(e) => setVitalsForm({ ...vitalsForm, gfr: e.target.value })}
+                      className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 placeholder:text-gray-400 text-lg"
+                      placeholder="e.g. 90.0"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="sodium" className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Serum Sodium (mEq/L)
+                    </label>
+                    <p className="text-xs text-gray-500 mb-2">Get this value from your clinic lab results</p>
+                    <input
+                      id="sodium"
+                      type="number"
+                      step="0.1"
+                      value={vitalsForm.sodium}
+                      onChange={(e) => setVitalsForm({ ...vitalsForm, sodium: e.target.value })}
+                      className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 placeholder:text-gray-400 text-lg"
+                      placeholder="e.g. 140.0"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="potassium" className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Serum Potassium (mEq/L)
+                    </label>
+                    <p className="text-xs text-gray-500 mb-2">Get this value from your clinic lab results</p>
+                    <input
+                      id="potassium"
+                      type="number"
+                      step="0.1"
+                      value={vitalsForm.potassium}
+                      onChange={(e) => setVitalsForm({ ...vitalsForm, potassium: e.target.value })}
+                      className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 placeholder:text-gray-400 text-lg"
+                      placeholder="e.g. 4.0"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="hemoglobin" className="block text-base font-medium text-gray-700 dark:text-gray-300 mb-1">
+                      Hemoglobin (g/dL)
+                    </label>
+                    <p className="text-xs text-gray-500 mb-2">Get this value from your clinic lab results</p>
+                    <input
+                      id="hemoglobin"
+                      type="number"
+                      step="0.1"
+                      value={vitalsForm.hemoglobin}
+                      onChange={(e) => setVitalsForm({ ...vitalsForm, hemoglobin: e.target.value })}
+                      className="w-full px-5 py-4 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all duration-200 placeholder:text-gray-400 text-lg"
+                      placeholder="e.g. 13.5"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="pt-4">
               <Button type="submit" variant="primary" fullWidth size="lg" className="text-xl py-5 rounded-xl" disabled={isSubmitting}>

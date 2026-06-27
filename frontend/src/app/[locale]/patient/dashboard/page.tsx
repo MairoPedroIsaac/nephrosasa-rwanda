@@ -59,6 +59,7 @@ export default function PatientDashboard() {
       setRecentVitals(response.data);
     } catch (error) {
       console.error('Failed to fetch vitals history', error);
+      setRecentVitals([]);
     }
   };
 
@@ -133,7 +134,7 @@ export default function PatientDashboard() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
           
           {/* AI Kidney Risk Score Card */}
-          <Card className="border-t-4 border-primary shadow-xl shadow-primary/5 relative overflow-hidden group">
+          <Card className="shadow-xl shadow-primary/5 relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 opacity-5 text-primary">
               <Activity size={120} />
             </div>
@@ -312,7 +313,7 @@ export default function PatientDashboard() {
                   </Button>
                 </Link>
 
-                <Link href="/en/patient/qr-code">
+                <Link href="/en/patient/share-record">
                   <Button variant="outline" size="lg" fullWidth className="group justify-between bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 shadow-sm">
                     <span className="flex items-center gap-2">
                       <QrCode size={18} className="text-gray-400 dark:text-gray-400" />

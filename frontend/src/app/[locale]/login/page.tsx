@@ -45,7 +45,7 @@ export default function LoginPage() {
         localStorage.removeItem('nephrosasa_remembered_credentials');
       }
 
-      if (result.user?.user_type === 'DOCTOR') {
+      if (result.user?.role === 'doctor' || result.user?.user_type === 'DOCTOR') {
         router.push('/en/doctor/dashboard');
       } else {
         router.push('/en/patient/dashboard');

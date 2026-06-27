@@ -6,20 +6,19 @@ import { usePathname, useRouter } from 'next/navigation';
 import { getCurrentUser, logout } from '@/lib/auth';
 import { 
   Activity, 
-  Clock, 
   User, 
   LogOut,
   Menu,
   X,
-  HeartPulse,
   Sun,
   Moon,
   Stethoscope,
-  CreditCard,
-  QrCode
+  Users,
+  Calendar,
+  FileText
 } from 'lucide-react';
 
-export default function PatientLayout({
+export default function DoctorLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -82,12 +81,10 @@ export default function PatientLayout({
   };
 
   const navItems = [
-    { name: 'Dashboard', href: '/en/patient/dashboard', icon: Activity },
-    { name: 'Log Vitals', href: '/en/patient/log-vitals', icon: HeartPulse },
-    { name: 'Health History', href: '/en/patient/records', icon: Clock },
-    { name: 'Share Record', href: '/en/patient/share-record', icon: QrCode },
-    { name: 'Consultancy', href: '/en/patient/consult', icon: Stethoscope },
-    { name: 'Payments', href: '/en/patient/payments', icon: CreditCard },
+    { name: 'Dashboard', href: `/${currentLocale}/doctor/dashboard`, icon: Activity },
+    { name: 'My Patients', href: `/${currentLocale}/doctor/patients`, icon: Users },
+    { name: 'Schedule', href: `/${currentLocale}/doctor/schedule`, icon: Calendar },
+    { name: 'Prescriptions', href: `/${currentLocale}/doctor/prescriptions`, icon: FileText },
   ];
 
   return (
@@ -121,7 +118,7 @@ export default function PatientLayout({
           <div className="px-6 mb-8 flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-white tracking-tight">NephroSasa</h2>
-              <p className="text-blue-200 text-sm">Patient Portal</p>
+              <p className="text-blue-200 text-sm flex items-center gap-1"><Stethoscope size={14}/> Doctor Portal</p>
             </div>
             {/* Desktop Theme Toggle */}
             <button 
@@ -159,9 +156,9 @@ export default function PatientLayout({
           </nav>
 
           <div className="px-4 mt-auto">
-            <Link href="/en/patient/profile" onClick={() => setIsMobileMenuOpen(false)}>
+            <Link href={`/${currentLocale}/doctor/profile`} onClick={() => setIsMobileMenuOpen(false)}>
               <div className={`flex items-center gap-3 px-4 py-3 mb-2 rounded-xl transition-colors duration-200 ${
-                pathname === '/en/patient/profile' 
+                pathname === `/${currentLocale}/doctor/profile` 
                   ? 'bg-white/20 text-white font-semibold shadow-inner border border-white/10' 
                   : 'text-blue-100 hover:bg-white/10 hover:text-white'
               }`}>
@@ -175,7 +172,7 @@ export default function PatientLayout({
                   {user?.first_name?.charAt(0) || 'U'}
                 </div>
                 <div className="overflow-hidden">
-                  <p className="text-white font-medium truncate">{user?.first_name} {user?.last_name}</p>
+                  <p className="text-white font-medium truncate">Dr. {user?.last_name || user?.first_name}</p>
                   <p className="text-blue-200 text-xs truncate">{user?.email}</p>
                 </div>
               </div>
