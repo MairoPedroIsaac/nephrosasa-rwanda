@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { QrCode, ArrowRight, Info } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import apiClient from '@/lib/api';
 
 export default function DoctorScanQrPage() {
   const router = useRouter();
@@ -14,7 +15,7 @@ export default function DoctorScanQrPage() {
   const [inputVal, setInputVal] = useState('');
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
@@ -25,11 +26,10 @@ export default function DoctorScanQrPage() {
     }
 
     let token = val;
-    // Check if it's a URL
     if (val.includes('/shared-record/')) {
       const parts = val.split('/shared-record/');
       if (parts.length > 1) {
-        token = parts[1].split('/')[0].split('?')[0]; // Extract token and remove query params/trailing slashes
+        token = parts[1].split('/')[0].split('?')[0];
       }
     }
 
@@ -38,7 +38,12 @@ export default function DoctorScanQrPage() {
       return;
     }
 
-    // Client-side navigation to the public shared record page
+    try {
+      await apiClient.post('/doctor/add-patient/', { token });
+    } catch (err) {
+      console.error('Failed to save patient to list:', err);
+    }
+
     router.push(`/${locale}/shared-record/${token}`);
   };
 

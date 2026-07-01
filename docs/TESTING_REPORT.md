@@ -154,11 +154,11 @@ validate trajectory detection against clinical outcomes.
 ### 4.2 Future Work
 
 **Phase 2 (Post-Graduation, 2026):**
-- Doctor dashboard with RMDC verification and patient alert system
-- QR code health record sharing for cross-clinic access
+- Africa's Talking SMS reminders (7-day and 14-day missed follow-up intervals)
 - MTN Mobile Money and Airtel Money payment integration for remote consultations
-- Africa's Talking SMS reminders at 7-day and 14-day intervals
 - Supabase RLS security hardening across all tables
+- Doctor profile editing (name, phone number, specialty)
+- Doctor RMDC verification workflow: currently requires manual approval via Django admin panel. A dedicated admin verification interface is deferred to Phase 2.
 
 **Phase 3 (Masters Research, 2027):**
 - Flutter offline mobile application for community health workers

@@ -147,7 +147,7 @@ const Navbar = () => {
     { href: `/${currentLocale}/contact`, label: 'Contact' },
   ];
 
-  if (pathname.includes('/patient/') || pathname.includes('/doctor/') || pathname.includes('/admin/')) {
+  if (pathname.includes('/patient/') || pathname.includes('/doctor/') || pathname.includes('/admin/') || pathname.includes('/shared-record/')) {
     return null;
   }
 

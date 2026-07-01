@@ -14,6 +14,13 @@ interface VitalsRecord {
   blood_sugar: number;
   ai_risk_score: string;
   confidence_percentage: number;
+  hba1c?: number | null;
+  creatinine?: number | null;
+  bun?: number | null;
+  gfr?: number | null;
+  sodium?: number | null;
+  potassium?: number | null;
+  hemoglobin?: number | null;
 }
 
 export default function HealthHistoryPage() {
@@ -153,45 +160,77 @@ export default function HealthHistoryPage() {
                   <th className="py-4 px-6 font-semibold text-gray-700 dark:text-gray-300">Date</th>
                   <th className="py-4 px-6 font-semibold text-gray-700 dark:text-gray-300">Blood Pressure</th>
                   <th className="py-4 px-6 font-semibold text-gray-700 dark:text-gray-300">Blood Sugar</th>
+                  <th className="py-4 px-6 font-semibold text-gray-700 dark:text-gray-300">Mode</th>
                   <th className="py-4 px-6 font-semibold text-gray-700 dark:text-gray-300">AI Risk Score</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
-                {filteredRecords.map((record) => (
-                  <tr key={record.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-colors">
-                    <td className="py-4 px-6 text-gray-900 dark:text-gray-100">
-                      {new Date(record.recorded_at).toLocaleDateString('en-RW', {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
-                    </td>
-                    <td className="py-4 px-6">
-                      <span className="font-medium text-gray-900 dark:text-gray-100">{record.systolic_bp}</span>
-                      <span className="text-gray-500 dark:text-gray-400 mx-1">/</span>
-                      <span className="font-medium text-gray-900 dark:text-gray-100">{record.diastolic_bp}</span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">mmHg</span>
-                    </td>
-                    <td className="py-4 px-6">
-                      <span className="font-medium text-gray-900 dark:text-gray-100">{record.blood_sugar}</span>
-                      <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">mmol/L</span>
-                    </td>
-                    <td className="py-4 px-6">
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${getRiskColor(record.ai_risk_score)}`}>
-                        {record.ai_risk_score} RISK
-                      </span>
-                    </td>
-                  </tr>
-                ))}
+                {filteredRecords.map((record) => {
+                  const isClinic = record.hba1c != null || record.creatinine != null || record.bun != null || record.gfr != null || record.sodium != null || record.potassium != null || record.hemoglobin != null;
+                  return (
+                    <React.Fragment key={record.id}>
+                      <tr className="hover:bg-gray-50/50 dark:hover:bg-gray-800/20 transition-colors">
+                        <td className="py-4 px-6 text-gray-900 dark:text-gray-100">
+                          {new Date(record.recorded_at).toLocaleDateString('en-RW', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                          })}
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className="font-medium text-gray-900 dark:text-gray-100">{record.systolic_bp}</span>
+                          <span className="text-gray-500 dark:text-gray-400 mx-1">/</span>
+                          <span className="font-medium text-gray-900 dark:text-gray-100">{record.diastolic_bp}</span>
+                          <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">mmHg</span>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className="font-medium text-gray-900 dark:text-gray-100">{record.blood_sugar}</span>
+                          <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">mmol/L</span>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            isClinic
+                              ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' 
+                              : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                          }`}>
+                            {isClinic ? 'Clinic' : 'Home'}
+                          </span>
+                        </td>
+                        <td className="py-4 px-6">
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-bold border ${getRiskColor(record.ai_risk_score)}`}>
+                            {record.ai_risk_score} RISK
+                          </span>
+                        </td>
+                      </tr>
+                      {isClinic && (
+                        <tr className="bg-gray-50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-700">
+                          <td colSpan={5} className="px-6 py-3">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-gray-500 dark:text-gray-400">
+                              {record.hba1c != null && <span><strong>HbA1c:</strong> {record.hba1c}%</span>}
+                              {record.creatinine != null && <span><strong>Creatinine:</strong> {record.creatinine} mg/dL</span>}
+                              {record.bun != null && <span><strong>BUN:</strong> {record.bun} mg/dL</span>}
+                              {record.gfr != null && <span><strong>GFR:</strong> {record.gfr} mL/min</span>}
+                              {record.sodium != null && <span><strong>Sodium:</strong> {record.sodium} mEq/L</span>}
+                              {record.potassium != null && <span><strong>Potassium:</strong> {record.potassium} mEq/L</span>}
+                              {record.hemoglobin != null && <span><strong>Hemoglobin:</strong> {record.hemoglobin} g/dL</span>}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  );
+                })}
               </tbody>
             </table>
           </div>
 
           {/* Mobile Cards */}
           <div className="md:hidden divide-y divide-gray-100 dark:divide-gray-800">
-            {filteredRecords.map((record) => (
+            {filteredRecords.map((record) => {
+              const isClinic = record.hba1c != null || record.creatinine != null || record.bun != null || record.gfr != null || record.sodium != null || record.potassium != null || record.hemoglobin != null;
+              return (
               <div key={record.id} className="p-4 space-y-4">
                 <div className="flex justify-between items-start">
                   <div className="text-sm text-gray-500 dark:text-gray-400">
@@ -202,9 +241,14 @@ export default function HealthHistoryPage() {
                       minute: '2-digit'
                     })}
                   </div>
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold border ${getRiskColor(record.ai_risk_score)}`}>
-                    {record.ai_risk_score}
-                  </span>
+                  <div className="flex gap-2">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${isClinic ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'}`}>
+                      {isClinic ? 'Clinic' : 'Home'}
+                    </span>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold border ${getRiskColor(record.ai_risk_score)}`}>
+                      {record.ai_risk_score}
+                    </span>
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4 bg-gray-50 dark:bg-gray-800/30 p-3 rounded-lg">
@@ -221,8 +265,23 @@ export default function HealthHistoryPage() {
                     </p>
                   </div>
                 </div>
+
+                {isClinic && (
+                  <div className="bg-gray-50 dark:bg-gray-800/30 p-3 rounded-lg mt-2 border border-gray-100 dark:border-gray-700">
+                    <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Clinic Labs</p>
+                    <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 dark:text-gray-400">
+                        {record.hba1c != null && <span><strong>HbA1c:</strong> {record.hba1c}%</span>}
+                        {record.creatinine != null && <span><strong>Creatinine:</strong> {record.creatinine} mg/dL</span>}
+                        {record.bun != null && <span><strong>BUN:</strong> {record.bun} mg/dL</span>}
+                        {record.gfr != null && <span><strong>GFR:</strong> {record.gfr} mL/min</span>}
+                        {record.sodium != null && <span><strong>Sodium:</strong> {record.sodium} mEq/L</span>}
+                        {record.potassium != null && <span><strong>Potassium:</strong> {record.potassium} mEq/L</span>}
+                        {record.hemoglobin != null && <span><strong>Hemoglobin:</strong> {record.hemoglobin} g/dL</span>}
+                    </div>
+                  </div>
+                )}
               </div>
-            ))}
+            )})}
           </div>
         </Card>
       )}

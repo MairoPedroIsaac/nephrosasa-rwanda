@@ -182,9 +182,9 @@ npm run dev
 
 1. The vitals form UI collects 3 fields in Home mode and 10 fields in Clinic mode. When only 3 fields are submitted, the AI model uses dataset median defaults for the remaining 7 features, which reduces real-world accuracy below the reported 84.94%.
 
-2. Email delivery uses SendGrid single-sender verification without a custom domain. Emails may land in spam — this is expected and acceptable for the capstone phase.
+2. Email delivery uses SendGrid single-sender verification without a custom domain. Emails may land in spam.
 
-3. Doctor dashboard, QR code health record sharing, and mobile money payment integration are deferred to Phase 2 post-graduation development.
+3. Africa's Talking SMS reminders (7-day and 14-day missed follow-up) and MTN Mobile Money / Airtel Money payment integration for remote consultations are deferred to Phase 2 post-graduation development. Doctor RMDC verification currently requires manual approval via Django admin. A dedicated verification interface is a Phase 2 feature.
 
 4. Render free tier suspension occurs monthly when usage limits are reached. UptimeRobot pings the backend every 5 minutes to minimize cold starts during active periods.
 

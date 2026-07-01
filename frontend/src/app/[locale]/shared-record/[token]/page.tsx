@@ -4,19 +4,20 @@ import React, { useState, useEffect } from 'react';
 import { ShieldAlert, CheckCircle, Activity, HeartPulse, Droplet, User, MapPin } from 'lucide-react';
 import Card from '@/components/ui/Card';
 
-export default function SharedRecordPage({ params }: { params: { token: string } }) {
+export default function SharedRecordPage({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = React.use(params);
   const [loading, setLoading] = useState(true);
   const [recordData, setRecordData] = useState<any>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     fetchSharedRecord();
-  }, [params.token]);
+  }, [token]);
 
   const fetchSharedRecord = async () => {
     try {
       const baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
-      const response = await fetch(`${baseUrl}/shared-record/${params.token}/`);
+      const response = await fetch(`${baseUrl}/shared-record/${token}/`);
       
       if (!response.ok) {
         throw new Error('Record not found');
@@ -70,10 +71,18 @@ export default function SharedRecordPage({ params }: { params: { token: string }
       <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-4xl mx-auto px-4 py-4 sm:px-6 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold tracking-tight">
-              <span className="text-primary">Nephro</span>
-              <span className="text-accent">Sasa</span>
-            </h2>
+            <span className="text-xl font-bold">
+              <span className="text-primary">Nephro</span><span className="text-accent">Sasa</span>
+            </span>
+            <span className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">Rwanda</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => window.history.back()}
+              className="text-sm text-primary hover:underline flex items-center gap-1"
+            >
+              ← Back
+            </button>
           </div>
         </div>
       </div>
@@ -155,43 +164,60 @@ export default function SharedRecordPage({ params }: { params: { token: string }
                 </thead>
                 <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
                   {recent_vitals.map((vital: any, idx: number) => (
-                    <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
-                      <td className="p-4">
-                        <div className="font-medium text-gray-900 dark:text-white">
-                          {new Date(vital.recorded_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                        </div>
-                        <div className="text-sm text-gray-500">
-                          {new Date(vital.recorded_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-2">
-                          <HeartPulse size={16} className={vital.systolic_bp > 140 ? 'text-red-500' : 'text-primary'} />
-                          <span className={`font-semibold ${vital.systolic_bp > 140 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>
-                            {vital.systolic_bp}/{vital.diastolic_bp}
+                    <React.Fragment key={idx}>
+                      <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors">
+                        <td className="p-4">
+                          <div className="font-medium text-gray-900 dark:text-white">
+                            {new Date(vital.recorded_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {new Date(vital.recorded_at).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            <HeartPulse size={16} className={vital.systolic_bp > 140 ? 'text-red-500' : 'text-primary'} />
+                            <span className={`font-semibold ${vital.systolic_bp > 140 ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>
+                              {vital.systolic_bp}/{vital.diastolic_bp}
+                            </span>
+                            <span className="text-xs text-gray-500">mmHg</span>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            <Droplet size={16} className={vital.blood_sugar > 140 ? 'text-amber-500' : 'text-accent'} />
+                            <span className={`font-semibold ${vital.blood_sugar > 140 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white'}`}>
+                              {vital.blood_sugar}
+                            </span>
+                            <span className="text-xs text-gray-500">mg/dL</span>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            vital.source === 'Clinic' 
+                              ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' 
+                              : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                          }`}>
+                            {vital.source || 'Home'}
                           </span>
-                          <span className="text-xs text-gray-500">mmHg</span>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center gap-2">
-                          <Droplet size={16} className={vital.blood_sugar > 140 ? 'text-amber-500' : 'text-accent'} />
-                          <span className={`font-semibold ${vital.blood_sugar > 140 ? 'text-amber-600 dark:text-amber-400' : 'text-gray-900 dark:text-white'}`}>
-                            {vital.blood_sugar}
-                          </span>
-                          <span className="text-xs text-gray-500">mg/dL</span>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          vital.source === 'Clinic' 
-                            ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' 
-                            : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-                        }`}>
-                          {vital.source || 'Home'}
-                        </span>
-                      </td>
-                    </tr>
+                        </td>
+                      </tr>
+                      {vital.source === 'Clinic' && (
+                        <tr className="bg-gray-50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-700">
+                          <td colSpan={4} className="px-4 py-3">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-gray-500 dark:text-gray-400">
+                              {vital.hba1c !== null && <span><strong>HbA1c:</strong> {vital.hba1c}%</span>}
+                              {vital.creatinine !== null && <span><strong>Creatinine:</strong> {vital.creatinine} mg/dL</span>}
+                              {vital.bun !== null && <span><strong>BUN:</strong> {vital.bun} mg/dL</span>}
+                              {vital.gfr !== null && <span><strong>GFR:</strong> {vital.gfr} mL/min</span>}
+                              {vital.sodium !== null && <span><strong>Sodium:</strong> {vital.sodium} mEq/L</span>}
+                              {vital.potassium !== null && <span><strong>Potassium:</strong> {vital.potassium} mEq/L</span>}
+                              {vital.hemoglobin !== null && <span><strong>Hemoglobin:</strong> {vital.hemoglobin} g/dL</span>}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>

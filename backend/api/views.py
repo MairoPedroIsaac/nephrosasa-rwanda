@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .models import PatientProfile, VitalLog, DoctorProfile, HealthRecordShare, Consultation
+from .models import PatientProfile, VitalLog, DoctorProfile, HealthRecordShare, Consultation, DoctorPatient
 from .serializers import UserSerializer, PatientProfileSerializer, VitalLogSerializer, DoctorProfileSerializer
 from django.db import transaction
 from django.contrib.auth import get_user_model, authenticate
@@ -390,7 +390,7 @@ class DoctorDashboardView(views.APIView):
             "specialty": profile.specialty,
             "phone_number": profile.phone_number,
             "is_verified": profile.is_verified,
-            "total_patients": 0,
+            "total_patients": DoctorPatient.objects.filter(doctor=profile).count(),
             "recent_alerts": [],
             "upcoming_consultations": []
         })
@@ -455,7 +455,14 @@ class SharedRecordView(views.APIView):
                 "systolic_bp": v.systolic_bp,
                 "diastolic_bp": v.diastolic_bp,
                 "blood_sugar": v.blood_sugar,
-                "source": "Home"
+                "source": "Clinic" if any([v.hba1c, v.creatinine, v.gfr, v.bun]) else "Home",
+                "hba1c": float(v.hba1c) if v.hba1c is not None else None,
+                "creatinine": float(v.creatinine) if v.creatinine is not None else None,
+                "bun": float(v.bun) if v.bun is not None else None,
+                "gfr": float(v.gfr) if v.gfr is not None else None,
+                "sodium": float(v.sodium) if v.sodium is not None else None,
+                "potassium": float(v.potassium) if v.potassium is not None else None,
+                "hemoglobin": float(v.hemoglobin) if v.hemoglobin is not None else None,
             })
             
         latest_vital = vitals.first()
@@ -547,4 +554,73 @@ class MyConsultationsView(views.APIView):
                 "status": c.status,
                 "notes": c.notes
             })
+        return Response(data)
+
+class AddPatientView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can add patients'}, status=status.HTTP_403_FORBIDDEN)
+
+        token = request.data.get('token')
+        if not token:
+            return Response({'error': 'Token is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            share = HealthRecordShare.objects.get(token=token, is_active=True)
+        except HealthRecordShare.DoesNotExist:
+            return Response({'error': 'Invalid or expired token'}, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            doctor_profile = request.user.doctor_profile
+        except DoctorProfile.DoesNotExist:
+            return Response({'error': 'Doctor profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        doctor_patient, created = DoctorPatient.objects.get_or_create(
+            doctor=doctor_profile,
+            patient=share.patient,
+            defaults={'share_token': token}
+        )
+
+        return Response({
+            'message': 'Patient added successfully' if created else 'Patient already in your list',
+            'created': created
+        }, status=status.HTTP_201_CREATED)
+
+
+class MyPatientsView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can access patient list'}, status=status.HTTP_403_FORBIDDEN)
+
+        try:
+            doctor_profile = request.user.doctor_profile
+        except DoctorProfile.DoesNotExist:
+            return Response({'error': 'Doctor profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        doctor_patients = DoctorPatient.objects.filter(doctor=doctor_profile).order_by('-added_at')
+        data = []
+        for dp in doctor_patients:
+            patient = dp.patient
+            try:
+                profile = patient.patient_profile
+                vitals = VitalLog.objects.filter(patient=profile).order_by('-recorded_at').first()
+                risk_level = vitals.ai_risk_score if vitals else None
+            except PatientProfile.DoesNotExist:
+                risk_level = None
+
+            active_share = HealthRecordShare.objects.filter(patient=patient, is_active=True).first()
+            share_token = active_share.token if active_share else dp.share_token
+
+            data.append({
+                'patient_name': patient.get_full_name(),
+                'email': patient.email,
+                'risk_level': risk_level,
+                'added_at': dp.added_at,
+                'share_token': share_token
+            })
+
         return Response(data)

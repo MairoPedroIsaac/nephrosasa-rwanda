@@ -97,3 +97,15 @@ class Consultation(models.Model):
     
     def __str__(self):
         return f"{self.patient.username} with {self.doctor.full_name} on {self.scheduled_date}"
+
+class DoctorPatient(models.Model):
+    doctor = models.ForeignKey(DoctorProfile, on_delete=models.CASCADE, related_name='doctor_patients')
+    patient = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='patient_doctors')
+    added_at = models.DateTimeField(auto_now_add=True)
+    share_token = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        unique_together = ('doctor', 'patient')
+
+    def __str__(self):
+        return f"Dr. {self.doctor.full_name} - {self.patient.get_full_name()}"
