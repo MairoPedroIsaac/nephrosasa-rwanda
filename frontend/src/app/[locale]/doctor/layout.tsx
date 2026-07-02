@@ -168,8 +168,12 @@ export default function DoctorLayout({
             </Link>
             <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-white font-bold text-lg shadow-md">
-                  {user?.first_name?.charAt(0) || 'U'}
+                <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-white font-bold text-lg shadow-md overflow-hidden">
+                  {user?.profile_picture ? (
+                    <img src={user.profile_picture} alt="Profile" className="w-full h-full object-cover" />
+                  ) : (
+                    user?.first_name?.charAt(0) || 'D'
+                  )}
                 </div>
                 <div className="overflow-hidden">
                   <p className="text-white font-medium truncate">Dr. {user?.last_name || user?.first_name}</p>

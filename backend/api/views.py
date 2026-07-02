@@ -1,5 +1,6 @@
 import os
 import uuid
+import datetime
 import joblib
 import pandas as pd
 import requests
@@ -266,6 +267,21 @@ class ProfileUpdateView(views.APIView):
             user.profile_picture = request.FILES['profile_picture']
             
         user.save()
+        
+        if user.role == 'doctor':
+            try:
+                doctor_profile = user.doctor_profile
+                full_name_parts = []
+                if user.first_name:
+                    full_name_parts.append(user.first_name)
+                if user.last_name:
+                    full_name_parts.append(user.last_name)
+                if full_name_parts:
+                    doctor_profile.full_name = ' '.join(full_name_parts)
+                    doctor_profile.save()
+            except Exception:
+                pass
+
         return Response({'message': 'Profile updated successfully'})
 
 class ChangePasswordView(views.APIView):
@@ -392,7 +408,10 @@ class DoctorDashboardView(views.APIView):
             "is_verified": profile.is_verified,
             "total_patients": DoctorPatient.objects.filter(doctor=profile).count(),
             "recent_alerts": [],
-            "upcoming_consultations": []
+            "upcoming_consultations_today": Consultation.objects.filter(
+                doctor=profile,
+                scheduled_date=datetime.date.today()
+            ).count()
         })
 
 class GenerateShareTokenView(views.APIView):
@@ -624,3 +643,52 @@ class MyPatientsView(views.APIView):
             })
 
         return Response(data)
+
+class DoctorScheduleView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can access schedule'}, status=status.HTTP_403_FORBIDDEN)
+        try:
+            doctor_profile = request.user.doctor_profile
+        except DoctorProfile.DoesNotExist:
+            return Response({'error': 'Doctor profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        consultations = Consultation.objects.filter(
+            doctor=doctor_profile
+        ).order_by('scheduled_date', 'scheduled_time')
+
+        data = []
+        for c in consultations:
+            data.append({
+                'id': str(c.id),
+                'patient_name': f"{c.patient.first_name} {c.patient.last_name}",
+                'patient_email': c.patient.email,
+                'consultation_type': c.consultation_type,
+                'scheduled_date': c.scheduled_date,
+                'scheduled_time': c.scheduled_time,
+                'status': c.status,
+                'notes': c.notes
+            })
+        return Response(data)
+
+class UpdateConsultationView(views.APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, consultation_id):
+        if request.user.role != 'doctor':
+            return Response({'error': 'Only doctors can update consultations'}, status=status.HTTP_403_FORBIDDEN)
+        
+        try:
+            consultation = Consultation.objects.get(id=consultation_id, doctor=request.user.doctor_profile)
+        except Consultation.DoesNotExist:
+            return Response({'error': 'Consultation not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        if 'status' in request.data:
+            consultation.status = request.data['status']
+        if 'session_link' in request.data:
+            consultation.session_link = request.data['session_link']
+        consultation.save()
+        
+        return Response({'message': 'Consultation updated', 'status': consultation.status, 'session_link': consultation.session_link})

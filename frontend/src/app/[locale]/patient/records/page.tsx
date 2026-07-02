@@ -62,14 +62,25 @@ export default function HealthHistoryPage() {
     setExportSuccess(false);
     
     setTimeout(() => {
-      const headers = ['Date', 'Systolic BP (mmHg)', 'Diastolic BP (mmHg)', 'Blood Sugar (mmol/L)', 'AI Risk Score', 'Confidence %'];
+      const headers = ['Date', 'Systolic BP (mmHg)', 'Diastolic BP (mmHg)', 'Blood Sugar (mmol/L)', 'AI Risk Score', 'Confidence %', 'Mode', 'HbA1c (%)', 'Creatinine (mg/dL)', 'BUN (mg/dL)', 'eGFR (mL/min)', 'Sodium (mEq/L)', 'Potassium (mEq/L)', 'Hemoglobin (g/dL)'];
       const csvRows = [headers.join(',')];
       
       filteredRecords.forEach(record => {
         const date = new Date(record.recorded_at).toLocaleDateString('en-RW', {
           year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
         }).replace(/,/g, '');
-        csvRows.push(`${date},${record.systolic_bp},${record.diastolic_bp},${record.blood_sugar},${record.ai_risk_score},${record.confidence_percentage}`);
+        
+        const isClinic = record.hba1c != null || record.creatinine != null || record.bun != null || record.gfr != null || record.sodium != null || record.potassium != null || record.hemoglobin != null;
+        const mode = isClinic ? 'Clinic' : 'Home';
+        const hba1c = isClinic && record.hba1c != null ? record.hba1c : '';
+        const creatinine = isClinic && record.creatinine != null ? record.creatinine : '';
+        const bun = isClinic && record.bun != null ? record.bun : '';
+        const gfr = isClinic && record.gfr != null ? record.gfr : '';
+        const sodium = isClinic && record.sodium != null ? record.sodium : '';
+        const potassium = isClinic && record.potassium != null ? record.potassium : '';
+        const hemoglobin = isClinic && record.hemoglobin != null ? record.hemoglobin : '';
+
+        csvRows.push(`${date},${record.systolic_bp},${record.diastolic_bp},${record.blood_sugar},${record.ai_risk_score},${record.confidence_percentage},${mode},${hba1c},${creatinine},${bun},${gfr},${sodium},${potassium},${hemoglobin}`);
       });
       
       const csvString = csvRows.join('\n');

@@ -2,10 +2,11 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, Mail, Phone, Hash, Stethoscope, ShieldAlert, CheckCircle, Info, Camera, Edit2 } from 'lucide-react';
+import { User, Mail, Phone, Hash, Stethoscope, ShieldAlert, CheckCircle, Camera, Edit2, X, Trash2, Shield, Eye, EyeOff } from 'lucide-react';
 import { isAuthenticated, getCurrentUser } from '@/lib/auth';
 import apiClient from '@/lib/api';
 import Card from '@/components/ui/Card';
+import Button from '@/components/ui/Button';
 
 export default function DoctorProfilePage() {
   const router = useRouter();
@@ -13,7 +14,24 @@ export default function DoctorProfilePage() {
   const [doctorData, setDoctorData] = useState<any>(null);
   const [authUser, setAuthUser] = useState<any>(null);
   
+  const [isEditingMode, setIsEditingMode] = useState(false);
+  const [editForm, setEditForm] = useState({ first_name: '', last_name: '', phone_number: '' });
+  
+  // Profile edit messages
+  const [profileMessage, setProfileMessage] = useState('');
+  const [profileError, setProfileError] = useState('');
+
+  // Password fields and state
+  const [passwordForm, setPasswordForm] = useState({ current_password: '', new_password: '', confirm_new_password: '' });
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  const [passwordFieldErrors, setPasswordFieldErrors] = useState({ current_password: '', new_password: '', confirm_new_password: '' });
+  const [passwordSuccessMessage, setPasswordSuccessMessage] = useState('');
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const passwordSectionRef = useRef<HTMLDivElement>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -24,7 +42,6 @@ export default function DoctorProfilePage() {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         
-        // Optimistically update the authUser state
         const newPhotoUrl = URL.createObjectURL(e.target.files[0]);
         const updatedUser = { ...authUser, profile_picture: newPhotoUrl };
         setAuthUser(updatedUser);
@@ -39,18 +56,112 @@ export default function DoctorProfilePage() {
     }
   };
 
+  const handleRemovePhoto = () => {
+    const updatedUser = { ...authUser, profile_picture: null };
+    setAuthUser(updatedUser);
+    
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      localStorage.setItem('user', JSON.stringify({ ...JSON.parse(stored), profile_picture: null }));
+    }
+    setProfileMessage("Profile photo removed.");
+    setTimeout(() => setProfileMessage(''), 3000);
+  };
+
+  const handleChangePassword = async () => {
+    setPasswordFieldErrors({ current_password: '', new_password: '', confirm_new_password: '' });
+    setPasswordSuccessMessage('');
+
+    let hasError = false;
+    const errors = { current_password: '', new_password: '', confirm_new_password: '' };
+    
+    if (!passwordForm.current_password) {
+      errors.current_password = 'This field is required';
+      hasError = true;
+    }
+    if (!passwordForm.new_password) {
+      errors.new_password = 'This field is required';
+      hasError = true;
+    }
+    if (!passwordForm.confirm_new_password) {
+      errors.confirm_new_password = 'This field is required';
+      hasError = true;
+    }
+
+    if (hasError) {
+      setPasswordFieldErrors(errors);
+      passwordSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    try {
+      const response = await apiClient.post('/auth/change-password/', passwordForm);
+      setPasswordSuccessMessage('Password updated successfully');
+      setPasswordForm({ current_password: '', new_password: '', confirm_new_password: '' });
+    } catch (err: any) {
+      const errorMsg = err.response?.data?.error || 'Failed to change password';
+      const newErrors = { current_password: '', new_password: '', confirm_new_password: '' };
+      
+      if (errorMsg.toLowerCase().includes('current password')) {
+        newErrors.current_password = errorMsg;
+      } else if (errorMsg.toLowerCase().includes('match')) {
+        newErrors.confirm_new_password = errorMsg;
+      } else {
+        newErrors.current_password = errorMsg;
+      }
+      setPasswordFieldErrors(newErrors);
+      passwordSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  };
+
+  const handleSaveDetails = async () => {
+    try {
+      setProfileMessage('');
+      setProfileError('');
+      const response = await apiClient.put('/auth/profile/update/', editForm);
+      setProfileMessage(response.data.message || 'Profile updated successfully (Note: Specialty update not supported by backend)');
+      setIsEditingMode(false);
+      
+      const updatedUser = { ...authUser, ...editForm };
+      setAuthUser(updatedUser);
+      
+      setDoctorData({
+        ...doctorData,
+        full_name: `${editForm.first_name} ${editForm.last_name}`.trim() || doctorData.full_name,
+        phone_number: editForm.phone_number
+      });
+      
+      const stored = localStorage.getItem('user');
+      if (stored) {
+        localStorage.setItem('user', JSON.stringify({ ...JSON.parse(stored), ...editForm }));
+      }
+      setTimeout(() => setProfileMessage(''), 3000);
+    } catch (err: any) {
+      setProfileError(err.response?.data?.error || 'Failed to update details');
+      setTimeout(() => setProfileError(''), 3000);
+    }
+  };
+
   useEffect(() => {
     if (!isAuthenticated()) {
       router.push('/en/login');
       return;
     }
     
-    setAuthUser(getCurrentUser());
+    const user = getCurrentUser();
+    setAuthUser(user);
 
     const fetchProfile = async () => {
       try {
         const response = await apiClient.get('/doctor/dashboard/');
         setDoctorData(response.data);
+        if (user) {
+          setEditForm({
+            first_name: user.first_name || '',
+            last_name: user.last_name || '',
+            phone_number: user.phone_number || response.data.phone_number || ''
+          });
+        }
       } catch (err) {
         console.error('Failed to fetch doctor profile', err);
       } finally {
@@ -80,13 +191,41 @@ export default function DoctorProfilePage() {
   return (
     <div className="min-h-full pb-12 bg-gray-50 dark:bg-gray-900 transition-colors p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2">
-            Doctor Profile
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 text-lg">
-            Your NephroSasa provider information.
-          </p>
+        
+        {/* Top alerts just for profile edits if any */}
+        {profileMessage && (
+          <div className="mb-4 p-4 bg-green-100 text-green-800 rounded-lg flex items-center justify-between">
+            <span>{profileMessage}</span>
+            <button onClick={() => setProfileMessage('')}><X size={16} /></button>
+          </div>
+        )}
+        {profileError && (
+          <div className="mb-4 p-4 bg-red-100 text-red-800 rounded-lg flex items-center justify-between">
+            <span>{profileError}</span>
+            <button onClick={() => setProfileError('')}><X size={16} /></button>
+          </div>
+        )}
+
+        <div className="mb-8 flex justify-between items-end">
+          <div>
+            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2">
+              Doctor Profile
+            </h1>
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              Your NephroSasa provider information.
+            </p>
+          </div>
+          {!isEditingMode ? (
+            <Button variant="outline" size="sm" onClick={() => setIsEditingMode(true)} className="bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+              <Edit2 size={14} className="mr-2" />
+              Edit Profile
+            </Button>
+          ) : (
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setIsEditingMode(false)}>Cancel</Button>
+              <Button variant="primary" size="sm" onClick={handleSaveDetails}>Save</Button>
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 gap-6">
@@ -150,6 +289,41 @@ export default function DoctorProfilePage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {isEditingMode ? (
+                  <>
+                    <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                      <label className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        <User size={16} /> First Name
+                      </label>
+                      <input 
+                        type="text" 
+                        value={editForm.first_name} 
+                        onChange={e => setEditForm({...editForm, first_name: e.target.value})}
+                        className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg p-2 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary"
+                      />
+                    </div>
+                    <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                      <label className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-2">
+                        <User size={16} /> Last Name
+                      </label>
+                      <input 
+                        type="text" 
+                        value={editForm.last_name} 
+                        onChange={e => setEditForm({...editForm, last_name: e.target.value})}
+                        className="w-full bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg p-2 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary"
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 flex items-start gap-3 md:col-span-2">
+                    <User className="text-primary mt-1" size={20} />
+                    <div>
+                      <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-0.5">Full Name</p>
+                      <p className="font-semibold text-gray-900 dark:text-white">{doctorData.full_name}</p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 flex items-start gap-3">
                   <Mail className="text-primary mt-1" size={20} />
                   <div>
@@ -160,16 +334,25 @@ export default function DoctorProfilePage() {
 
                 <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 flex items-start gap-3">
                   <Phone className="text-primary mt-1" size={20} />
-                  <div>
+                  <div className="w-full">
                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-0.5">Phone Number</p>
-                    <p className="font-semibold text-gray-900 dark:text-white">{doctorData.phone_number || 'Not provided'}</p>
+                    {isEditingMode ? (
+                      <input 
+                        type="text" 
+                        value={editForm.phone_number} 
+                        onChange={e => setEditForm({...editForm, phone_number: e.target.value})}
+                        className="w-full mt-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg p-2 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary"
+                      />
+                    ) : (
+                      <p className="font-semibold text-gray-900 dark:text-white">{doctorData.phone_number || 'Not provided'}</p>
+                    )}
                   </div>
                 </div>
 
                 <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 flex items-start gap-3 md:col-span-2">
                   <Hash className="text-primary mt-1" size={20} />
                   <div>
-                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-0.5">RMDC License Number</p>
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-0.5">RMDC License Number <span className="text-xs ml-2 text-amber-600 dark:text-amber-400 font-normal border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 px-1.5 py-0.5 rounded">Read-only</span></p>
                     <p className="font-semibold text-gray-900 dark:text-white font-mono">{doctorData.rmdc_number}</p>
                   </div>
                 </div>
@@ -177,14 +360,108 @@ export default function DoctorProfilePage() {
             </div>
           </Card>
 
-          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-xl shadow-sm dark:bg-blue-900/20 flex items-start gap-3">
-            <Info className="text-blue-500 mt-0.5" size={24} />
-            <div>
-              <p className="font-semibold text-blue-800 dark:text-blue-300">Profile Editing</p>
-              <p className="text-blue-700 dark:text-blue-400 text-sm mt-1">
-                Profile editing will be available in a future update. For now, to update your RMDC license number or core details, please contact NephroSasa support.
-              </p>
-            </div>
+          {/* Section A: Remove Profile Photo */}
+          {authUser?.profile_picture && (
+            <Card className="shadow-xl shadow-primary/5 p-6">
+              <div className="flex items-start justify-between">
+                <div>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
+                    <Camera size={18} className="text-gray-500" />
+                    Profile Photo
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Remove your current profile photo.
+                  </p>
+                </div>
+                <Button variant="outline" size="sm" onClick={handleRemovePhoto} className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/20">
+                  <Trash2 size={16} className="mr-2" />
+                  Remove Photo
+                </Button>
+              </div>
+            </Card>
+          )}
+
+          {/* Section B: Change Password */}
+          <div ref={passwordSectionRef}>
+            <Card className="shadow-xl shadow-primary/5 p-6 border-t-4 border-accent">
+              <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                <Shield size={18} className="text-accent" />
+                Change Password
+              </h3>
+              
+              <div className="space-y-4 max-w-md">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Current Password</label>
+                  <div className="relative">
+                    <input 
+                      type={showCurrentPassword ? "text" : "password"}
+                      value={passwordForm.current_password}
+                      onChange={e => setPasswordForm({...passwordForm, current_password: e.target.value})}
+                      className={`w-full bg-white dark:bg-gray-800 border ${passwordFieldErrors.current_password ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} rounded-lg p-2.5 pr-10 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary outline-none`}
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      {showCurrentPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {passwordFieldErrors.current_password && (
+                    <p className="text-red-500 text-xs mt-1">{passwordFieldErrors.current_password}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Password</label>
+                  <div className="relative">
+                    <input 
+                      type={showNewPassword ? "text" : "password"}
+                      value={passwordForm.new_password}
+                      onChange={e => setPasswordForm({...passwordForm, new_password: e.target.value})}
+                      className={`w-full bg-white dark:bg-gray-800 border ${passwordFieldErrors.new_password ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} rounded-lg p-2.5 pr-10 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary outline-none`}
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => setShowNewPassword(!showNewPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      {showNewPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {passwordFieldErrors.new_password && (
+                    <p className="text-red-500 text-xs mt-1">{passwordFieldErrors.new_password}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm New Password</label>
+                  <div className="relative">
+                    <input 
+                      type={showConfirmPassword ? "text" : "password"}
+                      value={passwordForm.confirm_new_password}
+                      onChange={e => setPasswordForm({...passwordForm, confirm_new_password: e.target.value})}
+                      className={`w-full bg-white dark:bg-gray-800 border ${passwordFieldErrors.confirm_new_password ? 'border-red-500' : 'border-gray-300 dark:border-gray-700'} rounded-lg p-2.5 pr-10 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary outline-none`}
+                    />
+                    <button 
+                      type="button"
+                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                      className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                    >
+                      {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                  </div>
+                  {passwordFieldErrors.confirm_new_password && (
+                    <p className="text-red-500 text-xs mt-1">{passwordFieldErrors.confirm_new_password}</p>
+                  )}
+                </div>
+                
+                <div className="pt-2">
+                  <Button variant="primary" onClick={handleChangePassword}>Update Password</Button>
+                  {passwordSuccessMessage && (
+                    <p className="text-green-600 text-sm mt-2">{passwordSuccessMessage}</p>
+                  )}
+                </div>
+              </div>
+            </Card>
           </div>
         </div>
       </div>

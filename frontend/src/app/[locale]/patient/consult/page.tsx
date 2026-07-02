@@ -277,7 +277,12 @@ export default function ConsultPage() {
               </Card>
             ) : (
               <div className="space-y-4">
-                {consultations.map((consultation: any) => (
+                {consultations.map((consultation: any) => {
+                  const status = consultation.status || 'Pending';
+                  const isConfirmed = status.toLowerCase() === 'confirmed';
+                  const isCancelled = status.toLowerCase() === 'cancelled';
+                  
+                  return (
                   <Card key={consultation.id} className="p-5 shadow-md border border-gray-100 dark:border-gray-800">
                     <div className="flex justify-between items-start mb-4">
                       <div>
@@ -286,28 +291,43 @@ export default function ConsultPage() {
                           Dr. {consultation.doctor_name}
                         </h3>
                         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
-                          {consultation.consultation_type === 'virtual' ? <Video size={14} /> : <MapPin size={14} />}
-                          {consultation.consultation_type === 'virtual' ? 'Virtual Session' : 'In-Person Visit'}
+                          {consultation.consultation_type === 'Virtual' || consultation.consultation_type === 'virtual' ? <Video size={14} /> : <MapPin size={14} />}
+                          {consultation.consultation_type === 'Virtual' || consultation.consultation_type === 'virtual' ? 'Virtual Session' : 'In-Person Visit'}
                         </p>
                       </div>
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                        consultation.status === 'confirmed' ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800' :
-                        consultation.status === 'cancelled' ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800' :
+                        isConfirmed ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800' :
+                        isCancelled ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800' :
                         'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800'
                       }`}>
-                        {consultation.status.charAt(0).toUpperCase() + consultation.status.slice(1)}
+                        {status}
                       </span>
                     </div>
                     
-                    <div className="bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg flex items-center gap-4 mb-3">
-                      <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                        <Calendar size={16} className="text-gray-400" />
-                        {new Date(consultation.scheduled_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                    <div className="bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg flex flex-col gap-3 mb-3">
+                      <div className="flex flex-wrap items-center gap-4">
+                        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                          <Calendar size={16} className="text-gray-400" />
+                          {new Date(consultation.scheduled_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
+                          <Clock size={16} className="text-gray-400" />
+                          {consultation.scheduled_time}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                        <Clock size={16} className="text-gray-400" />
-                        {consultation.scheduled_time}
-                      </div>
+
+                      {isConfirmed && consultation.session_link && (
+                        <div className="pt-2 mt-1 border-t border-gray-200 dark:border-gray-700">
+                          <Button 
+                            variant="primary" 
+                            size="sm" 
+                            onClick={() => window.open(consultation.session_link, '_blank')}
+                          >
+                            <Video size={14} className="mr-2" />
+                            Join Meeting
+                          </Button>
+                        </div>
+                      )}
                     </div>
 
                     {consultation.notes && (
@@ -316,7 +336,7 @@ export default function ConsultPage() {
                       </p>
                     )}
                   </Card>
-                ))}
+                )})}
               </div>
             )}
           </div>

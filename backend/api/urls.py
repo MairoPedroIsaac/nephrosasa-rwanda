@@ -3,7 +3,7 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from .views import (
     RegisterPatientView, LogVitalsView, PatientHistoryView, LoginView, ProfileUpdateView, ChangePasswordView,
     RegisterDoctorView, DoctorDashboardView, GenerateShareTokenView, GetShareTokenView, SharedRecordView,
-    AvailableDoctorsView, BookConsultationView, MyConsultationsView, AddPatientView, MyPatientsView
+    AvailableDoctorsView, BookConsultationView, MyConsultationsView, AddPatientView, MyPatientsView, DoctorScheduleView, UpdateConsultationView
 )
 
 urlpatterns = [
@@ -28,4 +28,6 @@ urlpatterns = [
     path('consultations/my/', MyConsultationsView.as_view(), name='my_consultations'),
     path('doctor/add-patient/', AddPatientView.as_view(), name='add_patient'),
     path('doctor/my-patients/', MyPatientsView.as_view(), name='my_patients'),
+    path('doctor/schedule/', DoctorScheduleView.as_view(), name='doctor_schedule'),
+    path('doctor/consultation/<uuid:consultation_id>/update/', UpdateConsultationView.as_view(), name='update_consultation'),
 ]
