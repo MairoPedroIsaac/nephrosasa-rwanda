@@ -39,7 +39,7 @@ NephroSasa Rwanda is an AI-powered longitudinal kidney health monitoring platfor
 
 ## Demo Video
 
-[Click here to watch the 5-minute core functionality demo](#)
+[Click here to watch the 5-minute core functionality demo](https://youtu.be/wWy2c76qtjU)
 
 > Video covers: patient registration, vitals logging (Home and Clinic modes), AI risk scoring (LOW/MEDIUM/HIGH), email alerts, health history, and multi-device responsiveness. Sign-up and sign-in flows are not the focus.
 
@@ -73,9 +73,16 @@ All testing screenshots are located in the `testing/screenshots/` folder.
 | 20 | `20_samsung_medium_dashboard.png`         | Samsung simulation (DevTools) — MEDIUM RISK dashboard |
 | 21 | `21_samsung_medium_history.png`           | Samsung simulation (DevTools) — health history        |
 | 22 | `22_samsung_high_dashboard.png`           | Samsung simulation (DevTools) — HIGH RISK dashboard   |
-| 23 | `23_samsung_high_history.png`             | Samsung simulation (DevTools) — health history        |
+| 23 | `23_samsung_high_history.png`             | Samsung simulation (DevTools) — health history
+| 24 | `24_doctor_dashboard_overview.png`  | Doctor dashboard — overview                                   |
+| 25 | `25_doctor_dashboard_verified.png`  | Doctor dashboard — verified badge, Practice Overview stats    |
+| 26 | `26_doctor_my_patients.png`         | My Patients list                                               |
+| 27 | `27_doctor_scan_qr.png`             | QR code scanner for patient health records                    |
+| 28 | `28_doctor_schedule_confirmed.png`  | Schedule — confirmed consultation                              |
+| 29 | `29_doctor_profile.png`             | Doctor profile page                                            |
 
-> **Note:** The 23 screenshots above document the core vitals logging, AI risk scoring, and multi-device testing described in the original capstone proposal. Doctor-side features (registration, verification, dashboard, QR scanning, consultation scheduling) and patient-side QR sharing and consultation booking were built afterward and are demonstrated live in the demo video rather than in static screenshots.
+
+> Note: Screenshots 01-23 document the core vitals logging, AI risk scoring, and multi-device testing described in the original capstone proposal. Screenshots 24-29 document doctor-side features (dashboard, My Patients, QR scanning, consultation scheduling, profile) built afterward as an expanded scope. All features are also demonstrated live in the demo video.
 
 ---
 
@@ -195,8 +202,7 @@ npm run dev
 | `docs/TESTING_REPORT.md`                                         | Testing analysis, results, discussion, and recommendations |
 | `backend/api/ml_models/nephrosasa_model.pkl`                     | Trained Random Forest model                                |
 | `backend/nephrosasa-ai/`                                         | Model training notebook and dataset                        |
-| `testing/screenshots/`                                           | All 23 testing screenshots                                 |
-| `testing/video/`                                                 | 5-minute demo video                                        |
+| `testing/screenshots/`                                           | All 29 testing screenshots                                 |                                       |
 
 ---
 
