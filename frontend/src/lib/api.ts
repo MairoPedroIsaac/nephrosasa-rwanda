@@ -26,7 +26,10 @@ apiClient.interceptors.request.use(
     // Get token from localStorage (saved during login)
     const token = localStorage.getItem('access_token');
     
-    if (token) {
+    // Check if the route is for authentication (login or register)
+    const isAuthRoute = config.url?.includes('/auth/login') || config.url?.includes('/auth/register');
+    
+    if (token && !isAuthRoute) {
       // Add token to Authorization header
       config.headers.Authorization = `Bearer ${token}`;
     }
