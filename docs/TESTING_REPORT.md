@@ -20,10 +20,10 @@ successfully dispatches welcome emails upon patient registration and automated
 "Vitals Recorded" risk notifications after every vital submission, with the AI risk 
 level (LOW, MEDIUM, or HIGH) included in the email body.
 
-**Compatibility Testing:** The platform was tested across three device types 
-(laptop, iPhone, Vivo Android) and multiple browsers (Chrome desktop, Safari iOS, 
-Chrome Android) to verify responsive layout and consistent functionality across 
-different hardware and software specifications.
+**Compatibility Testing:** The platform was tested on laptop (Windows 11, Chrome) 
+and via Chrome DevTools device emulation simulating iPhone and Samsung viewports, 
+to verify responsive layout and consistent functionality across different screen 
+sizes. See Section 1.3 for full detail on this testing method and its limitations.
 
 **Functional Testing -- Home vs Clinic Mode:** The vitals form toggle was tested in 
 both modes. Home Monitoring mode (3 fields) and Clinic Visit mode (10 fields) were 
@@ -67,11 +67,13 @@ All screenshots are in the testing/screenshots/ folder.
 **Laptop (Windows 11, Chrome):** Full functionality tested including vitals 
 submission, AI scoring, health history, and email alerts across all three accounts.
 
-**iPhone (iOS, Safari):** Dashboard and health history pages verified responsive 
-and functional. Risk scores displayed correctly on mobile viewport.
-
-**Vivo Android (Android, Chrome):** Dashboard and health history pages verified 
-responsive and functional. Risk scores displayed correctly on Android viewport.
+**Mobile Responsiveness (Chrome DevTools Device Simulation):** Dashboard and 
+health history pages were verified using Chrome DevTools' device emulation mode, 
+simulating iPhone and Samsung viewport dimensions. Layout, navigation, and risk 
+score display were confirmed responsive and functional across both simulated 
+device profiles. This method tests viewport-based responsive CSS behavior but 
+does not verify device-specific browser engine quirks (e.g. actual Safari iOS 
+rendering), which is noted as a limitation for future physical device testing.
 
 **Network:** All local testing was conducted with the Django backend running on 
 localhost:8000 connected directly to the production Supabase PostgreSQL database 
@@ -81,6 +83,32 @@ via DATABASE_URL. The Vercel frontend remained live throughout.
 2026 due to monthly usage limits. All system testing was conducted on localhost 
 against the live Supabase database. This is documented as a known infrastructure 
 limitation. The service auto-resumes July 1, 2026.
+
+---
+
+### 1.4 Doctor and Consultation Feature Testing
+
+Beyond the core AI risk scoring workflow, the doctor-facing and consultation 
+features were tested end-to-end using the isaacmairopedro@gmail.com doctor 
+account (RMDC/2024/0988, manually verified via Django admin) alongside the 
+three patient test accounts.
+
+**Doctor Registration and Verification:** Doctor registration with RMDC number 
+was tested, confirming the account defaults to unverified until manually 
+approved in Django admin, at which point the doctor dashboard unlocks full 
+functionality.
+
+**QR Code Sharing:** Patient QR code generation and doctor-side scanning were 
+tested together, confirming a doctor scanning a patient's QR code correctly 
+saves that patient to the doctor's My Patients list and grants access to the 
+patient's shared health record.
+
+**Consultation Booking and Scheduling:** A full booking cycle was tested: a 
+patient booked both a Virtual Session and an In-Person Visit with the verified 
+doctor, the doctor confirmed each request from the Schedule page, and for the 
+Virtual Session the doctor added a Google Meet session link. The confirmed 
+status and session link were both verified to display correctly on the 
+patient's Consultancy page, including a working Join Meeting button.
 
 ---
 

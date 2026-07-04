@@ -4,6 +4,7 @@ import React from 'react';
 import { CreditCard, QrCode, Smartphone, ArrowRight } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import Collapsible from '@/components/ui/Collapsible';
 
 export default function PaymentsPage() {
   return (
@@ -74,9 +75,14 @@ export default function PaymentsPage() {
             Download Invoice
           </Button>
         </div>
-        <div className="text-center py-10 bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
-          <p className="text-gray-500 dark:text-gray-400">No recent transactions found.</p>
-        </div>
+        <Collapsible 
+          title={<span className="font-medium text-gray-700 dark:text-gray-300">View Transactions</span>}
+          className="border border-gray-200 dark:border-gray-700"
+        >
+          <div className="text-center py-10 bg-gray-50 dark:bg-gray-800/30">
+            <p className="text-gray-500 dark:text-gray-400">No recent transactions found.</p>
+          </div>
+        </Collapsible>
       </Card>
     </div>
   );

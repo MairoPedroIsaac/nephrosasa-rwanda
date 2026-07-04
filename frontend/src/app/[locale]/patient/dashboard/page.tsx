@@ -26,6 +26,7 @@ import { getCurrentUser, isAuthenticated } from '@/lib/auth';
 import apiClient from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import Collapsible from '@/components/ui/Collapsible';
 
 /**
  * PATIENT DASHBOARD PAGE
@@ -246,50 +247,54 @@ export default function PatientDashboard() {
               </div>
 
               {recentVitals.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
-                  <FileText className="mx-auto h-12 w-12 text-gray-400 mb-3" />
-                  <p className="text-gray-500 dark:text-gray-400 font-medium">No history available</p>
-                </div>
+                <Collapsible title={<span className="font-medium text-gray-700 dark:text-gray-300">Toggle History Data</span>} className="border border-gray-200 dark:border-gray-700">
+                  <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/30">
+                    <FileText className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+                    <p className="text-gray-500 dark:text-gray-400 font-medium">No history available</p>
+                  </div>
+                </Collapsible>
               ) : (
-                <div className="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-gray-50 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700">
-                        <th className="p-4 text-xs tracking-wider font-semibold text-gray-500 dark:text-gray-400 uppercase">Date & Time</th>
-                        <th className="p-4 text-xs tracking-wider font-semibold text-gray-500 dark:text-gray-400 uppercase">Blood Pressure</th>
-                        <th className="p-4 text-xs tracking-wider font-semibold text-gray-500 dark:text-gray-400 uppercase">Blood Sugar</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50">
-                      {recentVitals.map((record) => (
-                        <tr key={record.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
-                          <td className="p-4">
-                            <p className="font-medium text-gray-900 dark:text-white">
-                              {new Date(record.recorded_at).toLocaleDateString('en-RW', { month: 'short', day: 'numeric', year: 'numeric' })}
-                            </p>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                              {new Date(record.recorded_at).toLocaleTimeString('en-RW', { hour: '2-digit', minute: '2-digit' })}
-                            </p>
-                          </td>
-                          <td className="p-4">
-                            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${
-                              record.systolic_bp > 140 || record.diastolic_bp > 90
-                                ? 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800'
-                                : record.systolic_bp > 130 || record.diastolic_bp > 85
-                                ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800'
-                                : 'bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400 border border-teal-200 dark:border-teal-800'
-                            }`}>
-                              {record.systolic_bp} / {record.diastolic_bp} mmHg
-                            </span>
-                          </td>
-                          <td className="p-4 text-sm text-gray-700 dark:text-gray-300 font-medium">
-                            {record.blood_sugar} <span className="text-gray-500 dark:text-gray-500 text-xs font-normal">mmol/L</span>
-                          </td>
+                <Collapsible title={<span className="font-medium text-gray-700 dark:text-gray-300">Toggle History Data</span>} className="border border-gray-200 dark:border-gray-700">
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left border-collapse">
+                      <thead>
+                        <tr className="bg-gray-50 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700">
+                          <th className="p-4 text-xs tracking-wider font-semibold text-gray-500 dark:text-gray-400 uppercase">Date & Time</th>
+                          <th className="p-4 text-xs tracking-wider font-semibold text-gray-500 dark:text-gray-400 uppercase">Blood Pressure</th>
+                          <th className="p-4 text-xs tracking-wider font-semibold text-gray-500 dark:text-gray-400 uppercase">Blood Sugar</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody className="divide-y divide-gray-100 dark:divide-gray-700/50">
+                        {recentVitals.map((record) => (
+                          <tr key={record.id} className="hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors">
+                            <td className="p-4">
+                              <p className="font-medium text-gray-900 dark:text-white">
+                                {new Date(record.recorded_at).toLocaleDateString('en-RW', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              </p>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                                {new Date(record.recorded_at).toLocaleTimeString('en-RW', { hour: '2-digit', minute: '2-digit' })}
+                              </p>
+                            </td>
+                            <td className="p-4">
+                              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold tracking-wide ${
+                                record.systolic_bp > 140 || record.diastolic_bp > 90
+                                  ? 'bg-red-50 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800'
+                                  : record.systolic_bp > 130 || record.diastolic_bp > 85
+                                  ? 'bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800'
+                                  : 'bg-teal-50 text-teal-700 dark:bg-teal-900/30 dark:text-teal-400 border border-teal-200 dark:border-teal-800'
+                              }`}>
+                                {record.systolic_bp} / {record.diastolic_bp} mmHg
+                              </span>
+                            </td>
+                            <td className="p-4 text-sm text-gray-700 dark:text-gray-300 font-medium">
+                              {record.blood_sugar} <span className="text-gray-500 dark:text-gray-500 text-xs font-normal">mmol/L</span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Collapsible>
               )}
             </Card>
           </div>

@@ -3,9 +3,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { User, Mail, Phone, Edit2, Shield, Camera, X, Eye, EyeOff } from 'lucide-react';
 import { getCurrentUser } from '@/lib/auth';
-import apiClient from '@/lib/api';
+import apiClient, { API_URL } from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+
+const getImageUrl = (url: string | null | undefined) => {
+  if (!url) return '';
+  if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) return url;
+  return `${API_URL.replace('/api', '')}${url.startsWith('/') ? '' : '/'}${url}`;
+};
 
 export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
@@ -64,12 +70,19 @@ export default function ProfilePage() {
       try {
         setMessage('');
         setError('');
-        await apiClient.put('/auth/profile/update/', formData, {
+        const response = await apiClient.put('/auth/profile/update/', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         setMessage('Profile picture updated successfully!');
-        // Note: In a real app we'd fetch the new image URL. 
-        // For now, we alert success.
+        const newPhotoUrl = response.data.user.profile_picture;
+        const updatedUser = { ...user, profile_picture: newPhotoUrl };
+        setUser(updatedUser);
+        
+        const stored = localStorage.getItem('user');
+        if (stored) {
+          localStorage.setItem('user', JSON.stringify({ ...JSON.parse(stored), profile_picture: newPhotoUrl }));
+        }
+        window.dispatchEvent(new Event('userProfileUpdated'));
       } catch (err) {
         setError('Failed to upload profile picture');
       }
@@ -125,7 +138,7 @@ export default function ProfilePage() {
           <Card className="text-center shadow-xl shadow-primary/5 p-8 relative">
             <div className="w-32 h-32 mx-auto bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center text-white text-4xl font-bold mb-4 shadow-lg overflow-hidden relative group">
               {user.profile_picture ? (
-                <img src={user.profile_picture} alt="Profile" className="w-full h-full object-cover" />
+                <img src={getImageUrl(user.profile_picture)} alt="Profile" className="w-full h-full object-cover" />
               ) : (
                 <span>{user.first_name?.[0] || '?'}{user.last_name?.[0] || '?'}</span>
               )}

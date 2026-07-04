@@ -4,9 +4,15 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { User, Mail, Phone, Hash, Stethoscope, ShieldAlert, CheckCircle, Camera, Edit2, X, Trash2, Shield, Eye, EyeOff } from 'lucide-react';
 import { isAuthenticated, getCurrentUser } from '@/lib/auth';
-import apiClient from '@/lib/api';
+import apiClient, { API_URL } from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+
+const getImageUrl = (url: string | null | undefined) => {
+  if (!url) return '';
+  if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) return url;
+  return `${API_URL.replace('/api', '')}${url.startsWith('/') ? '' : '/'}${url}`;
+};
 
 export default function DoctorProfilePage() {
   const router = useRouter();
@@ -38,11 +44,11 @@ export default function DoctorProfilePage() {
       const formData = new FormData();
       formData.append('profile_picture', e.target.files[0]);
       try {
-        await apiClient.put('/auth/profile/update/', formData, {
+        const response = await apiClient.put('/auth/profile/update/', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         });
         
-        const newPhotoUrl = URL.createObjectURL(e.target.files[0]);
+        const newPhotoUrl = response.data.user.profile_picture;
         const updatedUser = { ...authUser, profile_picture: newPhotoUrl };
         setAuthUser(updatedUser);
         
@@ -50,6 +56,7 @@ export default function DoctorProfilePage() {
         if (stored) {
           localStorage.setItem('user', JSON.stringify({ ...JSON.parse(stored), profile_picture: newPhotoUrl }));
         }
+        window.dispatchEvent(new Event('userProfileUpdated'));
       } catch (err) {
         console.error('Failed to upload profile picture', err);
       }
@@ -64,6 +71,7 @@ export default function DoctorProfilePage() {
     if (stored) {
       localStorage.setItem('user', JSON.stringify({ ...JSON.parse(stored), profile_picture: null }));
     }
+    window.dispatchEvent(new Event('userProfileUpdated'));
     setProfileMessage("Profile photo removed.");
     setTimeout(() => setProfileMessage(''), 3000);
   };
@@ -234,7 +242,7 @@ export default function DoctorProfilePage() {
               <div className="absolute -bottom-16 left-8 flex flex-col items-center">
                 <div className="w-28 h-28 rounded-full border-4 border-white dark:border-gray-800 bg-white dark:bg-gray-700 flex items-center justify-center text-4xl font-bold text-primary shadow-md overflow-hidden relative group">
                   {authUser?.profile_picture ? (
-                    <img src={authUser.profile_picture} alt="Profile" className="w-full h-full object-cover" />
+                    <img src={getImageUrl(authUser.profile_picture)} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
                     <span>{doctorData.full_name?.charAt(0) || 'D'}</span>
                   )}
@@ -361,9 +369,16 @@ export default function DoctorProfilePage() {
           </Card>
 
           {/* Section A: Remove Profile Photo */}
-          {authUser?.profile_picture && (
-            <Card className="shadow-xl shadow-primary/5 p-6">
-              <div className="flex items-start justify-between">
+          <Card className="shadow-xl shadow-primary/5 p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-full border border-gray-200 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 flex items-center justify-center overflow-hidden shrink-0">
+                  {authUser?.profile_picture ? (
+                    <img src={getImageUrl(authUser.profile_picture)} alt="Profile preview" className="w-full h-full object-cover" />
+                  ) : (
+                    <User size={24} className="text-gray-400" />
+                  )}
+                </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
                     <Camera size={18} className="text-gray-500" />
@@ -373,13 +388,19 @@ export default function DoctorProfilePage() {
                     Remove your current profile photo.
                   </p>
                 </div>
-                <Button variant="outline" size="sm" onClick={handleRemovePhoto} className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/20">
-                  <Trash2 size={16} className="mr-2" />
-                  Remove Photo
-                </Button>
               </div>
-            </Card>
-          )}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleRemovePhoto} 
+                disabled={!authUser?.profile_picture}
+                className="border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/20 disabled:opacity-50 disabled:pointer-events-none"
+              >
+                <Trash2 size={16} className="mr-2" />
+                Remove Photo
+              </Button>
+            </div>
+          </Card>
 
           {/* Section B: Change Password */}
           <div ref={passwordSectionRef}>

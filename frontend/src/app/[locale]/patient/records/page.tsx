@@ -5,6 +5,7 @@ import { Clock, TrendingUp, Filter, Download, CheckCircle } from 'lucide-react';
 import apiClient from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import Collapsible from '@/components/ui/Collapsible';
 
 interface VitalsRecord {
   id: number;
@@ -217,16 +218,22 @@ export default function HealthHistoryPage() {
                       </tr>
                       {isClinic && (
                         <tr className="bg-gray-50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-700">
-                          <td colSpan={5} className="px-6 py-3">
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-gray-500 dark:text-gray-400">
-                              {record.hba1c != null && <span><strong>HbA1c:</strong> {record.hba1c}%</span>}
-                              {record.creatinine != null && <span><strong>Creatinine:</strong> {record.creatinine} mg/dL</span>}
-                              {record.bun != null && <span><strong>BUN:</strong> {record.bun} mg/dL</span>}
-                              {record.gfr != null && <span><strong>GFR:</strong> {record.gfr} mL/min</span>}
-                              {record.sodium != null && <span><strong>Sodium:</strong> {record.sodium} mEq/L</span>}
-                              {record.potassium != null && <span><strong>Potassium:</strong> {record.potassium} mEq/L</span>}
-                              {record.hemoglobin != null && <span><strong>Hemoglobin:</strong> {record.hemoglobin} g/dL</span>}
-                            </div>
+                          <td colSpan={5} className="p-0">
+                            <Collapsible 
+                              title={<span className="text-xs font-semibold text-gray-600 dark:text-gray-400">View Clinic Labs</span>} 
+                              className="border-none rounded-none"
+                              headerClassName="py-2 px-6 bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800/50"
+                            >
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-gray-500 dark:text-gray-400 p-2 pl-6">
+                                {record.hba1c != null && <span><strong>HbA1c:</strong> {record.hba1c}%</span>}
+                                {record.creatinine != null && <span><strong>Creatinine:</strong> {record.creatinine} mg/dL</span>}
+                                {record.bun != null && <span><strong>BUN:</strong> {record.bun} mg/dL</span>}
+                                {record.gfr != null && <span><strong>GFR:</strong> {record.gfr} mL/min</span>}
+                                {record.sodium != null && <span><strong>Sodium:</strong> {record.sodium} mEq/L</span>}
+                                {record.potassium != null && <span><strong>Potassium:</strong> {record.potassium} mEq/L</span>}
+                                {record.hemoglobin != null && <span><strong>Hemoglobin:</strong> {record.hemoglobin} g/dL</span>}
+                              </div>
+                            </Collapsible>
                           </td>
                         </tr>
                       )}
@@ -278,8 +285,11 @@ export default function HealthHistoryPage() {
                 </div>
 
                 {isClinic && (
-                  <div className="bg-gray-50 dark:bg-gray-800/30 p-3 rounded-lg mt-2 border border-gray-100 dark:border-gray-700">
-                    <p className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Clinic Labs</p>
+                  <Collapsible 
+                    title={<span className="text-xs font-semibold text-gray-700 dark:text-gray-300">Clinic Labs</span>}
+                    className="border border-gray-100 dark:border-gray-700 mt-2"
+                    headerClassName="py-2.5 px-3 bg-gray-50 dark:bg-gray-800/30"
+                  >
                     <div className="grid grid-cols-2 gap-2 text-xs text-gray-500 dark:text-gray-400">
                         {record.hba1c != null && <span><strong>HbA1c:</strong> {record.hba1c}%</span>}
                         {record.creatinine != null && <span><strong>Creatinine:</strong> {record.creatinine} mg/dL</span>}
@@ -289,7 +299,7 @@ export default function HealthHistoryPage() {
                         {record.potassium != null && <span><strong>Potassium:</strong> {record.potassium} mEq/L</span>}
                         {record.hemoglobin != null && <span><strong>Hemoglobin:</strong> {record.hemoglobin} g/dL</span>}
                     </div>
-                  </div>
+                  </Collapsible>
                 )}
               </div>
             )})}

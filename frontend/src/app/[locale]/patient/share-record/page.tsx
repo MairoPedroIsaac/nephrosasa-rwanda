@@ -9,6 +9,7 @@ import { isAuthenticated } from '@/lib/auth';
 import apiClient from '@/lib/api';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
+import Collapsible from '@/components/ui/Collapsible';
 
 export default function ShareRecordPage() {
   const router = useRouter();
@@ -145,51 +146,57 @@ export default function ShareRecordPage() {
 
           {/* Right section: Instructions */}
           <div className="flex flex-col gap-6">
-            <Card className="shadow-xl shadow-primary/5 bg-white dark:bg-gray-800">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2 mb-6">
-                <Info className="text-primary" size={24} />
-                How it works
-              </h2>
+            <Card className="shadow-xl shadow-primary/5 bg-white dark:bg-gray-800 p-0 overflow-hidden">
+              <Collapsible 
+                title={
+                  <span className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <Info className="text-primary" size={24} />
+                    How it works
+                  </span>
+                }
+                className="border-none rounded-none"
+                headerClassName="p-6 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-750"
+              >
+                <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 dark:before:via-gray-700 before:to-transparent px-6 pb-6">
+                  
+                  <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white dark:border-gray-800 bg-primary/10 text-primary font-bold shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                      1
+                    </div>
+                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                      <p className="text-gray-700 dark:text-gray-300 font-medium">Generate your unique QR code</p>
+                    </div>
+                  </div>
 
-              <div className="space-y-6 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 dark:before:via-gray-700 before:to-transparent">
-                
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white dark:border-gray-800 bg-primary/10 text-primary font-bold shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                    1
+                  <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white dark:border-gray-800 bg-primary/10 text-primary font-bold shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                      2
+                    </div>
+                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                      <p className="text-gray-700 dark:text-gray-300 font-medium">Show it to your nephrologist at your appointment</p>
+                    </div>
                   </div>
-                  <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
-                    <p className="text-gray-700 dark:text-gray-300 font-medium">Generate your unique QR code</p>
+
+                  <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white dark:border-gray-800 bg-primary/10 text-primary font-bold shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                      3
+                    </div>
+                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                      <p className="text-gray-700 dark:text-gray-300 font-medium">They scan it to instantly access your full kidney health history, including risk scores and vital trends</p>
+                    </div>
                   </div>
+
+                  <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white dark:border-gray-800 bg-primary/10 text-primary font-bold shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                      4
+                    </div>
+                    <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
+                      <p className="text-gray-700 dark:text-gray-300 font-medium">Regenerate anytime to revoke previous access</p>
+                    </div>
+                  </div>
+
                 </div>
-
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white dark:border-gray-800 bg-primary/10 text-primary font-bold shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                    2
-                  </div>
-                  <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
-                    <p className="text-gray-700 dark:text-gray-300 font-medium">Show it to your nephrologist at your appointment</p>
-                  </div>
-                </div>
-
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white dark:border-gray-800 bg-primary/10 text-primary font-bold shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                    3
-                  </div>
-                  <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
-                    <p className="text-gray-700 dark:text-gray-300 font-medium">They scan it to instantly access your full kidney health history, including risk scores and vital trends</p>
-                  </div>
-                </div>
-
-                <div className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full border border-white dark:border-gray-800 bg-primary/10 text-primary font-bold shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                    4
-                  </div>
-                  <div className="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm">
-                    <p className="text-gray-700 dark:text-gray-300 font-medium">Regenerate anytime to revoke previous access</p>
-                  </div>
-                </div>
-
-              </div>
+              </Collapsible>
             </Card>
 
             <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg shadow-sm">

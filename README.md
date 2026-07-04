@@ -4,7 +4,27 @@
 
 > *"Monitor Your Kidneys. Before It's Too Late."*
 
-NephroSasa Rwanda is an AI-powered longitudinal kidney health monitoring platform for Rwandan adults already diagnosed with hypertension or Type 2 diabetes. It tracks blood pressure and blood sugar readings across multiple visits, uses a Random Forest machine learning model (84.94% accuracy) to generate a **LOW**, **MEDIUM**, or **HIGH** kidney risk score, and sends automated email alerts after every vital submission.
+NephroSasa Rwanda is an AI-powered longitudinal kidney health monitoring platform for Rwandan adults already diagnosed with hypertension or Type 2 diabetes. It tracks blood pressure and blood sugar readings across multiple visits, uses a Random Forest machine learning model (84.94% accuracy) to generate a **LOW**, **MEDIUM**, or **HIGH** kidney risk score, and sends automated email alerts after every vital submission. The platform connects patients with verified nephrologists through QR-based health record sharing and consultation booking, closing the loop between AI-detected risk and actual clinical follow-up.
+
+---
+
+## Core Features
+
+**Patient**
+- Registration, login, and JWT-secured session management
+- Vitals logging in Home mode (3 fields) or Clinic mode (10 fields), with an AI-generated LOW/MEDIUM/HIGH kidney risk score after each submission
+- Automated email alerts via SendGrid on registration and after every vitals submission
+- Health history with mode indicators, expandable clinic lab details, and CSV export
+- QR code generation for secure, shareable health records
+- Consultation booking with verified nephrologists (Virtual or In-Person)
+
+**Doctor**
+- Registration with RMDC medical licence number, verified manually via Django admin
+- Doctor dashboard with live patient count and upcoming consultations
+- QR code scanning to access a patient's shared health record
+- My Patients list of all patients who have shared records via QR
+- Schedule management: confirm or cancel consultation requests, add session links for virtual consultations
+- Profile editing (name, phone, photo, password)
 
 ---
 
@@ -46,14 +66,16 @@ All testing screenshots are located in the `testing/screenshots/` folder.
 | 13 | `13_laptop_high_health_history.png`       | Health history entry — HIGH             |
 | 14 | `14_laptop_high_email.png`                | Email alert — HIGH RISK                 |
 | 15 | `15_laptop_high_dashboard_overview.png`   | Full dashboard overview                 |
-| 16 | `16_iphone_low_dashboard.png`             | iPhone — LOW RISK dashboard             |
-| 17 | `17_iphone_low_history.png`               | iPhone — health history                 |
-| 18 | `18_iphone_medium_dashboard.png`          | iPhone — MEDIUM RISK dashboard          |
-| 19 | `19_iphone_medium_history.png`            | iPhone — health history                 |
-| 20 | `20_vivo_medium_dashboard.png`            | Vivo Android — MEDIUM RISK dashboard    |
-| 21 | `21_vivo_medium_history.png`              | Vivo Android — health history           |
-| 22 | `22_vivo_high_dashboard.png`              | Vivo Android — HIGH RISK dashboard      |
-| 23 | `23_vivo_high_history.png`                | Vivo Android — health history           |
+| 16 | `16_iphone_low_dashboard.png`             | iPhone simulation (DevTools) — LOW RISK dashboard    |
+| 17 | `17_iphone_low_history.png`               | iPhone simulation (DevTools) — health history        |
+| 18 | `18_iphone_medium_dashboard.png`          | iPhone simulation (DevTools) — MEDIUM RISK dashboard |
+| 19 | `19_iphone_medium_history.png`            | iPhone simulation (DevTools) — health history        |               |
+| 20 | `20_samsung_medium_dashboard.png`         | Samsung simulation (DevTools) — MEDIUM RISK dashboard |
+| 21 | `21_samsung_medium_history.png`           | Samsung simulation (DevTools) — health history        |
+| 22 | `22_samsung_high_dashboard.png`           | Samsung simulation (DevTools) — HIGH RISK dashboard   |
+| 23 | `23_samsung_high_history.png`             | Samsung simulation (DevTools) — health history        |
+
+> **Note:** The 23 screenshots above document the core vitals logging, AI risk scoring, and multi-device testing described in the original capstone proposal. Doctor-side features (registration, verification, dashboard, QR scanning, consultation scheduling) and patient-side QR sharing and consultation booking were built afterward and are demonstrated live in the demo video rather than in static screenshots.
 
 ---
 
@@ -62,7 +84,7 @@ All testing screenshots are located in the `testing/screenshots/` folder.
 | Layer      | Technology                          | Purpose                     |
 | ---------- | ----------------------------------- | --------------------------- |
 | Frontend   | Next.js 14, TypeScript, TailwindCSS | Web application             |
-| Backend    | Django 5, Django REST Framework     | API server                  |
+| Backend    | Django 4.2, Django REST Framework   | API server                  |
 | Database   | PostgreSQL via Supabase             | Longitudinal health records |
 | AI Model   | scikit-learn Random Forest          | Kidney risk scoring         |
 | Email      | SendGrid (HTTP API)                 | Automated patient alerts    |

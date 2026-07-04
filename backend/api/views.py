@@ -5,6 +5,7 @@ import joblib
 import pandas as pd
 import requests
 from django.conf import settings
+from django.utils import timezone
 from rest_framework import status, views
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -282,7 +283,11 @@ class ProfileUpdateView(views.APIView):
             except Exception:
                 pass
 
-        return Response({'message': 'Profile updated successfully'})
+        user_serializer = UserSerializer(user)
+        return Response({
+            'message': 'Profile updated successfully',
+            'user': user_serializer.data
+        })
 
 class ChangePasswordView(views.APIView):
     permission_classes = [IsAuthenticated]
@@ -320,8 +325,9 @@ class RegisterDoctorView(views.APIView):
                 counter += 1
             data['username'] = username
 
-        # Ensure role is set to doctor
+        # Ensure role and user_type are set to doctor
         data['role'] = 'doctor'
+        data['user_type'] = 'DOCTOR'
 
         user_serializer = UserSerializer(data=data)
         if user_serializer.is_valid():
@@ -410,7 +416,8 @@ class DoctorDashboardView(views.APIView):
             "recent_alerts": [],
             "upcoming_consultations_today": Consultation.objects.filter(
                 doctor=profile,
-                scheduled_date=datetime.date.today()
+                scheduled_date=timezone.localdate(),
+                status__iexact='confirmed'
             ).count()
         })
 
@@ -571,7 +578,8 @@ class MyConsultationsView(views.APIView):
                 "scheduled_date": c.scheduled_date,
                 "scheduled_time": c.scheduled_time,
                 "status": c.status,
-                "notes": c.notes
+                "notes": c.notes,
+                "session_link": c.session_link
             })
         return Response(data)
 
@@ -669,7 +677,8 @@ class DoctorScheduleView(views.APIView):
                 'scheduled_date': c.scheduled_date,
                 'scheduled_time': c.scheduled_time,
                 'status': c.status,
-                'notes': c.notes
+                'notes': c.notes,
+                'session_link': c.session_link
             })
         return Response(data)
 

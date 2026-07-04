@@ -38,7 +38,7 @@ interface DoctorData {
   is_verified: boolean;
   total_patients: number;
   recent_alerts: any[];
-  upcoming_consultations: any[];
+  upcoming_consultations_today: number;
 }
 
 export default function DoctorDashboard() {
@@ -168,7 +168,7 @@ export default function DoctorDashboard() {
                 </div>
                 <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 col-span-2">
                   <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Upcoming Consultations (Today)</p>
-                  <h3 className="text-2xl font-bold text-primary">{doctorData?.upcoming_consultations?.length || 0}</h3>
+                  <h3 className="text-2xl font-bold text-primary">{doctorData?.upcoming_consultations_today || 0}</h3>
                 </div>
               </div>
             </div>

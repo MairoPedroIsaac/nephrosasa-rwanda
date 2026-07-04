@@ -4,6 +4,13 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { getCurrentUser, logout } from '@/lib/auth';
+import { API_URL } from '@/lib/api';
+
+const getImageUrl = (url: string | null | undefined) => {
+  if (!url) return '';
+  if (url.startsWith('http') || url.startsWith('blob:') || url.startsWith('data:')) return url;
+  return `${API_URL.replace('/api', '')}${url.startsWith('/') ? '' : '/'}${url}`;
+};
 import { 
   Activity, 
   User, 
@@ -34,6 +41,11 @@ export default function DoctorLayout({
   useEffect(() => {
     setUser(getCurrentUser());
     
+    const handleUserUpdate = () => {
+      setUser(getCurrentUser());
+    };
+    window.addEventListener('userProfileUpdated', handleUserUpdate);
+    
     // Check initial theme
     if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
       setIsDarkMode(true);
@@ -42,6 +54,10 @@ export default function DoctorLayout({
       setIsDarkMode(false);
       document.documentElement.classList.remove('dark');
     }
+
+    return () => {
+      window.removeEventListener('userProfileUpdated', handleUserUpdate);
+    };
   }, []);
 
   const toggleTheme = () => {
@@ -170,7 +186,7 @@ export default function DoctorLayout({
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-white font-bold text-lg shadow-md overflow-hidden">
                   {user?.profile_picture ? (
-                    <img src={user.profile_picture} alt="Profile" className="w-full h-full object-cover" />
+                    <img src={getImageUrl(user.profile_picture)} alt="Profile" className="w-full h-full object-cover" />
                   ) : (
                     user?.first_name?.charAt(0) || 'D'
                   )}

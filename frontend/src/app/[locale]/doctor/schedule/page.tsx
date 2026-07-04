@@ -11,16 +11,44 @@ import Button from '@/components/ui/Button';
 const ConsultationCard = ({ appointment, onUpdateStatus, onUpdateSessionLink }: any) => {
   const [sessionLinkInput, setSessionLinkInput] = useState(appointment.session_link || '');
   const [isSaving, setIsSaving] = useState(false);
+  const [showSaved, setShowSaved] = useState(false);
   
   const isVirtual = (appointment.consultation_type || '').toLowerCase().includes('virtual');
+  
+  const isPastMeeting = () => {
+    if (!appointment.scheduled_date) return false;
+    const dateParts = appointment.scheduled_date.split('-');
+    if (dateParts.length !== 3) return false;
+    const year = parseInt(dateParts[0], 10);
+    const month = parseInt(dateParts[1], 10) - 1;
+    const day = parseInt(dateParts[2], 10);
+    let hour = 0;
+    let minute = 0;
+    if (appointment.scheduled_time) {
+      const timeStr = appointment.scheduled_time.trim().toUpperCase();
+      const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)?/);
+      if (match) {
+        hour = parseInt(match[1], 10);
+        minute = parseInt(match[2], 10);
+        if (match[3] === 'PM' && hour < 12) hour += 12;
+        if (match[3] === 'AM' && hour === 12) hour = 0;
+      }
+    }
+    const appointmentDate = new Date(year, month, day, hour, minute);
+    return appointmentDate < new Date();
+  };
+  
+  const isPast = isPastMeeting();
   
   let StatusIcon = AlertCircle;
   let statusClasses = "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50";
   
-  if (appointment.status === 'Confirmed') {
+  const currentStatus = (appointment.status || 'pending').toLowerCase();
+  
+  if (currentStatus === 'confirmed') {
     StatusIcon = CheckCircle;
     statusClasses = "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800/50";
-  } else if (appointment.status === 'Cancelled') {
+  } else if (currentStatus === 'cancelled') {
     StatusIcon = XCircle;
     statusClasses = "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800/50";
   }
@@ -29,6 +57,8 @@ const ConsultationCard = ({ appointment, onUpdateStatus, onUpdateSessionLink }: 
     setIsSaving(true);
     await onUpdateSessionLink(appointment.id, sessionLinkInput);
     setIsSaving(false);
+    setShowSaved(true);
+    setTimeout(() => setShowSaved(false), 2500);
   };
 
   return (
@@ -49,16 +79,16 @@ const ConsultationCard = ({ appointment, onUpdateStatus, onUpdateSessionLink }: 
         </div>
         <div className="flex items-center gap-2">
           <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm ${statusClasses}`}>
-            <StatusIcon size={14} /> {appointment.status || 'Pending'}
+            <StatusIcon size={14} /> {appointment.status ? appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1).toLowerCase() : 'Pending'}
           </span>
           <select 
-            value={appointment.status || 'Pending'} 
+            value={currentStatus} 
             onChange={(e) => onUpdateStatus(appointment.id, e.target.value)}
             className="text-sm border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-1.5 outline-none focus:ring-2 focus:ring-primary"
           >
-            <option value="Pending">Pending</option>
-            <option value="Confirmed">Confirmed</option>
-            <option value="Cancelled">Cancelled</option>
+            <option value="pending">Pending</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="cancelled">Cancelled</option>
           </select>
         </div>
       </div>
@@ -73,7 +103,7 @@ const ConsultationCard = ({ appointment, onUpdateStatus, onUpdateSessionLink }: 
           <span className="font-medium">{appointment.scheduled_time}</span>
         </div>
         <div className="flex flex-col gap-2 sm:col-span-2">
-          <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
+          <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 flex-wrap">
             {isVirtual ? (
               <>
                 <Video size={18} className="text-purple-500" />
@@ -85,9 +115,15 @@ const ConsultationCard = ({ appointment, onUpdateStatus, onUpdateSessionLink }: 
                 <span className="font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-0.5 rounded text-sm">In-Person Visit</span>
               </>
             )}
+            
+            {isPast && (
+              <span className="font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 px-2 py-0.5 rounded text-sm border border-gray-200 dark:border-gray-700">
+                Concluded
+              </span>
+            )}
           </div>
           
-          {isVirtual && (
+          {isVirtual && !isPast && (
             <div className="mt-3 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
                 <LinkIcon size={16} /> Session Link (Zoom / Google Meet)
@@ -103,7 +139,12 @@ const ConsultationCard = ({ appointment, onUpdateStatus, onUpdateSessionLink }: 
                 <Button variant="primary" size="sm" onClick={handleSaveLink} disabled={isSaving}>
                   {isSaving ? 'Saving...' : 'Save'}
                 </Button>
-                {appointment.session_link && (
+                {showSaved && (
+                  <span className="flex items-center text-green-600 dark:text-green-400 text-sm font-medium animate-fade-in px-2">
+                    <CheckCircle size={16} className="mr-1" /> Saved
+                  </span>
+                )}
+                {appointment.session_link && !showSaved && (
                   <Button variant="outline" size="sm" onClick={() => window.open(appointment.session_link, '_blank')} className="border-blue-200 text-blue-600 hover:bg-blue-50 dark:border-blue-900/50 dark:text-blue-400">
                     Join Meeting
                   </Button>
@@ -111,8 +152,9 @@ const ConsultationCard = ({ appointment, onUpdateStatus, onUpdateSessionLink }: 
               </div>
             </div>
           )}
+
         </div>
-        {appointment.notes && (
+        {appointment.notes && !isPast && (
           <div className="sm:col-span-2 mt-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400">
             <span className="font-semibold block mb-1">Notes:</span>
             {appointment.notes}
