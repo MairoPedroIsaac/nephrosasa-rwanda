@@ -66,29 +66,31 @@ export default function DoctorScanQrPage() {
   const startScanner = async () => {
     setIsScanning(true);
     setError('');
-    try {
-      const html5QrCode = new Html5Qrcode("reader");
-      scannerRef.current = html5QrCode;
-      await html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        (decodedText) => {
-          // On successful scan
-          html5QrCode.stop().then(() => {
-            setIsScanning(false);
-            setInputVal(decodedText);
-            processToken(decodedText);
-          }).catch(console.error);
-        },
-        (errorMessage) => {
-          // Parse errors are normal when no QR code is in view
-        }
-      );
-    } catch (err) {
-      console.error("Camera error:", err);
-      setError("Failed to access camera. Please check permissions or use manual entry.");
-      setIsScanning(false);
-    }
+    setTimeout(async () => {
+      try {
+        const html5QrCode = new Html5Qrcode("reader");
+        scannerRef.current = html5QrCode;
+        await html5QrCode.start(
+          { facingMode: "environment" },
+          { fps: 10, qrbox: { width: 250, height: 250 } },
+          (decodedText) => {
+            // On successful scan
+            html5QrCode.stop().then(() => {
+              setIsScanning(false);
+              setInputVal(decodedText);
+              processToken(decodedText);
+            }).catch(console.error);
+          },
+          (errorMessage) => {
+            // Parse errors are normal when no QR code is in view
+          }
+        );
+      } catch (err) {
+        console.error("Camera error:", err);
+        setError("Failed to access camera. Please check permissions or use manual entry.");
+        setIsScanning(false);
+      }
+    }, 100);
   };
 
   const stopScanner = async () => {

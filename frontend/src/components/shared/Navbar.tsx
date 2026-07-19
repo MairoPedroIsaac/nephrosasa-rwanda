@@ -148,7 +148,7 @@ const Navbar = () => {
   ];
 
   if (pathname.includes('/patient/') || pathname.includes('/doctor/') || pathname.includes('/admin/') || pathname.includes('/shared-record/')) {
-    return null;
+    return <div id="google_translate_element" className="hidden"></div>;
   }
 
   return (

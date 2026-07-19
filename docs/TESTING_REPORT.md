@@ -10,10 +10,13 @@ The NephroSasa platform underwent rigorous testing across multiple strategies:
 against known edge cases from the El Kharoua dataset, consistently maintaining its 
 84.94% accuracy benchmark.
 
-**Integration Testing:** The data flow from the Next.js frontend to the Django REST 
-API was tested end-to-end, confirming that JWT authentication correctly restricted 
-access and that the Supabase PostgreSQL database accurately stored longitudinal vital 
-logs across multiple submissions per patient.
+**Integration Testing:** 18 automated integration tests (Django REST Framework's 
+APITestCase, isolated test database) cover authentication, vitals logging with 
+AI scoring, doctor registration, QR sharing, and consultation flows — see Section 
+1.1.1 for full detail. Manual full-stack verification (frontend to backend to 
+database) was also conducted, confirming JWT authentication correctly restricted 
+access and that Supabase accurately stored longitudinal vital logs across multiple 
+submissions per patient — documented as system testing below.
 
 **System Testing:** Alert triggers were tested end-to-end. The SendGrid API 
 successfully dispatches welcome emails upon patient registration and automated 
@@ -30,6 +33,22 @@ both modes. Home Monitoring mode (3 fields) and Clinic Visit mode (10 fields) we
 each submitted and verified to produce correct AI risk scores and email alerts.
 
 ---
+
+### 1.1.1 Automated Testing (CI/CD)
+
+In addition to the manual testing described above, an automated test suite 
+runs via GitHub Actions on every push to the main branch:
+
+- **Unit tests (4):** AI model risk-label boundaries, representative clinical 
+  profiles, edge cases on GFR/Serum Creatinine, and reproduction of the 
+  84.94% accuracy benchmark.
+- **Integration tests (18):** Django REST Framework APITestCase coverage of 
+  authentication, vitals logging + AI scoring trigger, health history, QR 
+  generation and scanning, doctor registration/verification, consultation 
+  booking and confirmation, and doctor profile updates.
+
+All 22 tests execute automatically against an isolated test database on 
+every push. Workflow: .github/workflows/tests.yml
 
 ### 1.2 Demonstration with Different Data Values
 
