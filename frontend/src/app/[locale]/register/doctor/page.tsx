@@ -95,7 +95,7 @@ export default function RegisterDoctorPage() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Left Side - Hero Image (55%) */}
-      <div className="lg:w-[55%] relative min-h-[50vh] lg:min-h-screen">
+      <div className="hidden lg:block lg:w-[55%] relative min-h-screen">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image
@@ -565,14 +565,9 @@ export default function RegisterDoctorPage() {
                     />
                     <label htmlFor="acceptTerms" className="text-sm text-gray-700 dark:text-gray-300">
                       I agree to the{' '}
-                      <Link href="/en/terms" className="text-primary font-medium hover:text-primary-dark">
-                        Terms of Service
-                      </Link>{' '}
-                      and{' '}
-                      <Link href="/en/privacy" className="text-primary font-medium hover:text-primary-dark">
+                      <Link href="/en/privacy-policy" target="_blank" className="text-primary font-medium hover:text-primary-dark">
                         Privacy Policy
                       </Link>
-                      . I understand that access to patient records requires patient approval.
                     </label>
                   </div>
                 </div>
@@ -603,7 +598,7 @@ export default function RegisterDoctorPage() {
               ) : (
                 <button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || !formData.acceptTerms}
                   className="flex-1 bg-primary text-white font-medium py-3 rounded-xl hover:bg-primary-dark transition-colors disabled:opacity-70"
                 >
                   {loading ? (

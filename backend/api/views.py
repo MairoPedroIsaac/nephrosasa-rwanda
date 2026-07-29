@@ -41,9 +41,17 @@ def get_risk_label(probability):
         return "HIGH", probability
 
 class RegisterPatientView(views.APIView):
+    """
+    Handles the registration of new patient accounts.
+    """
     permission_classes = [AllowAny]
 
     def post(self, request):
+        """
+        Creates a User and associated PatientProfile.
+        Expected input: User details (email, password, etc.).
+        Returns: Auth tokens (access, refresh) and the newly created user data.
+        """
         data = request.data.copy() if hasattr(request.data, 'copy') else dict(request.data)
         if 'username' not in data and 'email' in data:
             base_username = data['email'].split('@')[0]
@@ -114,9 +122,17 @@ class RegisterPatientView(views.APIView):
         return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(views.APIView):
+    """
+    Handles user authentication for both patients and doctors.
+    """
     permission_classes = [AllowAny]
 
     def post(self, request):
+        """
+        Authenticates a user via email/username and password.
+        Expected input: 'email' (or 'username') and 'password'.
+        Returns: JWT auth tokens (access, refresh) and user profile info.
+        """
         email = request.data.get('email')
         username = request.data.get('username')
         password = request.data.get('password')
@@ -164,9 +180,17 @@ class LoginView(views.APIView):
             return Response({"error": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
 
 class LogVitalsView(views.APIView):
+    """
+    Handles the submission and AI risk assessment of patient vitals.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        """
+        Records patient vitals and invokes the ML model for risk scoring.
+        Expected input: Vitals payload (systolic_bp, blood_sugar, etc.).
+        Returns: The saved vital log object including the computed AI risk score.
+        """
         try:
             patient = request.user.patient_profile
         except PatientProfile.DoesNotExist:
@@ -238,9 +262,17 @@ class LogVitalsView(views.APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class PatientHistoryView(views.APIView):
+    """
+    Retrieves the historical vital logs for the authenticated patient.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """
+        Fetches all vital logs associated with the patient, ordered by date.
+        Expected input: None (uses request.user context).
+        Returns: A list of serialized VitalLog objects.
+        """
         if request.user.user_type != 'PATIENT':
             return Response({'error': 'Only patients can view history'}, status=status.HTTP_403_FORBIDDEN)
         
@@ -250,9 +282,17 @@ class PatientHistoryView(views.APIView):
         return Response(serializer.data)
 
 class ProfileUpdateView(views.APIView):
+    """
+    Allows authenticated users to update their profile information.
+    """
     permission_classes = [IsAuthenticated]
 
     def put(self, request):
+        """
+        Updates fields like name, phone number, and profile picture.
+        Expected input: Optional fields (first_name, last_name, phone_number, profile_picture).
+        Returns: A success message and the updated user data.
+        """
         user = request.user
         
         # Update user fields
@@ -290,9 +330,17 @@ class ProfileUpdateView(views.APIView):
         })
 
 class ChangePasswordView(views.APIView):
+    """
+    Allows authenticated users to change their account password.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        """
+        Validates the current password and sets a new one.
+        Expected input: 'current_password', 'new_password', 'confirm_new_password'.
+        Returns: A success message.
+        """
         user = request.user
         current_password = request.data.get('current_password')
         new_password = request.data.get('new_password')
@@ -312,9 +360,17 @@ class ChangePasswordView(views.APIView):
         return Response({'message': 'Password updated successfully'})
 
 class RegisterDoctorView(views.APIView):
+    """
+    Handles the registration of new doctor accounts.
+    """
     permission_classes = [AllowAny]
 
     def post(self, request):
+        """
+        Creates a User and associated DoctorProfile.
+        Expected input: User details and doctor specifics (e.g., rmdc_number, specialty).
+        Returns: Auth tokens (access, refresh) and the newly created user data.
+        """
         data = request.data.copy() if hasattr(request.data, 'copy') else dict(request.data)
         if 'username' not in data and 'email' in data:
             base_username = data['email'].split('@')[0]
@@ -395,9 +451,17 @@ class RegisterDoctorView(views.APIView):
         return Response(user_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class DoctorDashboardView(views.APIView):
+    """
+    Provides overview statistics and data for the doctor's dashboard.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """
+        Retrieves doctor profile details, total patients, and upcoming consultations.
+        Expected input: None (uses request.user context).
+        Returns: A dictionary of dashboard metrics and profile status.
+        """
         if request.user.role != 'doctor':
             return Response({'error': 'Only doctors can access this dashboard'}, status=status.HTTP_403_FORBIDDEN)
         
@@ -422,9 +486,17 @@ class DoctorDashboardView(views.APIView):
         })
 
 class GenerateShareTokenView(views.APIView):
+    """
+    Generates a secure, temporary token for sharing patient health records.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        """
+        Deactivates old tokens and creates a new shareable token.
+        Expected input: None (uses request.user context).
+        Returns: The newly generated token and its share URL.
+        """
         if request.user.role != 'patient':
             return Response({'error': 'Only patients can generate share tokens'}, status=status.HTTP_403_FORBIDDEN)
         
@@ -442,9 +514,17 @@ class GenerateShareTokenView(views.APIView):
         })
 
 class GetShareTokenView(views.APIView):
+    """
+    Retrieves the currently active share token for a patient.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """
+        Fetches the active token if one exists.
+        Expected input: None (uses request.user context).
+        Returns: The active token and share URL, or null if none exists.
+        """
         if request.user.role != 'patient':
             return Response({'error': 'Only patients can access share tokens'}, status=status.HTTP_403_FORBIDDEN)
         
@@ -458,9 +538,17 @@ class GetShareTokenView(views.APIView):
         return Response(None)
 
 class SharedRecordView(views.APIView):
+    """
+    Provides read-only access to a patient's vitals via a share token.
+    """
     permission_classes = [AllowAny]
 
     def get(self, request, token):
+        """
+        Validates the token and retrieves a summary of the patient's vitals.
+        Expected input: 'token' from the URL parameter.
+        Returns: Patient details, recent vitals, and the latest AI risk score.
+        """
         try:
             share = HealthRecordShare.objects.get(token=token, is_active=True)
         except HealthRecordShare.DoesNotExist:
@@ -510,9 +598,17 @@ class SharedRecordView(views.APIView):
         })
 
 class AvailableDoctorsView(views.APIView):
+    """
+    Lists all verified doctors available for consultations.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """
+        Fetches a list of doctors whose accounts are fully verified.
+        Expected input: None.
+        Returns: A list of doctor profiles (name, specialty, rmdc_number).
+        """
         if request.user.role != 'patient':
             return Response({'error': 'Only patients can access available doctors'}, status=status.HTTP_403_FORBIDDEN)
         
@@ -529,9 +625,17 @@ class AvailableDoctorsView(views.APIView):
         return Response(data)
 
 class BookConsultationView(views.APIView):
+    """
+    Allows a patient to request a consultation with a specific doctor.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        """
+        Creates a new Consultation record.
+        Expected input: 'doctor_id', 'consultation_type', 'scheduled_date', 'scheduled_time', 'notes'.
+        Returns: The newly created consultation ID and status message.
+        """
         if request.user.role != 'patient':
             return Response({'error': 'Only patients can book consultations'}, status=status.HTTP_403_FORBIDDEN)
         
@@ -562,9 +666,17 @@ class BookConsultationView(views.APIView):
         }, status=status.HTTP_201_CREATED)
 
 class MyConsultationsView(views.APIView):
+    """
+    Retrieves all consultations booked by the authenticated patient.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """
+        Fetches the patient's consultation history.
+        Expected input: None (uses request.user context).
+        Returns: A list of consultation records.
+        """
         if request.user.role != 'patient':
             return Response({'error': 'Only patients can access their consultations'}, status=status.HTTP_403_FORBIDDEN)
             
@@ -584,9 +696,17 @@ class MyConsultationsView(views.APIView):
         return Response(data)
 
 class AddPatientView(views.APIView):
+    """
+    Allows a doctor to add a patient to their roster using a share token.
+    """
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        """
+        Links a patient to the doctor if the provided share token is valid.
+        Expected input: 'token' (the patient's active share token).
+        Returns: A success message confirming the link.
+        """
         if request.user.role != 'doctor':
             return Response({'error': 'Only doctors can add patients'}, status=status.HTTP_403_FORBIDDEN)
 
@@ -617,9 +737,17 @@ class AddPatientView(views.APIView):
 
 
 class MyPatientsView(views.APIView):
+    """
+    Retrieves the list of patients currently linked to the doctor.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """
+        Fetches patient details and their latest AI risk scores for the doctor.
+        Expected input: None (uses request.user context).
+        Returns: A list of linked patient summaries.
+        """
         if request.user.role != 'doctor':
             return Response({'error': 'Only doctors can access patient list'}, status=status.HTTP_403_FORBIDDEN)
 
@@ -653,9 +781,17 @@ class MyPatientsView(views.APIView):
         return Response(data)
 
 class DoctorScheduleView(views.APIView):
+    """
+    Retrieves the doctor's upcoming and past consultations.
+    """
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """
+        Fetches all consultations assigned to the doctor, ordered by date.
+        Expected input: None (uses request.user context).
+        Returns: A list of consultation details.
+        """
         if request.user.role != 'doctor':
             return Response({'error': 'Only doctors can access schedule'}, status=status.HTTP_403_FORBIDDEN)
         try:
@@ -683,9 +819,17 @@ class DoctorScheduleView(views.APIView):
         return Response(data)
 
 class UpdateConsultationView(views.APIView):
+    """
+    Allows doctors to update the status or link for a specific consultation.
+    """
     permission_classes = [IsAuthenticated]
 
     def patch(self, request, consultation_id):
+        """
+        Updates fields like consultation status and session link.
+        Expected input: 'status' (optional) and/or 'session_link' (optional).
+        Returns: The updated consultation status and link.
+        """
         if request.user.role != 'doctor':
             return Response({'error': 'Only doctors can update consultations'}, status=status.HTTP_403_FORBIDDEN)
         

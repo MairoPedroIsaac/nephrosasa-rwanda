@@ -25,17 +25,19 @@ def predict_kidney_risk(patient_data):
     Predict kidney risk level from patient vital readings.
     
     Args:
-        patient_data: Dictionary with these keys:
-            - SystolicBP: float
-            - DiastolicBP: float
-            - FastingBloodSugar: float
-            - HbA1c: float
-            - SerumCreatinine: float
-            - GFR: float
-            - BUNLevels: float
-            - Age: float
-            - Smoking: int (0 or 1)
-            - FamilyHistoryKidneyDisease: int (0 or 1)
+        patient_data (dict): Expected to contain 10 specific keys (SystolicBP, DiastolicBP, 
+            FastingBloodSugar, HbA1c, SerumCreatinine, GFR, BUNLevels, Age, Smoking, 
+            FamilyHistoryKidneyDisease). The DataFrame built from this will have shape (1, 10).
+            
+    Returns:
+        dict: Contains 'risk_level' ('low', 'medium', 'high'), 'confidence' percentage, 
+            raw 'probability', and a descriptive 'message'.
+            
+    Processing steps:
+        - Converts the dictionary to a pandas DataFrame (shape 1x10).
+        - Reorders columns to strictly match training data expectations.
+        - Scales the data using the pre-fitted joblib StandardScaler.
+        - Predicts using the RandomForest model and assigns a risk category.
     """
     # Convert to DataFrame
     patient_df = pd.DataFrame([patient_data])

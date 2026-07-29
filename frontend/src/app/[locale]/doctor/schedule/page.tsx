@@ -12,6 +12,7 @@ const ConsultationCard = ({ appointment, onUpdateStatus, onUpdateSessionLink }: 
   const [sessionLinkInput, setSessionLinkInput] = useState(appointment.session_link || '');
   const [isSaving, setIsSaving] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
+  const [isEditingLink, setIsEditingLink] = useState(!appointment.session_link);
   
   const isVirtual = (appointment.consultation_type || '').toLowerCase().includes('virtual');
   
@@ -38,7 +39,7 @@ const ConsultationCard = ({ appointment, onUpdateStatus, onUpdateSessionLink }: 
     return appointmentDate < new Date();
   };
   
-  const isPast = isPastMeeting();
+  const isPast = isPastMeeting() || (appointment.status || '').toLowerCase() === 'completed';
   
   let StatusIcon = AlertCircle;
   let statusClasses = "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50";
@@ -48,6 +49,9 @@ const ConsultationCard = ({ appointment, onUpdateStatus, onUpdateSessionLink }: 
   if (currentStatus === 'confirmed') {
     StatusIcon = CheckCircle;
     statusClasses = "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800/50";
+  } else if (currentStatus === 'completed') {
+    StatusIcon = CheckCircle;
+    statusClasses = "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700";
   } else if (currentStatus === 'cancelled') {
     StatusIcon = XCircle;
     statusClasses = "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800/50";
@@ -58,6 +62,7 @@ const ConsultationCard = ({ appointment, onUpdateStatus, onUpdateSessionLink }: 
     await onUpdateSessionLink(appointment.id, sessionLinkInput);
     setIsSaving(false);
     setShowSaved(true);
+    setIsEditingLink(false);
     setTimeout(() => setShowSaved(false), 2500);
   };
 
@@ -88,6 +93,7 @@ const ConsultationCard = ({ appointment, onUpdateStatus, onUpdateSessionLink }: 
           >
             <option value="pending">Pending</option>
             <option value="confirmed">Confirmed</option>
+            <option value="completed">Completed</option>
             <option value="cancelled">Cancelled</option>
           </select>
         </div>
@@ -128,26 +134,45 @@ const ConsultationCard = ({ appointment, onUpdateStatus, onUpdateSessionLink }: 
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
                 <LinkIcon size={16} /> Session Link (Zoom / Google Meet)
               </label>
-              <div className="flex gap-2">
-                <input 
-                  type="text" 
-                  value={sessionLinkInput}
-                  onChange={(e) => setSessionLinkInput(e.target.value)}
-                  placeholder="Paste meeting link here"
-                  className="flex-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary outline-none"
-                />
-                <Button variant="primary" size="sm" onClick={handleSaveLink} disabled={isSaving}>
-                  {isSaving ? 'Saving...' : 'Save'}
-                </Button>
+              <div className="flex gap-2 items-center">
+                {isEditingLink ? (
+                  <>
+                    <input 
+                      type="text" 
+                      value={sessionLinkInput}
+                      onChange={(e) => setSessionLinkInput(e.target.value)}
+                      placeholder="Paste meeting link here"
+                      className="flex-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary outline-none"
+                    />
+                    <Button variant="primary" size="sm" onClick={handleSaveLink} disabled={isSaving}>
+                      {isSaving ? 'Saving...' : 'Save'}
+                    </Button>
+                    {appointment.session_link && (
+                      <Button variant="outline" size="sm" onClick={() => {
+                        setSessionLinkInput(appointment.session_link);
+                        setIsEditingLink(false);
+                      }}>
+                        Cancel
+                      </Button>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="flex-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-sm text-gray-900 dark:text-white truncate">
+                      {appointment.session_link}
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => setIsEditingLink(true)}>
+                      Edit
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={() => window.open(appointment.session_link, '_blank')} className="border-blue-200 text-blue-600 hover:bg-blue-50 dark:border-blue-900/50 dark:text-blue-400">
+                      Join Meeting
+                    </Button>
+                  </>
+                )}
                 {showSaved && (
                   <span className="flex items-center text-green-600 dark:text-green-400 text-sm font-medium animate-fade-in px-2">
                     <CheckCircle size={16} className="mr-1" /> Saved
                   </span>
-                )}
-                {appointment.session_link && !showSaved && (
-                  <Button variant="outline" size="sm" onClick={() => window.open(appointment.session_link, '_blank')} className="border-blue-200 text-blue-600 hover:bg-blue-50 dark:border-blue-900/50 dark:text-blue-400">
-                    Join Meeting
-                  </Button>
                 )}
               </div>
             </div>

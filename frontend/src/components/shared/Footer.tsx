@@ -46,35 +46,25 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/en/privacy" className="text-gray-400 hover:text-accent transition-colors">
+                <Link href="/en/privacy-policy" className="text-gray-400 hover:text-accent transition-colors">
                   Privacy Policy
-                </Link>
-              </li>
-              <li>
-                <Link href="/en/terms" className="text-gray-400 hover:text-accent transition-colors">
-                  Terms of Service
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Column 3: For Doctors */}
+          {/* Column 3: Get Started */}
           <div>
-            <h4 className="text-lg font-semibold mb-4">For Doctors</h4>
+            <h4 className="text-lg font-semibold mb-4">Get Started</h4>
             <ul className="space-y-2">
+              <li>
+                <Link href="/en/register/patient" className="text-gray-400 hover:text-accent transition-colors">
+                  Register as Patient
+                </Link>
+              </li>
               <li>
                 <Link href="/en/register/doctor" className="text-gray-400 hover:text-accent transition-colors">
                   Register as Doctor
-                </Link>
-              </li>
-              <li>
-                <Link href="/en/features" className="text-gray-400 hover:text-accent transition-colors">
-                  Features
-                </Link>
-              </li>
-              <li>
-                <Link href="/en/pricing" className="text-gray-400 hover:text-accent transition-colors">
-                  Pricing
                 </Link>
               </li>
             </ul>

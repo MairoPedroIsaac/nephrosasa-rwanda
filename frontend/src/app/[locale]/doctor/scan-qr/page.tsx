@@ -98,7 +98,7 @@ export default function DoctorScanQrPage() {
       try {
         await scannerRef.current.stop();
       } catch (e) {
-        console.error(e);
+        // Ignored. The scanner might not have been fully started or already stopped.
       }
     }
     setIsScanning(false);

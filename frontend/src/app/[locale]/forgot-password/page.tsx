@@ -30,7 +30,7 @@ export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row bg-gray-50 dark:bg-gray-900 transition-colors">
       {/* Left Side - Hero Image (55%) */}
-      <div className="lg:w-[55%] relative min-h-[50vh] lg:min-h-screen">
+      <div className="hidden lg:block lg:w-[55%] relative min-h-screen">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image

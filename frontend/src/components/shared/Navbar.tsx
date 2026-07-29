@@ -145,6 +145,7 @@ const Navbar = () => {
     { href: `/${currentLocale}`, label: 'Home' },
     { href: `/${currentLocale}/about`, label: 'About' },
     { href: `/${currentLocale}/contact`, label: 'Contact' },
+    { href: `/${currentLocale}/privacy-policy`, label: 'Privacy Policy' },
   ];
 
   if (pathname.includes('/patient/') || pathname.includes('/doctor/') || pathname.includes('/admin/') || pathname.includes('/shared-record/')) {
