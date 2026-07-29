@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import { ShieldAlert, CheckCircle, Activity, HeartPulse, Droplet, User, MapPin } from 'lucide-react';
 import Card from '@/components/ui/Card';
 
-export default function SharedRecordPage({ params }: { params: Promise<{ token: string }> }) {
-  const { token } = React.use(params);
+export default function SharedRecordPage() {
+  const params = useParams();
+  const token = params.token as string;
   const [loading, setLoading] = useState(true);
   const [recordData, setRecordData] = useState<any>(null);
   const [error, setError] = useState(false);
@@ -144,9 +146,51 @@ export default function SharedRecordPage({ params }: { params: Promise<{ token: 
           </Card>
         </div>
 
+        {/* Clinical Consultation Placeholder */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <Activity size={24} className="text-primary" />
+              Clinical Consultation Session
+            </h3>
+            <span className="text-xs font-semibold bg-primary/10 text-primary px-3 py-1 rounded-full uppercase tracking-wider border border-primary/20">For Medical Professionals</span>
+          </div>
+          
+          <Card className="shadow-sm border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+            <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/50 rounded-t-xl">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-white">Log Patient Vitals</h4>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Record new health metrics for this patient's profile.</p>
+                </div>
+                
+                {/* Toggle Button Group */}
+                <div className="flex p-1 bg-gray-200 dark:bg-gray-700 rounded-lg shrink-0">
+                  <button className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md bg-white dark:bg-gray-800 text-primary dark:text-white shadow-sm transition-all">
+                    Clinic Method
+                  </button>
+                  <button className="flex-1 sm:flex-none px-4 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all">
+                    Home Mode
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="p-6">
+              <div className="text-center py-8 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg">
+                <p className="text-gray-500 dark:text-gray-400 font-medium">Clinic Consultation Module</p>
+                <p className="text-sm text-gray-400 mt-2">Comprehensive clinical logging interface will be available here for authorized nephrologists.</p>
+                <button className="mt-4 px-6 py-2 bg-primary/10 text-primary hover:bg-primary/20 font-medium rounded-lg transition-colors cursor-not-allowed opacity-70">
+                  Begin Session
+                </button>
+              </div>
+            </div>
+          </Card>
+        </div>
+
         {/* Recent Vitals */}
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          <Activity size={24} className="text-primary" />
+          <Activity size={24} className="text-gray-400" />
           Recent Vital Logs
         </h3>
         
@@ -205,14 +249,14 @@ export default function SharedRecordPage({ params }: { params: Promise<{ token: 
                       {vital.source === 'Clinic' && (
                         <tr className="bg-gray-50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-700">
                           <td colSpan={4} className="px-4 py-3">
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-gray-500 dark:text-gray-400">
-                              {vital.hba1c !== null && <span><strong>HbA1c:</strong> {vital.hba1c}%</span>}
-                              {vital.creatinine !== null && <span><strong>Creatinine:</strong> {vital.creatinine} mg/dL</span>}
-                              {vital.bun !== null && <span><strong>BUN:</strong> {vital.bun} mg/dL</span>}
-                              {vital.gfr !== null && <span><strong>GFR:</strong> {vital.gfr} mL/min</span>}
-                              {vital.sodium !== null && <span><strong>Sodium:</strong> {vital.sodium} mEq/L</span>}
-                              {vital.potassium !== null && <span><strong>Potassium:</strong> {vital.potassium} mEq/L</span>}
-                              {vital.hemoglobin !== null && <span><strong>Hemoglobin:</strong> {vital.hemoglobin} g/dL</span>}
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                              {vital.hba1c !== null && <div className="bg-white dark:bg-gray-800 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm"><p className="text-[10px] uppercase font-bold text-gray-500 mb-0.5">HbA1c</p><p className="font-semibold text-gray-900 dark:text-gray-100">{vital.hba1c}%</p></div>}
+                              {vital.creatinine !== null && <div className="bg-white dark:bg-gray-800 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm"><p className="text-[10px] uppercase font-bold text-gray-500 mb-0.5">Creatinine</p><p className="font-semibold text-gray-900 dark:text-gray-100">{vital.creatinine} <span className="text-[10px] text-gray-500 font-normal">mg/dL</span></p></div>}
+                              {vital.bun !== null && <div className="bg-white dark:bg-gray-800 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm"><p className="text-[10px] uppercase font-bold text-gray-500 mb-0.5">BUN</p><p className="font-semibold text-gray-900 dark:text-gray-100">{vital.bun} <span className="text-[10px] text-gray-500 font-normal">mg/dL</span></p></div>}
+                              {vital.gfr !== null && <div className="bg-white dark:bg-gray-800 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm"><p className="text-[10px] uppercase font-bold text-gray-500 mb-0.5">GFR</p><p className="font-semibold text-gray-900 dark:text-gray-100">{vital.gfr} <span className="text-[10px] text-gray-500 font-normal">mL/min</span></p></div>}
+                              {vital.sodium !== null && <div className="bg-white dark:bg-gray-800 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm"><p className="text-[10px] uppercase font-bold text-gray-500 mb-0.5">Sodium</p><p className="font-semibold text-gray-900 dark:text-gray-100">{vital.sodium} <span className="text-[10px] text-gray-500 font-normal">mEq/L</span></p></div>}
+                              {vital.potassium !== null && <div className="bg-white dark:bg-gray-800 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm"><p className="text-[10px] uppercase font-bold text-gray-500 mb-0.5">Potassium</p><p className="font-semibold text-gray-900 dark:text-gray-100">{vital.potassium} <span className="text-[10px] text-gray-500 font-normal">mEq/L</span></p></div>}
+                              {vital.hemoglobin !== null && <div className="bg-white dark:bg-gray-800 p-2.5 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm"><p className="text-[10px] uppercase font-bold text-gray-500 mb-0.5">Hemoglobin</p><p className="font-semibold text-gray-900 dark:text-gray-100">{vital.hemoglobin} <span className="text-[10px] text-gray-500 font-normal">g/dL</span></p></div>}
                             </div>
                           </td>
                         </tr>
