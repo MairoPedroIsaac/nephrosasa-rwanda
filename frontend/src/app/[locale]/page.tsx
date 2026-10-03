@@ -152,10 +152,6 @@ export default function HomePage() {
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 flex items-center min-h-[600px] md:min-h-[700px]">
           <div className="max-w-4xl text-white">
-            <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-6 py-3 rounded-full border border-white/30 mb-8">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              <span className="font-medium">Trusted by 1,000+ Rwandans</span>
-            </div>
 
             <h1 className="text-4xl md:text-5xl lg:text-7xl font-bold mb-6 md:mb-8">
               Monitor Your Kidneys.
