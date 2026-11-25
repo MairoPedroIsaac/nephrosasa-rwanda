@@ -103,3 +103,7 @@ yarn-error.log*
 
 # TypeScript incremental build info
 *.tsbuildinfo
+
+# Local capstone working files
+docs/*
+!docs/screenshots/

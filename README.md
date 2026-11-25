@@ -39,33 +39,54 @@ NephroSasa Rwanda is an AI-powered longitudinal kidney health monitoring platfor
 
 ## Screenshots
 
-Current design, captured from a local run with demo data. All images live in [`docs/screenshots/`](docs/screenshots/).
+The current design, captured from a local run with demo data. Every image is in [`docs/screenshots/`](docs/screenshots/), numbered in the order below.
 
-| Patient dashboard | Patient dashboard (dark) |
-| --- | --- |
-| ![Patient dashboard](docs/screenshots/04-patient-dashboard-light.png) | ![Patient dashboard in dark mode](docs/screenshots/05-patient-dashboard-dark.png) |
+### Patient portal
 
-| Doctor dashboard | Patient dashboard on a phone |
-| --- | --- |
-| ![Doctor dashboard](docs/screenshots/11-doctor-dashboard.png) | <img src="docs/screenshots/10-patient-dashboard-phone.png" alt="Patient dashboard on a phone" width="260"> |
+<p align="center"><img src="docs/screenshots/04-patient-dashboard-light.png" alt="Patient dashboard" width="860"><br><sub>Dashboard</sub></p>
 
-| # | File | Page |
-| -- | -- | -- |
-| 01 | `01-home.png` | Home page |
-| 02 | `02-login.png` | Sign in |
-| 03 | `03-forgot-password.png` | Forgot password |
-| 04 | `04-patient-dashboard-light.png` | Patient dashboard, light mode |
-| 05 | `05-patient-dashboard-dark.png` | Patient dashboard, dark mode |
-| 06 | `06-patient-log-vitals.png` | Log vitals |
-| 07 | `07-patient-health-history.png` | Health history |
-| 08 | `08-patient-consultations.png` | Book and view consultations |
-| 09 | `09-patient-share-record.png` | Share record by QR |
-| 10 | `10-patient-dashboard-phone.png` | Patient dashboard on a phone |
-| 11 | `11-doctor-dashboard.png` | Doctor dashboard |
-| 12 | `12-doctor-patients.png` | My patients |
-| 13 | `13-doctor-schedule.png` | Doctor schedule |
-| 14 | `14-doctor-prescriptions.png` | Prescriptions |
-| 15 | `15-doctor-scan-qr.png` | Scan patient QR |
+<table>
+  <tr>
+    <td align="center" width="50%"><img src="docs/screenshots/06-patient-log-vitals.png" alt="Log vitals" width="420"><br><sub>Log vitals</sub></td>
+    <td align="center" width="50%"><img src="docs/screenshots/07-patient-health-history.png" alt="Health history" width="420"><br><sub>Health history</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><img src="docs/screenshots/08-patient-consultations.png" alt="Consultations" width="420"><br><sub>Consultations</sub></td>
+    <td align="center" width="50%"><img src="docs/screenshots/09-patient-share-record.png" alt="Share record by QR" width="420"><br><sub>Share record by QR</sub></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td align="center"><img src="docs/screenshots/05-patient-dashboard-dark.png" alt="Patient dashboard in dark mode" width="560"><br><sub>Dark mode</sub></td>
+    <td align="center"><img src="docs/screenshots/10-patient-dashboard-phone.png" alt="Patient dashboard on a phone" width="205"><br><sub>On a phone</sub></td>
+  </tr>
+</table>
+
+### Doctor portal
+
+<p align="center"><img src="docs/screenshots/11-doctor-dashboard.png" alt="Doctor dashboard" width="860"><br><sub>Dashboard</sub></p>
+
+<table>
+  <tr>
+    <td align="center" width="50%"><img src="docs/screenshots/12-doctor-patients.png" alt="My patients" width="420"><br><sub>My patients</sub></td>
+    <td align="center" width="50%"><img src="docs/screenshots/13-doctor-schedule.png" alt="Schedule" width="420"><br><sub>Schedule</sub></td>
+  </tr>
+  <tr>
+    <td align="center" width="50%"><img src="docs/screenshots/14-doctor-prescriptions.png" alt="Prescriptions" width="420"><br><sub>Prescriptions</sub></td>
+    <td align="center" width="50%"><img src="docs/screenshots/15-doctor-scan-qr.png" alt="Scan patient QR" width="420"><br><sub>Scan patient QR</sub></td>
+  </tr>
+</table>
+
+### Public pages and sign in
+
+<table>
+  <tr>
+    <td align="center" width="33%"><img src="docs/screenshots/01-home.png" alt="Home page" width="280"><br><sub>Home</sub></td>
+    <td align="center" width="33%"><img src="docs/screenshots/02-login.png" alt="Sign in" width="280"><br><sub>Sign in</sub></td>
+    <td align="center" width="33%"><img src="docs/screenshots/03-forgot-password.png" alt="Forgot password" width="280"><br><sub>Forgot password</sub></td>
+  </tr>
+</table>
 
 ---
 
