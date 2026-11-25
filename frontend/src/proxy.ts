@@ -1,4 +1,4 @@
-// src/middleware.ts
+// src/proxy.ts (Next.js 16 name for middleware)
 // Handles language detection and redirection for multi-language support
 
 import { NextResponse } from "next/server";
@@ -8,7 +8,7 @@ import type { NextRequest } from "next/server";
 const locales = ["en", "rw", "fr"];
 const defaultLocale = "en";
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Check if pathname already has a locale (e.g., /en/about or /fr/login)

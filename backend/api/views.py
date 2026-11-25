@@ -845,3 +845,104 @@ class UpdateConsultationView(views.APIView):
         consultation.save()
         
         return Response({'message': 'Consultation updated', 'status': consultation.status, 'session_link': consultation.session_link})
+
+
+# ---------------------------------------------------------------------------
+# Password reset (forgot password)
+# ---------------------------------------------------------------------------
+from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+
+
+class PasswordResetRequestView(views.APIView):
+    """
+    Sends a password reset link to the given email.
+    Always answers the same way so nobody can find out which emails are registered.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = (request.data.get('email') or '').strip()
+        if not email or '@' not in email:
+            return Response({'error': 'Please enter a valid email address.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        message = {'message': 'If an account exists for this email, a reset link has been sent.'}
+        user = User.objects.filter(email__iexact=email, is_active=True).first()
+        if not user:
+            return Response(message)
+
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        frontend = os.getenv('FRONTEND_URL', 'http://localhost:3000').rstrip('/')
+        link = f"{frontend}/en/reset-password?uid={uid}&token={token}"
+
+        if not settings.SENDGRID_API_KEY or settings.DEBUG:
+            # Local development: show the link in the server console
+            print(f"\n[Password reset] Link for {user.email}:\n{link}\n")
+
+        if settings.SENDGRID_API_KEY:
+            try:
+                html_content = f"""
+            <div style="font-family: Arial, sans-serif; color: #0F172A; max-width: 560px; margin: 0 auto; padding: 24px;">
+                <h2 style="color: #0D1F45;">Reset your NephroSasa Rwanda password</h2>
+                <p style="font-size: 16px;">Hello {user.first_name or ''},</p>
+                <p style="font-size: 16px; line-height: 1.5;">We received a request to reset your password. Click the button below to choose a new one. The link works once and expires in 3 days.</p>
+                <p style="margin: 28px 0;"><a href="{link}" style="background: #3B82F6; color: #fff; padding: 14px 22px; border-radius: 999px; text-decoration: none; font-weight: bold;">Choose a new password</a></p>
+                <p style="font-size: 14px; color: #64748B;">If you did not ask for this, you can ignore this email. Your password will not change.</p>
+            </div>
+            """
+                payload = {
+                    "personalizations": [{"to": [{"email": user.email}], "subject": "Reset your NephroSasa Rwanda password"}],
+                    "from": {"email": "isaacmairopedro@gmail.com", "name": "NephroSasa Rwanda"},
+                    "content": [{"type": "text/html", "value": html_content}],
+                }
+                response = requests.post(
+                    "https://api.sendgrid.com/v3/mail/send",
+                    json=payload,
+                    headers={"Authorization": f"Bearer {settings.SENDGRID_API_KEY}", "Content-Type": "application/json"},
+                    timeout=10,
+                )
+                if response.status_code >= 400:
+                    print(f"Failed to send reset email. Status Code: {response.status_code}, Body: {response.text}")
+            except Exception as e:
+                print(f"Exception sending reset email: {e}")
+
+        return Response(message)
+
+
+class PasswordResetConfirmView(views.APIView):
+    """
+    Sets a new password using the uid and token from the reset link.
+    """
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        uid = request.data.get('uid')
+        token = request.data.get('token')
+        new_password = request.data.get('new_password')
+        confirm_password = request.data.get('confirm_password')
+
+        if not uid or not token:
+            return Response({'error': 'This reset link is invalid.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not new_password or new_password != confirm_password:
+            return Response({'error': 'Passwords do not match.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(pk=force_str(urlsafe_base64_decode(uid)))
+        except (User.DoesNotExist, ValueError, TypeError, OverflowError):
+            user = None
+
+        if user is None or not default_token_generator.check_token(user, token):
+            return Response({'error': 'This reset link is invalid or has expired. Please request a new one.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            validate_password(new_password, user)
+        except ValidationError as e:
+            return Response({'error': ' '.join(e.messages)}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new_password)
+        user.save()
+        return Response({'message': 'Your password has been reset. You can now log in.'})

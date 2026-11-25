@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import apiClient from '@/lib/api';
 import { ArrowLeft, Shield, Zap, Smartphone, Mail, Check } from 'lucide-react';
 
 export default function ForgotPasswordPage() {
@@ -13,18 +14,20 @@ export default function ForgotPasswordPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
-    
-    // Simulate API call for password reset
-    setTimeout(() => {
-      if (email.includes('@')) {
-        setSuccess(true);
-      } else {
-        setError('Please enter a valid email address.');
-      }
+    if (!email.includes('@')) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await apiClient.post('/auth/password-reset/', { email });
+      setSuccess(true);
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Could not send the reset link. Please try again.');
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (
@@ -193,7 +196,7 @@ export default function ForgotPasswordPage() {
               </div>
               <h3 className="text-2xl font-bold text-green-800">Check your email</h3>
               <p className="text-green-700 text-lg">
-                We've sent password reset instructions to <strong>{email}</strong>
+                If an account exists for <strong>{email}</strong>, a reset link is on its way. It works once and expires in 3 days.
               </p>
               <div className="pt-6">
                 <Link href="/en/login">

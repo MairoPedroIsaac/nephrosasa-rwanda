@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Bricolage_Grotesque, Instrument_Sans, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import TranslateProvider from "@/components/shared/TranslateProvider";
 
-const inter = Inter({ subsets: ["latin"] });
+const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["500", "600", "700", "800"], variable: "--font-display" });
+const body = Instrument_Sans({ subsets: ["latin"], weight: ["400", "500", "600", "700"], variable: "--font-body" });
+const mono = Geist_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--font-mono" });
 
 export const metadata: Metadata = {
   title: "NephroSasa Rwanda - Monitor Your Kidneys. Before It's Too Late.",
@@ -26,8 +29,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
+    <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
+      <body className="font-sans antialiased">
+        <TranslateProvider />
+        {children}
+      </body>
     </html>
   );
 }

@@ -3,9 +3,6 @@
 import React, { useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { QrCode, ArrowRight, Info, Camera, X } from 'lucide-react';
-import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
-import Collapsible from '@/components/ui/Collapsible';
 import apiClient from '@/lib/api';
 import { Html5Qrcode } from 'html5-qrcode';
 
@@ -105,79 +102,89 @@ export default function DoctorScanQrPage() {
   };
 
   return (
-    <div className="min-h-full pb-12 bg-gray-50 dark:bg-gray-900 transition-colors p-4 sm:p-6 lg:p-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2">
-            Scan Patient QR
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 text-lg">
-            Enter a patient's NephroSasa share token or paste their share URL to access their health record.
-          </p>
-        </div>
+    <div className="pb-16">
+      <header className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 lg:pt-12">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-gray-500">Doctor portal</p>
+        <h1 className="mt-3 font-display text-4xl sm:text-5xl font-extrabold tracking-tightest text-gray-900 dark:text-white">Scan Patient QR</h1>
+        <p className="mt-2 max-w-2xl text-gray-500 dark:text-gray-400">
+          Enter a patient&apos;s NephroSasa share token or paste their share URL to access their health record.
+        </p>
+      </header>
 
-        <Card className="shadow-xl shadow-primary/5 p-8 mb-8">
-          <div className="w-20 h-20 bg-blue-50 dark:bg-blue-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
-            <QrCode size={40} className="text-primary" />
-          </div>
-
-          <div className="max-w-md mx-auto mb-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch">
+        {/* Camera */}
+        <section className="relative overflow-hidden rounded-3xl bg-ink p-6 sm:p-8 text-white flex flex-col dark:ring-1 dark:ring-white/10">
+          <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.7)_1px,transparent_1px)] [background-size:40px_40px] [mask-image:radial-gradient(ellipse_at_top_right,black,transparent_70%)]" />
+          <div className="relative flex flex-1 flex-col">
+            <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/50">Camera</p>
             {!isScanning ? (
-              <Button variant="outline" type="button" onClick={startScanner} className="w-full border-primary text-primary hover:bg-primary/5 dark:hover:bg-primary/20">
-                <Camera size={20} className="mr-2" />
-                Scan with Camera
-              </Button>
+              <>
+                <div className="my-8 flex flex-1 items-center justify-center">
+                  <div className="relative grid h-40 w-40 place-items-center">
+                    <span className="absolute left-0 top-0 h-8 w-8 rounded-tl-2xl border-l-2 border-t-2 border-primary-light" />
+                    <span className="absolute right-0 top-0 h-8 w-8 rounded-tr-2xl border-r-2 border-t-2 border-primary-light" />
+                    <span className="absolute bottom-0 left-0 h-8 w-8 rounded-bl-2xl border-b-2 border-l-2 border-primary-light" />
+                    <span className="absolute bottom-0 right-0 h-8 w-8 rounded-br-2xl border-b-2 border-r-2 border-primary-light" />
+                    <QrCode size={64} className="text-white/80" />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={startScanner}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-white px-6 py-3.5 font-semibold text-ink transition-transform hover:-translate-y-0.5"
+                >
+                  <Camera size={19} /> Scan with Camera
+                </button>
+              </>
             ) : (
-              <div className="relative">
-                <div id="reader" className="w-full rounded-lg overflow-hidden border border-gray-300 dark:border-gray-600 bg-black"></div>
-                <Button variant="outline" type="button" onClick={stopScanner} className="mt-4 w-full text-red-500 border-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
-                  <X size={20} className="mr-2" />
-                  Cancel Scanning
-                </Button>
+              <div className="mt-6">
+                <div id="reader" className="w-full overflow-hidden rounded-2xl bg-black" />
+                <button
+                  type="button"
+                  onClick={stopScanner}
+                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/20 px-6 py-3 font-semibold text-white transition hover:bg-white/10"
+                >
+                  <X size={18} /> Cancel Scanning
+                </button>
               </div>
             )}
           </div>
-          
-          <div className="relative flex py-5 items-center max-w-md mx-auto">
-            <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
-            <span className="flex-shrink-0 mx-4 text-gray-400 text-sm">OR</span>
-            <div className="flex-grow border-t border-gray-300 dark:border-gray-700"></div>
-          </div>
-          
-          <form onSubmit={handleSubmit} className="max-w-md mx-auto">
-            <div className="mb-6">
-              <label htmlFor="tokenInput" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                Patient Share Token or URL
-              </label>
-              <input
-                id="tokenInput"
-                type="text"
-                value={inputVal}
-                onChange={(e) => setInputVal(e.target.value)}
-                placeholder="Enter token (e.g. abc123...) or paste full share URL"
-                className="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
-              />
-              {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
-            </div>
-            
-            <Button type="submit" variant="primary" size="lg" className="w-full shadow-md shadow-primary/20 flex justify-center items-center">
-              Access Patient Record
-              <ArrowRight size={20} className="ml-2" />
-            </Button>
-          </form>
-        </Card>
+        </section>
 
-        <Collapsible 
-          title={<span className="font-bold text-blue-800 dark:text-blue-300 text-lg flex items-center gap-2"><Info className="text-blue-500" size={24} /> How to get a patient's token</span>}
-          className="border border-blue-100 dark:border-blue-900/50"
-          headerClassName="bg-blue-50 dark:bg-blue-900/20 px-6 py-4"
-        >
-          <div className="bg-blue-50 dark:bg-blue-900/20 px-6 pb-6 rounded-b-lg">
-            <p className="text-blue-700 dark:text-blue-400">
-              Ask your patient to go to <span className="font-semibold">Share Record</span> in their NephroSasa portal and share their QR code or copy their share URL. You can then paste it here or scan the QR code to instantly access their kidney health history.
-            </p>
-          </div>
-        </Collapsible>
+        {/* Manual */}
+        <section className="rounded-3xl border border-gray-200 bg-white p-6 sm:p-8 flex flex-col dark:border-white/10 dark:bg-gray-900">
+          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-gray-500">Or enter it yourself</p>
+          <form onSubmit={handleSubmit} className="mt-6 flex flex-1 flex-col">
+            <label htmlFor="tokenInput" className="text-sm font-semibold text-gray-900 dark:text-white">
+              Patient Share Token or URL
+            </label>
+            <input
+              id="tokenInput"
+              type="text"
+              value={inputVal}
+              onChange={(e) => setInputVal(e.target.value)}
+              placeholder="Enter token (e.g. abc123...) or paste full share URL"
+              className="mt-2 w-full rounded-2xl border border-gray-200 bg-gray-50 px-4 py-3.5 font-mono text-sm text-gray-900 outline-none transition focus:border-primary focus:bg-white focus:ring-4 focus:ring-primary/15 dark:border-white/10 dark:bg-white/5 dark:text-white"
+            />
+            {error && <p className="mt-2 text-sm text-red-600 dark:text-red-300">{error}</p>}
+            <button
+              type="submit"
+              className="group mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-primary-dark"
+            >
+              Access Patient Record
+              <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            </button>
+
+            <div className="mt-8 border-t border-gray-100 pt-6 dark:border-white/5">
+              <p className="flex items-center gap-2 text-sm font-semibold text-gray-900 dark:text-white">
+                <Info size={16} className="text-primary" /> How to get a patient&apos;s token
+              </p>
+              <p className="mt-2 text-sm leading-relaxed text-gray-500 dark:text-gray-400">
+                Ask your patient to go to <span className="font-semibold text-gray-700 dark:text-gray-200">Share Record</span> in their NephroSasa portal and share their QR code or copy their share URL. You can then paste it here or scan the QR code to instantly access their kidney health history.
+              </p>
+            </div>
+          </form>
+        </section>
       </div>
     </div>
   );

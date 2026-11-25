@@ -2,11 +2,37 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Calendar, Video, MapPin, User, Clock, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { Video, MapPin, Clock, CheckCircle, AlertCircle, ArrowRight, Check } from 'lucide-react';
 import { isAuthenticated } from '@/lib/auth';
 import apiClient from '@/lib/api';
-import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
+
+const isVirtual = (t: string) => String(t).toLowerCase() === 'virtual';
+
+const statusStyle = (status: string) => {
+  const s = status.toLowerCase();
+  if (s === 'confirmed') return 'bg-emerald-50 text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300';
+  if (s === 'cancelled') return 'bg-red-50 text-red-700 dark:bg-red-400/10 dark:text-red-300';
+  if (s === 'completed') return 'bg-gray-100 text-gray-600 dark:bg-white/5 dark:text-gray-400';
+  return 'bg-amber-50 text-amber-700 dark:bg-amber-400/10 dark:text-amber-300';
+};
+
+const dateParts = (iso: string) => {
+  const d = new Date(iso);
+  return {
+    day: d.toLocaleDateString('en-GB', { day: '2-digit' }),
+    month: d.toLocaleDateString('en-GB', { month: 'short' }),
+    full: d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }),
+  };
+};
+
+const initials = (name: string) =>
+  (name || '')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join('')
+    .toUpperCase();
 
 export default function ConsultPage() {
   const router = useRouter();
@@ -14,24 +40,20 @@ export default function ConsultPage() {
   const [loadingConsultations, setLoadingConsultations] = useState(true);
   const [doctors, setDoctors] = useState<any[]>([]);
   const [consultations, setConsultations] = useState<any[]>([]);
-  
+
   const [submitLoading, setSubmitLoading] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Form State
   const [formData, setFormData] = useState({
     consultation_type: 'virtual',
     doctor_id: '',
     scheduled_date: '',
     scheduled_time: '',
-    notes: ''
+    notes: '',
   });
 
-  const timeSlots = [
-    '08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM', 
-    '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'
-  ];
+  const timeSlots = ['08:00 AM', '09:00 AM', '10:00 AM', '11:00 AM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'];
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -47,7 +69,7 @@ export default function ConsultPage() {
       const response = await apiClient.get('/doctors/available/');
       setDoctors(response.data);
       if (response.data.length > 0) {
-        setFormData(prev => ({ ...prev, doctor_id: response.data[0].id }));
+        setFormData((prev) => ({ ...prev, doctor_id: response.data[0].id }));
       }
     } catch (err) {
       console.error('Failed to fetch doctors', err);
@@ -78,18 +100,23 @@ export default function ConsultPage() {
       setSubmitLoading(false);
       return;
     }
+    if (!formData.scheduled_time) {
+      setErrorMsg('Please pick a time.');
+      setSubmitLoading(false);
+      return;
+    }
 
     try {
       await apiClient.post('/consultations/book/', formData);
-      setSuccessMsg(`Consultation request sent! Your doctor will confirm your appointment.`);
+      setSuccessMsg('Consultation request sent! Your doctor will confirm your appointment.');
       setFormData({
         consultation_type: 'virtual',
         doctor_id: doctors.length > 0 ? doctors[0].id : '',
         scheduled_date: '',
         scheduled_time: '',
-        notes: ''
+        notes: '',
       });
-      fetchConsultations(); // Refresh list
+      fetchConsultations();
     } catch (err: any) {
       setErrorMsg(err.response?.data?.error || 'Failed to book consultation. Please try again.');
     } finally {
@@ -99,248 +126,257 @@ export default function ConsultPage() {
 
   const today = new Date().toISOString().split('T')[0];
 
+  // Next upcoming appointment gets the spotlight
+  const upcoming = consultations
+    .filter((c) => !['cancelled', 'completed'].includes(String(c.status).toLowerCase()) && c.scheduled_date >= today)
+    .sort((a, b) => String(a.scheduled_date).localeCompare(String(b.scheduled_date)));
+  const next = upcoming[0];
+  const rest = consultations.filter((c) => c !== next);
+
+  const label = 'block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2';
+  const field =
+    'w-full px-4 py-3 rounded-xl bg-white dark:bg-white/[0.03] border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors';
+
   return (
-    <div className="min-h-full pb-12 bg-gray-50 dark:bg-gray-900 transition-colors p-4 sm:p-6 lg:p-8">
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2">
-            Consultations
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 text-lg">
-            Book and manage your appointments with verified nephrologists.
-          </p>
-        </div>
+    <div className="pb-16">
+      <header className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 lg:pt-12">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-gray-500">Consultancy</p>
+        <h1 className="mt-3 font-display text-4xl sm:text-5xl font-extrabold tracking-tightest text-gray-900 dark:text-white">Consultations</h1>
+        <p className="mt-2 text-gray-500 dark:text-gray-400">Book and manage your appointments with verified nephrologists.</p>
+      </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Section 1: Book a Consultation */}
-          <Card className="shadow-xl shadow-primary/5">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-              <Calendar className="text-primary" />
-              Book a Consultation
-            </h2>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 grid grid-cols-1 xl:grid-cols-[1.15fr_1fr] gap-6 items-start">
+        {/* Booking */}
+        <section className="rounded-3xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-900 p-6 sm:p-8">
+          <h2 className="font-display text-2xl font-bold text-gray-900 dark:text-white">Book a Consultation</h2>
 
-            {successMsg && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg flex items-start gap-3">
-                <CheckCircle className="shrink-0 mt-0.5" />
-                <p>{successMsg}</p>
-              </div>
-            )}
+          {successMsg && (
+            <div className="mt-5 flex gap-3 rounded-2xl bg-emerald-50 p-4 text-emerald-800 dark:bg-emerald-400/10 dark:text-emerald-200">
+              <CheckCircle size={20} className="mt-0.5 flex-shrink-0" />
+              <p className="text-sm">{successMsg}</p>
+            </div>
+          )}
+          {errorMsg && (
+            <div className="mt-5 flex gap-3 rounded-2xl bg-red-50 p-4 text-red-800 dark:bg-red-400/10 dark:text-red-200">
+              <AlertCircle size={20} className="mt-0.5 flex-shrink-0" />
+              <p className="text-sm">{errorMsg}</p>
+            </div>
+          )}
 
-            {errorMsg && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg flex items-start gap-3">
-                <AlertCircle className="shrink-0 mt-0.5" />
-                <p>{errorMsg}</p>
-              </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Consultation Type Toggle */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Consultation Type
-                </label>
-                <div className="flex bg-gray-100 dark:bg-gray-800 p-1 rounded-xl">
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, consultation_type: 'virtual' })}
-                    className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-                      formData.consultation_type === 'virtual'
-                        ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                    }`}
-                  >
-                    <Video size={18} />
-                    Virtual Session
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFormData({ ...formData, consultation_type: 'in_person' })}
-                    className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 flex items-center justify-center gap-2 ${
-                      formData.consultation_type === 'in_person'
-                        ? 'bg-white dark:bg-gray-700 text-primary shadow-sm'
-                        : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
-                    }`}
-                  >
-                    <MapPin size={18} />
-                    In-Person Visit
-                  </button>
-                </div>
-              </div>
-
-              {/* Select Doctor */}
-              <div>
-                <label htmlFor="doctor" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Select Nephrologist *
-                </label>
-                {loadingDoctors ? (
-                  <div className="animate-pulse h-12 bg-gray-200 dark:bg-gray-800 rounded-xl"></div>
-                ) : doctors.length === 0 ? (
-                  <div className="p-4 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 rounded-xl border border-amber-200 dark:border-amber-800/50">
-                    No verified nephrologists available yet. Check back soon.
-                  </div>
-                ) : (
-                  <select
-                    id="doctor"
-                    value={formData.doctor_id}
-                    onChange={(e) => setFormData({ ...formData, doctor_id: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200"
-                    required
-                  >
-                    {doctors.map((doctor: any) => (
-                      <option key={doctor.id} value={doctor.id}>
-                        Dr. {doctor.full_name} - {doctor.rmdc_number}
-                      </option>
-                    ))}
-                  </select>
-                )}
-              </div>
-
-              {/* Date and Time */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="date" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Preferred Date *
-                  </label>
-                  <input
-                    type="date"
-                    id="date"
-                    min={today}
-                    value={formData.scheduled_date}
-                    onChange={(e) => setFormData({ ...formData, scheduled_date: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200"
-                    required
-                  />
-                </div>
-                <div>
-                  <label htmlFor="time" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Preferred Time *
-                  </label>
-                  <select
-                    id="time"
-                    value={formData.scheduled_time}
-                    onChange={(e) => setFormData({ ...formData, scheduled_time: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200"
-                    required
-                  >
-                    <option value="" disabled>Select a time</option>
-                    {timeSlots.map(slot => (
-                      <option key={slot} value={slot}>{slot}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* Notes */}
-              <div>
-                <label htmlFor="notes" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Notes (Optional)
-                </label>
-                <textarea
-                  id="notes"
-                  rows={4}
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  placeholder="Describe your symptoms or reason for consultation..."
-                  className="w-full px-4 py-3 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-700 text-gray-900 dark:text-white rounded-xl focus:ring-2 focus:ring-primary/30 focus:border-primary dark:focus:border-primary transition-all duration-200"
-                ></textarea>
-              </div>
-
-              <Button 
-                type="submit" 
-                variant="primary" 
-                size="lg" 
-                fullWidth 
-                disabled={submitLoading || doctors.length === 0}
-              >
-                {submitLoading ? 'Booking...' : 'Book Consultation'}
-              </Button>
-            </form>
-          </Card>
-
-          {/* Section 2: My Consultations */}
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
-              <Clock className="text-primary" />
-              My Consultations
-            </h2>
-            
-            {loadingConsultations ? (
-              <div className="space-y-4">
-                {[1, 2].map(i => (
-                  <div key={i} className="animate-pulse bg-gray-200 dark:bg-gray-800 h-32 rounded-xl"></div>
-                ))}
-              </div>
-            ) : consultations.length === 0 ? (
-              <Card className="text-center py-12">
-                <FileText size={48} className="mx-auto text-gray-300 dark:text-gray-600 mb-4" />
-                <p className="text-gray-500 dark:text-gray-400">No consultations booked yet.</p>
-              </Card>
-            ) : (
-              <div className="space-y-4">
-                {consultations.map((consultation: any) => {
-                  const status = consultation.status || 'Pending';
-                  const isConfirmed = status.toLowerCase() === 'confirmed';
-                  const isCancelled = status.toLowerCase() === 'cancelled';
-                  
+          <form onSubmit={handleSubmit} className="mt-6 space-y-7">
+            {/* Type */}
+            <fieldset>
+              <legend className={label}>Consultation Type</legend>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { v: 'virtual', icon: Video, t: 'Virtual Session', s: 'Video call from home' },
+                  { v: 'in_person', icon: MapPin, t: 'In-Person Visit', s: 'At the clinic in Kigali' },
+                ].map((o) => {
+                  const on = formData.consultation_type === o.v;
                   return (
-                  <Card key={consultation.id} className="p-5 shadow-md border border-gray-100 dark:border-gray-800">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="font-bold text-lg text-gray-900 dark:text-white flex items-center gap-2">
-                          <User size={18} className="text-primary" />
-                          Dr. {consultation.doctor_name}
-                        </h3>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1 flex items-center gap-1">
-                          {consultation.consultation_type === 'Virtual' || consultation.consultation_type === 'virtual' ? <Video size={14} /> : <MapPin size={14} />}
-                          {consultation.consultation_type === 'Virtual' || consultation.consultation_type === 'virtual' ? 'Virtual Session' : 'In-Person Visit'}
+                    <button
+                      key={o.v}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, consultation_type: o.v })}
+                      aria-pressed={on}
+                      className={`relative rounded-2xl border p-4 text-left transition-all ${
+                        on ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 hover:border-gray-300 dark:border-white/10 dark:hover:border-white/20'
+                      }`}
+                    >
+                      <o.icon size={20} className={on ? 'text-primary' : 'text-gray-400'} />
+                      <span className="mt-3 block font-semibold text-gray-900 dark:text-white">{o.t}</span>
+                      <span className="block text-sm text-gray-500 dark:text-gray-400">{o.s}</span>
+                      {on && (
+                        <span className="absolute right-3 top-3 grid h-5 w-5 place-items-center rounded-full bg-primary text-white">
+                          <Check size={12} />
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
+
+            {/* Doctor */}
+            <fieldset>
+              <legend className={label}>Select Nephrologist *</legend>
+              {loadingDoctors ? (
+                <div className="h-16 animate-pulse rounded-2xl bg-gray-100 dark:bg-white/5" />
+              ) : doctors.length === 0 ? (
+                <div className="rounded-2xl bg-amber-50 p-4 text-sm text-amber-800 dark:bg-amber-400/10 dark:text-amber-200">
+                  No verified nephrologists available yet. Check back soon.
+                </div>
+              ) : (
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {doctors.map((d: any) => {
+                    const on = String(formData.doctor_id) === String(d.id);
+                    return (
+                      <button
+                        key={d.id}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, doctor_id: d.id })}
+                        aria-pressed={on}
+                        className={`flex w-full items-center gap-3 rounded-2xl border p-3 text-left transition-all ${
+                          on ? 'border-primary bg-primary/5 ring-1 ring-primary' : 'border-gray-200 hover:border-gray-300 dark:border-white/10 dark:hover:border-white/20'
+                        }`}
+                      >
+                        <span className={`grid h-10 w-10 flex-shrink-0 place-items-center rounded-full text-sm font-semibold ${on ? 'bg-primary text-white' : 'bg-gray-100 text-gray-600 dark:bg-white/10 dark:text-gray-300'}`}>
+                          {initials(d.full_name)}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span translate="no" className="notranslate block truncate font-semibold text-gray-900 dark:text-white">Dr. {d.full_name}</span>
+                          <span translate="no" className="notranslate block truncate font-mono text-xs text-gray-500">{d.rmdc_number}</span>
+                        </span>
+                        <span className={`grid h-5 w-5 place-items-center rounded-full border ${on ? 'border-primary bg-primary text-white' : 'border-gray-300 dark:border-white/20'}`}>
+                          {on && <Check size={12} />}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </fieldset>
+
+            {/* Date */}
+            <div>
+              <label htmlFor="date" className={label}>Preferred Date *</label>
+              <input
+                type="date"
+                id="date"
+                min={today}
+                value={formData.scheduled_date}
+                onChange={(e) => setFormData({ ...formData, scheduled_date: e.target.value })}
+                className={field}
+                required
+              />
+            </div>
+
+            {/* Time */}
+            <fieldset>
+              <legend className={label}>Preferred Time *</legend>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {timeSlots.map((slot) => {
+                  const on = formData.scheduled_time === slot;
+                  return (
+                    <button
+                      key={slot}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, scheduled_time: slot })}
+                      aria-pressed={on}
+                      className={`rounded-xl border py-2.5 font-mono text-sm transition-all ${
+                        on
+                          ? 'border-primary bg-primary text-white'
+                          : 'border-gray-200 text-gray-700 hover:border-gray-400 dark:border-white/10 dark:text-gray-300 dark:hover:border-white/30'
+                      }`}
+                    >
+                      {slot}
+                    </button>
+                  );
+                })}
+              </div>
+            </fieldset>
+
+            {/* Notes */}
+            <div>
+              <label htmlFor="notes" className={label}>Notes (Optional)</label>
+              <textarea
+                id="notes"
+                rows={3}
+                value={formData.notes}
+                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                placeholder="Describe your symptoms or reason for consultation..."
+                className={field}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={submitLoading || doctors.length === 0}
+              className="group flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-primary-dark disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:translate-y-0 dark:disabled:bg-white/10"
+            >
+              {submitLoading ? 'Booking...' : 'Book Consultation'}
+              {!submitLoading && <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />}
+            </button>
+          </form>
+        </section>
+
+        {/* My consultations */}
+        <section className="space-y-4">
+          <h2 className="font-display text-2xl font-bold text-gray-900 dark:text-white">My Consultations</h2>
+
+          {loadingConsultations ? (
+            <div className="space-y-3">
+              {[1, 2].map((i) => (
+                <div key={i} className="h-28 animate-pulse rounded-3xl bg-gray-100 dark:bg-white/5" />
+              ))}
+            </div>
+          ) : consultations.length === 0 ? (
+            <div className="rounded-3xl border border-dashed border-gray-300 p-8 text-center dark:border-white/10">
+              <p className="font-medium text-gray-700 dark:text-gray-300">No consultations booked yet.</p>
+              <p className="mt-1 text-sm text-gray-500">Your appointments will appear here once you book one.</p>
+            </div>
+          ) : (
+            <>
+              {next && (
+                <div className="relative overflow-hidden rounded-3xl bg-ink p-6 text-white dark:ring-1 dark:ring-white/10">
+                  <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.7)_1px,transparent_1px)] [background-size:36px_36px] [mask-image:radial-gradient(ellipse_at_top_right,black,transparent_70%)]" />
+                  <div className="relative">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-white/50">Next appointment</p>
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${statusStyle(String(next.status || 'pending'))}`}>{next.status || 'pending'}</span>
+                    </div>
+                    <p className="mt-4 font-display text-3xl font-bold tracking-tight">{dateParts(next.scheduled_date).full}</p>
+                    <p translate="no" className="notranslate mt-1 font-mono text-lg text-primary-light">{next.scheduled_time}</p>
+                    <div className="mt-5 flex items-center gap-3 border-t border-white/10 pt-5">
+                      <span className="grid h-10 w-10 place-items-center rounded-full bg-white/10 text-sm font-semibold">{initials(next.doctor_name)}</span>
+                      <div className="min-w-0 flex-1">
+                        <p translate="no" className="notranslate truncate font-semibold">Dr. {next.doctor_name}</p>
+                        <p className="flex items-center gap-1.5 text-sm text-white/60">
+                          {isVirtual(next.consultation_type) ? <Video size={14} /> : <MapPin size={14} />}
+                          {isVirtual(next.consultation_type) ? 'Virtual Session' : 'In-Person Visit'}
                         </p>
                       </div>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                        isConfirmed ? 'bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800' :
-                        isCancelled ? 'bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800' :
-                        'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800'
-                      }`}>
-                        {status}
-                      </span>
-                    </div>
-                    
-                    <div className="bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg flex flex-col gap-3 mb-3">
-                      <div className="flex flex-wrap items-center gap-4">
-                        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                          <Calendar size={16} className="text-gray-400" />
-                          {new Date(consultation.scheduled_date).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })}
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
-                          <Clock size={16} className="text-gray-400" />
-                          {consultation.scheduled_time}
-                        </div>
-                      </div>
-
-                      {isConfirmed && consultation.session_link && (
-                        <div className="pt-2 mt-1 border-t border-gray-200 dark:border-gray-700">
-                          <Button 
-                            variant="primary" 
-                            size="sm" 
-                            onClick={() => window.open(consultation.session_link, '_blank')}
-                          >
-                            <Video size={14} className="mr-2" />
-                            Join Meeting
-                          </Button>
-                        </div>
+                      {String(next.status).toLowerCase() === 'confirmed' && next.session_link && (
+                        <a href={next.session_link} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full bg-white px-4 py-2.5 text-sm font-semibold text-ink transition-transform hover:-translate-y-0.5">
+                          <Video size={15} /> Join Meeting
+                        </a>
                       )}
                     </div>
+                    {next.notes && <p className="mt-4 text-sm text-white/60">&ldquo;{next.notes}&rdquo;</p>}
+                  </div>
+                </div>
+              )}
 
-                    {consultation.notes && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 italic">
-                        "{consultation.notes}"
-                      </p>
-                    )}
-                  </Card>
-                )})}
-              </div>
-            )}
-          </div>
-        </div>
+              {rest.length > 0 && (
+                <ul className="divide-y divide-gray-100 overflow-hidden rounded-3xl border border-gray-200 bg-white dark:divide-white/5 dark:border-white/10 dark:bg-gray-900">
+                  {rest.map((c: any) => {
+                    const dp = dateParts(c.scheduled_date);
+                    const status = String(c.status || 'pending');
+                    return (
+                      <li key={c.id} className="flex items-center gap-4 p-4 sm:p-5">
+                        <div className="w-14 flex-shrink-0 rounded-2xl bg-gray-50 py-2 text-center dark:bg-white/5">
+                          <p className="font-display text-xl font-bold leading-none text-gray-900 dark:text-white">{dp.day}</p>
+                          <p className="mt-1 font-mono text-[11px] uppercase text-gray-500">{dp.month}</p>
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <p translate="no" className="notranslate truncate font-semibold text-gray-900 dark:text-white">Dr. {c.doctor_name}</p>
+                          <p className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-sm text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                            {isVirtual(c.consultation_type) ? <Video size={13} /> : <MapPin size={13} />}
+                            {isVirtual(c.consultation_type) ? 'Virtual' : 'In-Person'}
+                            <span className="text-gray-300 dark:text-gray-600">·</span>
+                            <Clock size={13} />
+                            <span translate="no" className="notranslate font-mono">{c.scheduled_time}</span>
+                          </p>
+                        </div>
+                        <span className={`rounded-full px-2.5 py-1 text-xs font-medium capitalize ${statusStyle(status)}`}>{status}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </>
+          )}
+        </section>
       </div>
     </div>
   );

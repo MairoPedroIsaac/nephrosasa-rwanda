@@ -80,11 +80,13 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
+_DATABASE_URL = os.getenv('DATABASE_URL', f'sqlite:///{BASE_DIR}/db.sqlite3')
 DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL', f'sqlite:///{BASE_DIR}/db.sqlite3'),
+    'default': dj_database_url.parse(
+        _DATABASE_URL,
         conn_max_age=600,
-        ssl_require=True
+        # SSL for the hosted PostgreSQL database; local SQLite has no SSL
+        ssl_require=not _DATABASE_URL.startswith('sqlite'),
     )
 }
 

@@ -1,34 +1,22 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { 
-  Activity,
-  Info, 
-  FileText, 
-  QrCode, 
-  CreditCard, 
-  Bell, 
-  TrendingUp,
-  Calendar,
-  MapPin,
-  User,
-  AlertCircle,
-  CheckCircle,
-  Clock,
-  ArrowRight,
-  HeartPulse,
-  Droplet,
+import {
+  FileText,
+  ScanLine,
   Users,
+  Calendar,
+  ArrowRight,
+  ArrowUpRight,
   ShieldAlert,
-  Stethoscope
+  ShieldCheck,
+  CheckCircle,
 } from 'lucide-react';
 import { getCurrentUser, isAuthenticated } from '@/lib/auth';
 import apiClient from '@/lib/api';
-import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
+import ZoomImage from '@/components/motion/ZoomImage';
 
 interface DoctorData {
   full_name: string;
@@ -40,6 +28,13 @@ interface DoctorData {
   recent_alerts: any[];
   upcoming_consultations_today: number;
 }
+
+const greeting = () => {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good morning';
+  if (h < 17) return 'Good afternoon';
+  return 'Good evening';
+};
 
 export default function DoctorDashboard() {
   const router = useRouter();
@@ -56,261 +51,185 @@ export default function DoctorDashboard() {
     }
   };
 
-  // Check authentication on mount
   useEffect(() => {
     if (!isAuthenticated()) {
       router.push('/en/login');
       return;
     }
-
     const currentUser = getCurrentUser();
-    // Use role if available, otherwise check user_type (fallback)
     const isDoctor = currentUser?.role === 'doctor' || currentUser?.user_type === 'DOCTOR';
-    
     if (!isDoctor) {
-      router.push('/en/patient/dashboard'); // Redirect if patient
+      router.push('/en/patient/dashboard');
       return;
     }
-
     setUser(currentUser);
     fetchDoctorData().finally(() => setLoading(false));
   }, [router]);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-colors">
+      <div className="min-h-screen grid place-items-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Loading dashboard...</p>
+          <div className="mx-auto mb-4 h-10 w-10 animate-spin rounded-full border-2 border-gray-200 border-t-primary dark:border-white/10 dark:border-t-primary" />
+          <p className="text-sm text-gray-500">Loading dashboard...</p>
         </div>
       </div>
     );
   }
 
+  const lastName = doctorData?.full_name?.split(' ').pop() || user?.last_name;
+  const alerts = doctorData?.recent_alerts ?? [];
+  const stats = [
+    { label: 'Total Patients', value: doctorData?.total_patients || 0, href: '/en/doctor/patients', tone: 'text-white' },
+    { label: 'Unread Alerts', value: alerts.length, href: '#alerts', tone: alerts.length ? 'text-amber-300' : 'text-white' },
+    { label: 'Consultations Today', value: doctorData?.upcoming_consultations_today || 0, href: '/en/doctor/schedule', tone: 'text-primary-light' },
+  ];
+
   return (
-    <div className="min-h-full pb-12 bg-gray-50 dark:bg-gray-900 transition-colors">
-      {/* Modernized Floating Header Section */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-4">
-        <div className="bg-gradient-to-br from-primary via-primary-dark to-accent text-white rounded-3xl p-8 shadow-2xl shadow-primary/20 relative overflow-hidden">
-          {/* Decorative glass elements */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent opacity-20 rounded-full blur-2xl translate-y-1/3 -translate-x-1/4"></div>
-
-          <div className="relative z-10 flex flex-col md:flex-row md:items-center md:justify-between">
-            <div className="mb-6 md:mb-0">
-              <h1 className="text-3xl sm:text-4xl font-extrabold mb-2 tracking-tight">
-                Welcome back, Dr. {doctorData?.full_name?.split(' ').pop() || user?.last_name}!
-              </h1>
-              <p className="text-blue-100 text-lg flex items-center gap-2">
-                Managing {doctorData?.specialty || 'Nephrology'} practice at NephroSasa.
-              </p>
-            </div>
-
-            <div className="mt-6 md:mt-0">
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl px-6 py-4 border border-white/20 shadow-inner">
-                <div className="flex items-center gap-3 font-medium">
-                  <Calendar size={20} className="text-accent-light" />
-                  <span>{new Date().toLocaleDateString('en-RW', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
-                  })}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div className="pb-16">
+      {/* Page header */}
+      <header className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 lg:pt-12 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+        <div>
+          <p translate="no" className="notranslate font-mono text-xs uppercase tracking-[0.14em] text-gray-500">
+            {new Date().toLocaleDateString('en-RW', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          </p>
+          <h1 className="mt-3 font-display text-4xl sm:text-5xl font-extrabold tracking-tightest text-gray-900 dark:text-white">
+            {greeting()}, Dr. {lastName}.
+          </h1>
+          <p className="mt-2 text-gray-500 dark:text-gray-400">Managing {doctorData?.specialty || 'Nephrology'} practice at NephroSasa.</p>
         </div>
-      </section>
+        <Link
+          href="/en/doctor/scan-qr"
+          className="group inline-flex items-center justify-center gap-2 rounded-full bg-primary px-6 py-3.5 font-semibold text-white transition-all hover:-translate-y-0.5 hover:bg-primary-dark hover:shadow-[0_14px_30px_-12px_rgba(59,130,246,0.7)]"
+        >
+          <ScanLine size={18} />
+          Scan Patient QR
+        </Link>
+      </header>
 
-      {/* Verification Warning (if not verified) */}
+      {/* Verification */}
       {!doctorData?.is_verified && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-4">
-          <div className="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-lg shadow-sm">
-            <div className="flex items-center">
-              <ShieldAlert className="h-6 w-6 text-amber-500 mr-3" />
-              <div>
-                <p className="text-sm font-bold text-amber-800">Verification Pending</p>
-                <p className="text-sm text-amber-700 mt-1">Your RMDC number is currently being verified. You will not be able to accept new patients or issue prescriptions until verification is complete.</p>
-              </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+          <div className="flex gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 dark:border-amber-400/20 dark:bg-amber-400/10">
+            <ShieldAlert size={20} className="mt-0.5 flex-shrink-0 text-amber-600 dark:text-amber-300" />
+            <div>
+              <p className="font-semibold text-amber-900 dark:text-amber-200">Verification Pending</p>
+              <p className="mt-0.5 text-sm text-amber-800/80 dark:text-amber-200/70">
+                Your RMDC number is currently being verified. You will not be able to accept new patients or issue prescriptions until verification is complete.
+              </p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        
-        {/* Top Row: Practice Stats & Scan CTA */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          
-          {/* Practice Overview Card */}
-          <Card className="shadow-xl shadow-primary/5 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 p-4 opacity-5 text-primary">
-              <Users size={120} />
+      {/* Practice overview */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <section className="xl:col-span-2 relative overflow-hidden rounded-3xl bg-ink text-white dark:ring-1 dark:ring-white/10">
+          <div className="absolute inset-0 opacity-[0.06] [background-image:linear-gradient(rgba(255,255,255,.7)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,.7)_1px,transparent_1px)] [background-size:40px_40px] [mask-image:radial-gradient(ellipse_at_top_right,black,transparent_70%)]" />
+          <div className="relative p-6 sm:p-8">
+            <p translate="no" className="notranslate font-mono text-[11px] uppercase tracking-[0.14em] text-white/50">Practice Overview</p>
+            <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 border-t border-white/10">
+              {stats.map((s, i) => (
+                <Link key={s.label} href={s.href} className={`group py-5 sm:py-6 ${i > 0 ? 'border-t sm:border-t-0 sm:border-l border-white/10 sm:pl-6' : 'sm:pr-6'}`}>
+                  <p className={`font-display text-5xl font-bold tracking-tight tabular ${s.tone}`}>{s.value}</p>
+                  <p className="mt-2 flex items-center gap-1.5 text-sm text-white/60 group-hover:text-white transition-colors">
+                    {s.label}
+                    <ArrowUpRight size={14} className="opacity-0 -translate-x-1 transition-all group-hover:opacity-100 group-hover:translate-x-0" />
+                  </p>
+                </Link>
+              ))}
             </div>
-            <div className="relative z-10">
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                  <Activity className="text-primary" size={24} />
-                  Practice Overview
-                </h2>
+            <div className="mt-2 flex flex-col sm:flex-row sm:items-center gap-4 rounded-2xl bg-white/[0.05] p-5">
+              <div className="flex-1">
+                <p className="font-semibold">Access Patient Records</p>
+                <p className="mt-1 text-sm text-white/60">
+                  Scan a patient&apos;s NephroSasa QR code or enter their ID to view their full medical history and recent vitals.
+                </p>
               </div>
-              
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Total Patients</p>
-                  <h3 className="text-3xl font-bold text-gray-900 dark:text-white">{doctorData?.total_patients || 0}</h3>
-                </div>
-                <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Unread Alerts</p>
-                  <h3 className="text-3xl font-bold text-amber-500">{doctorData?.recent_alerts?.length || 0}</h3>
-                </div>
-                <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded-xl border border-gray-100 dark:border-gray-700 col-span-2">
-                  <p className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-1">Upcoming Consultations (Today)</p>
-                  <h3 className="text-2xl font-bold text-primary">{doctorData?.upcoming_consultations_today || 0}</h3>
-                </div>
-              </div>
+              <Link href="/en/doctor/scan-qr" className="group inline-flex items-center justify-center gap-2 rounded-full bg-white px-5 py-3 text-sm font-semibold text-ink transition-transform hover:-translate-y-0.5">
+                Scan Patient QR <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+              </Link>
             </div>
-          </Card>
+          </div>
+        </section>
 
-          {/* Scan QR CTA */}
-          <Card className="shadow-xl shadow-primary/5 flex flex-col justify-center items-center text-center p-8">
-            <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mb-6">
-              <QrCode size={40} className="text-primary" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-              Access Patient Records
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-sm">
-              Scan a patient's NephroSasa QR code or enter their ID to view their full medical history and recent vitals.
-            </p>
-            <Link href="/en/doctor/scan-qr" className="w-full sm:w-auto">
-              <Button variant="primary" size="lg" className="text-lg w-full">
-                Scan Patient QR
-                <ArrowRight size={20} className="ml-2 inline" />
-              </Button>
+        {/* Provider card */}
+        <section className="relative overflow-hidden rounded-3xl text-white min-h-[320px] flex flex-col">
+          <ZoomImage src="/images/doctors/doctor-3.jpg" alt="" className="absolute inset-0" from={1.06} sizes="(max-width: 1280px) 100vw, 33vw" />
+          <div className="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/10" />
+          <div className="relative flex items-center justify-between p-6">
+            <p translate="no" className="notranslate font-mono text-[11px] uppercase tracking-[0.14em] text-white/80">NephroSasa Provider</p>
+            <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 font-mono text-[10px] uppercase tracking-wider ${doctorData?.is_verified ? 'bg-emerald-400/20 text-emerald-200' : 'bg-amber-400/20 text-amber-200'}`}>
+              {doctorData?.is_verified ? <ShieldCheck size={12} /> : <ShieldAlert size={12} />}
+              {doctorData?.is_verified ? 'Verified' : 'Pending'}
+            </span>
+          </div>
+          <div className="relative mt-auto p-6">
+            <p className="font-display text-2xl font-bold leading-tight">Dr. {doctorData?.full_name || `${user?.first_name ?? ''} ${user?.last_name ?? ''}`}</p>
+            <p className="mt-1 text-primary-light font-medium">{doctorData?.specialty || 'Nephrology'}</p>
+            <p translate="no" className="notranslate mt-4 font-mono text-sm tracking-widest text-white/70">RMDC {(doctorData?.rmdc_number || 'N/A').replace(/^RMDC[-\s]*/i, '')}</p>
+          </div>
+        </section>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* Alerts */}
+        <section id="alerts" className="xl:col-span-2 rounded-3xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-900">
+          <div className="flex items-center justify-between gap-4 px-6 pt-6 pb-4">
+            <h2 className="font-display text-xl font-bold text-gray-900 dark:text-white">Recent Patient Alerts</h2>
+            <Link href="/en/doctor/patients" className="group inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+              View All <ArrowUpRight size={15} className="transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </Link>
-          </Card>
-        </div>
-
-        {/* Bottom Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* Recent Patient Alerts */}
-          <div className="lg:col-span-2">
-            <Card className="shadow-xl shadow-primary/5 h-full">
-              <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-2">
-                  <Bell size={20} className="text-primary" />
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">Recent Patient Alerts</h2>
-                </div>
-                <Link href="#">
-                  <Button variant="outline" size="sm" className="font-medium bg-white dark:bg-gray-800 shadow-sm border-gray-200 dark:border-gray-700">
-                    View All
-                  </Button>
-                </Link>
-              </div>
-
-              {!doctorData?.recent_alerts || doctorData.recent_alerts.length === 0 ? (
-                <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/30 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
-                  <CheckCircle className="mx-auto h-12 w-12 text-teal-400 mb-3" />
-                  <p className="text-gray-500 dark:text-gray-400 font-medium">All clear! No critical alerts from your patients.</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {/* Map through alerts here, placeholder for now */}
-                </div>
-              )}
-            </Card>
           </div>
-
-          {/* Quick Actions & Badge */}
-          <div className="flex flex-col gap-6">
-            <Card className="shadow-xl shadow-primary/5 bg-gradient-to-b from-white to-gray-50 dark:from-gray-800 dark:to-gray-800/80">
-              <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-5 flex items-center gap-2">
-                <Activity size={20} className="text-primary" />
-                Quick Actions
-              </h2>
-              
-              <div className="space-y-3">
-                <Link href="/en/doctor/prescriptions">
-                  <Button variant="primary" size="lg" fullWidth className="group justify-between shadow-md shadow-primary/20">
-                    <span className="flex items-center gap-2">
-                      <FileText size={18} />
-                      Write Prescription
-                    </span>
-                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </Link>
-
-                <Link href="/en/doctor/patients">
-                  <Button variant="outline" size="lg" fullWidth className="group justify-between bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 shadow-sm">
-                    <span className="flex items-center gap-2">
-                      <Users size={18} className="text-gray-400 dark:text-gray-400" />
-                      My Patients
-                    </span>
-                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform text-gray-400" />
-                  </Button>
-                </Link>
-
-                <Link href="/en/doctor/schedule">
-                  <Button variant="outline" size="lg" fullWidth className="group justify-between bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border-gray-200 dark:border-gray-600 shadow-sm">
-                    <span className="flex items-center gap-2">
-                      <Calendar size={18} className="text-gray-400 dark:text-gray-400" />
-                      Schedule
-                    </span>
-                    <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform text-gray-400" />
-                  </Button>
-                </Link>
-              </div>
-            </Card>
-
-            {/* Doctor ID Badge */}
-            <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-xl shadow-primary/10 border border-gray-200 dark:border-gray-700 overflow-hidden mt-2 group hover:shadow-2xl hover:shadow-primary/20 transition-shadow duration-300">
-              {/* Badge Header Bar */}
-              <div className="h-14 bg-gradient-to-r from-primary to-accent flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <h3 className="text-white font-bold tracking-widest text-sm uppercase flex items-center gap-2">
-                  <Stethoscope size={16} /> NephroSasa Provider
-                </h3>
-              </div>
-              
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-6">
-                  {/* Avatar */}
-                  <div className="w-16 h-16 bg-gradient-to-br from-primary/10 to-accent/10 dark:from-primary/20 dark:to-accent/20 rounded-xl flex items-center justify-center shadow-inner border border-primary/20 dark:border-primary/30">
-                    <User size={32} className="text-primary" />
-                  </div>
-                  
-                  {/* Status */}
-                  <div className={`text-xs font-bold px-2.5 py-1 rounded-md border uppercase tracking-wider flex items-center gap-1 ${doctorData?.is_verified ? 'bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-green-200 dark:border-green-800' : 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-800'}`}>
-                    <CheckCircle size={12} /> {doctorData?.is_verified ? 'Verified' : 'Pending'}
-                  </div>
-                </div>
-
-                {/* Doctor Details */}
-                <div className="space-y-1 mb-6">
-                  <p className="text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">Doctor Name</p>
-                  <p className="text-lg font-bold text-gray-900 dark:text-white leading-tight truncate">
-                    Dr. {doctorData?.full_name || `${user?.first_name} ${user?.last_name}`}
-                  </p>
-                  <p className="text-sm text-primary dark:text-primary-light font-medium">
-                    {doctorData?.specialty || 'Nephrology'}
-                  </p>
-                </div>
-
-                {/* Barcode/ID Area */}
-                <div className="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 border border-gray-100 dark:border-gray-700/50 flex flex-col items-center justify-center">
-                  <p className="font-mono font-bold tracking-widest text-gray-700 dark:text-gray-300 text-sm">
-                    RMDC: {doctorData?.rmdc_number || 'N/A'}
-                  </p>
-                </div>
+          {alerts.length === 0 ? (
+            <div className="mx-6 mb-6 flex items-center gap-4 rounded-2xl bg-emerald-50 p-5 dark:bg-emerald-400/10">
+              <CheckCircle size={22} className="flex-shrink-0 text-emerald-600 dark:text-emerald-300" />
+              <div>
+                <p className="font-semibold text-emerald-900 dark:text-emerald-200">All clear!</p>
+                <p className="text-sm text-emerald-800/80 dark:text-emerald-200/70">No critical alerts from your patients.</p>
               </div>
             </div>
-          </div>
-          
-        </div>
+          ) : (
+            <ul className="divide-y divide-gray-100 dark:divide-white/5 border-t border-gray-100 dark:border-white/5">
+              {alerts.map((a: any, i: number) => {
+                const high = String(a?.risk_level ?? a?.ai_risk_score ?? a?.severity ?? '').toUpperCase() === 'HIGH';
+                return (
+                  <li key={a?.id ?? i} className="flex items-center gap-4 px-6 py-4">
+                    <span className={`h-9 w-1 rounded-full ${high ? 'bg-red-500' : 'bg-amber-400'}`} />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-medium text-gray-900 dark:text-white">{a?.patient_name ?? a?.patient ?? 'Patient'}</p>
+                      <p className="truncate text-sm text-gray-500 dark:text-gray-400">{a?.message ?? a?.title ?? 'New reading needs review'}</p>
+                    </div>
+                    {a?.created_at && (
+                      <span className="font-mono text-xs text-gray-400">{new Date(a.created_at).toLocaleDateString('en-RW', { day: 'numeric', month: 'short' })}</span>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+
+        {/* Quick actions */}
+        <section className="rounded-3xl border border-gray-200 bg-white dark:border-white/10 dark:bg-gray-900 p-2">
+          <h2 className="px-4 pt-4 pb-2 font-display text-xl font-bold text-gray-900 dark:text-white">Quick Actions</h2>
+          {[
+            { href: '/en/doctor/prescriptions', icon: FileText, title: 'Write Prescription', sub: 'Issue and track prescriptions' },
+            { href: '/en/doctor/patients', icon: Users, title: 'My Patients', sub: 'Readings and risk for everyone you follow' },
+            { href: '/en/doctor/schedule', icon: Calendar, title: 'Schedule', sub: 'Today and upcoming consultations' },
+          ].map((a) => (
+            <Link key={a.href} href={a.href} className="group flex items-center gap-4 rounded-2xl p-4 transition-colors hover:bg-gray-50 dark:hover:bg-white/[0.04]">
+              <span className="grid h-11 w-11 flex-shrink-0 place-items-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+                <a.icon size={19} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block font-semibold text-gray-900 dark:text-white">{a.title}</span>
+                <span className="block text-sm text-gray-500 dark:text-gray-400">{a.sub}</span>
+              </span>
+              <ArrowRight size={17} className="text-gray-300 transition-all group-hover:translate-x-1 group-hover:text-primary dark:text-gray-600" />
+            </Link>
+          ))}
+        </section>
       </div>
     </div>
   );

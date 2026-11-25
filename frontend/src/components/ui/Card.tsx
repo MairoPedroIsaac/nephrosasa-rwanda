@@ -18,8 +18,8 @@ const Card: React.FC<CardProps> = ({
   hover = false,
   onClick,
 }) => {
-  const baseStyles = 'bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700 transition-colors';
-  const hoverStyles = hover ? 'hover:shadow-lg hover:scale-105 transition-all duration-200 cursor-pointer' : '';
+  const baseStyles = 'bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition-colors';
+  const hoverStyles = hover ? 'hover:-translate-y-0.5 hover:shadow-[0_20px_40px_-20px_rgba(15,23,42,0.25)] transition-all duration-300 cursor-pointer' : '';
   const clickableStyles = onClick ? 'cursor-pointer' : '';
   
   return (

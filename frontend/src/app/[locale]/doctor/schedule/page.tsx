@@ -2,278 +2,350 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Calendar as CalendarIcon, Clock, Video, MapPin, User, CheckCircle, AlertCircle, XCircle, Link as LinkIcon } from 'lucide-react';
+import { Calendar as CalendarIcon, Clock, Video, MapPin, Check, Link as LinkIcon, ChevronDown } from 'lucide-react';
 import { isAuthenticated } from '@/lib/auth';
 import apiClient from '@/lib/api';
-import Card from '@/components/ui/Card';
-import Button from '@/components/ui/Button';
 
-const ConsultationCard = ({ appointment, onUpdateStatus, onUpdateSessionLink }: any) => {
-  const [sessionLinkInput, setSessionLinkInput] = useState(appointment.session_link || '');
-  const [isSaving, setIsSaving] = useState(false);
-  const [showSaved, setShowSaved] = useState(false);
-  const [isEditingLink, setIsEditingLink] = useState(!appointment.session_link);
-  
-  const isVirtual = (appointment.consultation_type || '').toLowerCase().includes('virtual');
-  
-  const isPastMeeting = () => {
-    if (!appointment.scheduled_date) return false;
-    const dateParts = appointment.scheduled_date.split('-');
-    if (dateParts.length !== 3) return false;
-    const year = parseInt(dateParts[0], 10);
-    const month = parseInt(dateParts[1], 10) - 1;
-    const day = parseInt(dateParts[2], 10);
-    let hour = 0;
-    let minute = 0;
-    if (appointment.scheduled_time) {
-      const timeStr = appointment.scheduled_time.trim().toUpperCase();
-      const match = timeStr.match(/(\d+):(\d+)\s*(AM|PM)?/);
-      if (match) {
-        hour = parseInt(match[1], 10);
-        minute = parseInt(match[2], 10);
-        if (match[3] === 'PM' && hour < 12) hour += 12;
-        if (match[3] === 'AM' && hour === 12) hour = 0;
-      }
-    }
-    const appointmentDate = new Date(year, month, day, hour, minute);
-    return appointmentDate < new Date();
+interface Appointment {
+  id: string;
+  patient_name: string;
+  patient_email: string;
+  scheduled_date: string;
+  scheduled_time: string;
+  consultation_type: string;
+  status: string;
+  session_link?: string;
+  notes?: string;
+}
+
+type Status = 'pending' | 'confirmed' | 'completed' | 'cancelled';
+
+const STATUS: Record<Status, { label: string; dot: string; pill: string }> = {
+  pending: { label: 'Pending', dot: 'bg-amber-400', pill: 'bg-amber-50 text-amber-800 ring-amber-200 dark:bg-amber-400/10 dark:text-amber-200 dark:ring-amber-400/20' },
+  confirmed: { label: 'Confirmed', dot: 'bg-emerald-500', pill: 'bg-emerald-50 text-emerald-800 ring-emerald-200 dark:bg-emerald-400/10 dark:text-emerald-200 dark:ring-emerald-400/20' },
+  completed: { label: 'Completed', dot: 'bg-gray-400', pill: 'bg-gray-100 text-gray-700 ring-gray-200 dark:bg-white/5 dark:text-gray-300 dark:ring-white/10' },
+  cancelled: { label: 'Cancelled', dot: 'bg-red-500', pill: 'bg-red-50 text-red-700 ring-red-200 dark:bg-red-400/10 dark:text-red-300 dark:ring-red-400/20' },
+};
+
+const toStatus = (s: string | undefined): Status => {
+  const v = (s || 'pending').toLowerCase();
+  return (v in STATUS ? v : 'pending') as Status;
+};
+
+/** Combine the API's date (YYYY-MM-DD) and time (14:00 or 2:00 PM) into one Date. */
+const whenOf = (a: Appointment): Date | null => {
+  if (!a.scheduled_date) return null;
+  const [y, m, d] = String(a.scheduled_date).split('-').map((n) => parseInt(n, 10));
+  if (!y || !m || !d) return null;
+  let hour = 0;
+  let minute = 0;
+  const match = String(a.scheduled_time || '').trim().toUpperCase().match(/(\d+):(\d+)\s*(AM|PM)?/);
+  if (match) {
+    hour = parseInt(match[1], 10);
+    minute = parseInt(match[2], 10);
+    if (match[3] === 'PM' && hour < 12) hour += 12;
+    if (match[3] === 'AM' && hour === 12) hour = 0;
+  }
+  return new Date(y, m - 1, d, hour, minute);
+};
+
+const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString();
+
+const initials = (name: string) =>
+  (name || '?')
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0])
+    .join('')
+    .toUpperCase();
+
+const isVirtual = (t: string) => (t || '').toLowerCase().includes('virtual');
+
+function StatusSelect({ value, onChange }: { value: Status; onChange: (s: Status) => void }) {
+  const s = STATUS[value];
+  return (
+    <label className={`relative inline-flex items-center gap-2 rounded-full py-1.5 pl-3 pr-8 text-sm font-medium ring-1 ring-inset cursor-pointer ${s.pill}`}>
+      <span className={`h-2 w-2 rounded-full ${s.dot}`} />
+      {s.label}
+      <ChevronDown size={14} className="pointer-events-none absolute right-2.5 opacity-60" />
+      <select
+        aria-label="Change status"
+        value={value}
+        onChange={(e) => onChange(e.target.value as Status)}
+        className="absolute inset-0 cursor-pointer opacity-0"
+      >
+        {(Object.keys(STATUS) as Status[]).map((k) => (
+          <option key={k} value={k}>{STATUS[k].label}</option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function SessionLink({ appointment, onSave }: { appointment: Appointment; onSave: (id: string, link: string) => Promise<void> }) {
+  const [value, setValue] = useState(appointment.session_link || '');
+  const [editing, setEditing] = useState(!appointment.session_link);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  const save = async () => {
+    setSaving(true);
+    await onSave(appointment.id, value.trim());
+    setSaving(false);
+    setEditing(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
   };
-  
-  const isPast = isPastMeeting() || (appointment.status || '').toLowerCase() === 'completed';
-  
-  let StatusIcon = AlertCircle;
-  let statusClasses = "bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50";
-  
-  const currentStatus = (appointment.status || 'pending').toLowerCase();
-  
-  if (currentStatus === 'confirmed') {
-    StatusIcon = CheckCircle;
-    statusClasses = "bg-green-50 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800/50";
-  } else if (currentStatus === 'completed') {
-    StatusIcon = CheckCircle;
-    statusClasses = "bg-gray-50 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700";
-  } else if (currentStatus === 'cancelled') {
-    StatusIcon = XCircle;
-    statusClasses = "bg-red-50 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800/50";
+
+  if (!editing && appointment.session_link) {
+    return (
+      <div className="flex flex-wrap items-center gap-2">
+        <a
+          href={appointment.session_link}
+          target="_blank"
+          rel="noreferrer"
+          className="inline-flex items-center gap-2 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition-transform hover:-translate-y-0.5 dark:bg-white dark:text-ink"
+        >
+          <Video size={15} /> Join meeting
+        </a>
+        <button onClick={() => setEditing(true)} className="rounded-full px-3 py-2 text-sm font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-white/5 dark:hover:text-white">
+          Edit link
+        </button>
+        {saved && (
+          <span className="inline-flex items-center gap-1 text-sm font-medium text-emerald-600 dark:text-emerald-300">
+            <Check size={15} /> Saved
+          </span>
+        )}
+      </div>
+    );
   }
 
-  const handleSaveLink = async () => {
-    setIsSaving(true);
-    await onUpdateSessionLink(appointment.id, sessionLinkInput);
-    setIsSaving(false);
-    setShowSaved(true);
-    setIsEditingLink(false);
-    setTimeout(() => setShowSaved(false), 2500);
-  };
+  return (
+    <div className="flex flex-col sm:flex-row gap-2">
+      <div className="relative flex-1">
+        <LinkIcon size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+        <input
+          type="url"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          placeholder="Paste the Zoom or Google Meet link"
+          className="w-full rounded-full border border-gray-200 bg-white py-2.5 pl-10 pr-4 text-sm text-gray-900 outline-none transition focus:border-primary focus:ring-4 focus:ring-primary/15 dark:border-white/10 dark:bg-white/5 dark:text-white"
+        />
+      </div>
+      <div className="flex gap-2">
+        <button
+          onClick={save}
+          disabled={saving || !value.trim()}
+          className="rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark disabled:opacity-50"
+        >
+          {saving ? 'Saving...' : 'Save link'}
+        </button>
+        {appointment.session_link && (
+          <button
+            onClick={() => {
+              setValue(appointment.session_link || '');
+              setEditing(false);
+            }}
+            className="rounded-full px-4 py-2.5 text-sm font-medium text-gray-500 hover:bg-gray-100 dark:hover:bg-white/5"
+          >
+            Cancel
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function AppointmentRow({ appointment, past, onStatus, onLink }: {
+  appointment: Appointment;
+  past: boolean;
+  onStatus: (id: string, s: Status) => void;
+  onLink: (id: string, link: string) => Promise<void>;
+}) {
+  const when = whenOf(appointment);
+  const status = toStatus(appointment.status);
+  const virtual = isVirtual(appointment.consultation_type);
+  const needsWrapUp = past && (status === 'confirmed' || status === 'pending');
+  const showLink = virtual && !past && status !== 'cancelled';
 
   return (
-    <Card className="shadow-xl shadow-primary/5 p-6 hover:border-primary transition-colors">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-4 border-b border-gray-100 dark:border-gray-800">
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center text-primary">
-            <User size={24} />
-          </div>
-          <div>
-            <h3 className="font-bold text-gray-900 dark:text-white text-lg">
-              {appointment.patient_name}
-            </h3>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {appointment.patient_email}
-            </p>
-          </div>
+    <li className="p-5 sm:p-6">
+      <div className="flex gap-4 sm:gap-5">
+        {/* Date block */}
+        <div className={`flex w-14 flex-shrink-0 flex-col items-center justify-center rounded-2xl py-2.5 ${past ? 'bg-gray-100 text-gray-500 dark:bg-white/5 dark:text-gray-400' : 'bg-primary/10 text-primary'}`}>
+          <span className="font-mono text-[10px] uppercase tracking-wider">{when ? when.toLocaleDateString('en-GB', { month: 'short' }) : '--'}</span>
+          <span className="font-display text-2xl font-bold leading-none tabular">{when ? when.getDate() : '--'}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border shadow-sm ${statusClasses}`}>
-            <StatusIcon size={14} /> {appointment.status ? appointment.status.charAt(0).toUpperCase() + appointment.status.slice(1).toLowerCase() : 'Pending'}
-          </span>
-          <select 
-            value={currentStatus} 
-            onChange={(e) => onUpdateStatus(appointment.id, e.target.value)}
-            className="text-sm border border-gray-300 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-1.5 outline-none focus:ring-2 focus:ring-primary"
-          >
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="completed">Completed</option>
-            <option value="cancelled">Cancelled</option>
-          </select>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-          <CalendarIcon size={18} className="text-primary" />
-          <span className="font-medium">{appointment.scheduled_date}</span>
-        </div>
-        <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300">
-          <Clock size={18} className="text-accent" />
-          <span className="font-medium">{appointment.scheduled_time}</span>
-        </div>
-        <div className="flex flex-col gap-2 sm:col-span-2">
-          <div className="flex items-center gap-2 text-gray-700 dark:text-gray-300 flex-wrap">
-            {isVirtual ? (
-              <>
-                <Video size={18} className="text-purple-500" />
-                <span className="font-medium bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400 px-2 py-0.5 rounded text-sm">Virtual Session</span>
-              </>
-            ) : (
-              <>
-                <MapPin size={18} className="text-blue-500" />
-                <span className="font-medium bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-2 py-0.5 rounded text-sm">In-Person Visit</span>
-              </>
-            )}
-            
-            {isPast && (
-              <span className="font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400 px-2 py-0.5 rounded text-sm border border-gray-200 dark:border-gray-700">
-                Concluded
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex min-w-0 items-center gap-3">
+              <span className="grid h-10 w-10 flex-shrink-0 place-items-center rounded-full bg-ink text-sm font-semibold text-white dark:bg-white/10">
+                {initials(appointment.patient_name)}
               </span>
-            )}
-          </div>
-          
-          {isVirtual && !isPast && (
-            <div className="mt-3 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 flex items-center gap-2">
-                <LinkIcon size={16} /> Session Link (Zoom / Google Meet)
-              </label>
-              <div className="flex gap-2 items-center">
-                {isEditingLink ? (
-                  <>
-                    <input 
-                      type="text" 
-                      value={sessionLinkInput}
-                      onChange={(e) => setSessionLinkInput(e.target.value)}
-                      placeholder="Paste meeting link here"
-                      className="flex-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-sm text-gray-900 dark:text-white focus:ring-2 focus:ring-primary outline-none"
-                    />
-                    <Button variant="primary" size="sm" onClick={handleSaveLink} disabled={isSaving}>
-                      {isSaving ? 'Saving...' : 'Save'}
-                    </Button>
-                    {appointment.session_link && (
-                      <Button variant="outline" size="sm" onClick={() => {
-                        setSessionLinkInput(appointment.session_link);
-                        setIsEditingLink(false);
-                      }}>
-                        Cancel
-                      </Button>
-                    )}
-                  </>
-                ) : (
-                  <>
-                    <div className="flex-1 bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg p-2 text-sm text-gray-900 dark:text-white truncate">
-                      {appointment.session_link}
-                    </div>
-                    <Button variant="outline" size="sm" onClick={() => setIsEditingLink(true)}>
-                      Edit
-                    </Button>
-                    <Button variant="outline" size="sm" onClick={() => window.open(appointment.session_link, '_blank')} className="border-blue-200 text-blue-600 hover:bg-blue-50 dark:border-blue-900/50 dark:text-blue-400">
-                      Join Meeting
-                    </Button>
-                  </>
-                )}
-                {showSaved && (
-                  <span className="flex items-center text-green-600 dark:text-green-400 text-sm font-medium animate-fade-in px-2">
-                    <CheckCircle size={16} className="mr-1" /> Saved
-                  </span>
-                )}
+              <div className="min-w-0">
+                <p translate="no" className="notranslate truncate font-semibold text-gray-900 dark:text-white">{appointment.patient_name}</p>
+                <p className="truncate text-sm text-gray-500 dark:text-gray-400">{appointment.patient_email}</p>
               </div>
+            </div>
+            <StatusSelect value={status} onChange={(s) => onStatus(appointment.id, s)} />
+          </div>
+
+          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-600 dark:text-gray-300">
+            <span className="inline-flex items-center gap-1.5">
+              <CalendarIcon size={15} className="text-gray-400" />
+              {when ? when.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' }) : appointment.scheduled_date}
+            </span>
+            <span translate="no" className="notranslate inline-flex items-center gap-1.5 font-mono">
+              <Clock size={15} className="text-gray-400" />
+              {appointment.scheduled_time}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              {virtual ? <Video size={15} className="text-gray-400" /> : <MapPin size={15} className="text-gray-400" />}
+              {virtual ? 'Virtual Session' : 'In-Person Visit'}
+            </span>
+          </div>
+
+          {appointment.notes && !past && (
+            <p className="mt-4 rounded-2xl bg-gray-50 px-4 py-3 text-sm text-gray-600 dark:bg-white/[0.03] dark:text-gray-400">
+              &ldquo;{appointment.notes}&rdquo;
+            </p>
+          )}
+
+          {showLink && (
+            <div className="mt-4">
+              <SessionLink appointment={appointment} onSave={onLink} />
             </div>
           )}
 
+          {needsWrapUp && (
+            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+              <span className="text-gray-500 dark:text-gray-400">This time has passed.</span>
+              <button
+                onClick={() => onStatus(appointment.id, 'completed')}
+                className="inline-flex items-center gap-1.5 rounded-full border border-gray-200 px-3.5 py-1.5 font-medium text-gray-700 transition hover:border-gray-900 hover:text-gray-900 dark:border-white/10 dark:text-gray-300 dark:hover:border-white dark:hover:text-white"
+              >
+                <Check size={14} /> Mark as completed
+              </button>
+            </div>
+          )}
         </div>
-        {appointment.notes && !isPast && (
-          <div className="sm:col-span-2 mt-2 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-100 dark:border-gray-700 text-sm text-gray-600 dark:text-gray-400">
-            <span className="font-semibold block mb-1">Notes:</span>
-            {appointment.notes}
-          </div>
-        )}
       </div>
-    </Card>
+    </li>
   );
-};
+}
 
 export default function DoctorSchedulePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [schedule, setSchedule] = useState<any[]>([]);
+  const [schedule, setSchedule] = useState<Appointment[]>([]);
 
   useEffect(() => {
     if (!isAuthenticated()) {
       router.push('/en/login');
       return;
     }
-
-    const fetchSchedule = async () => {
-      try {
-        const response = await apiClient.get('/doctor/schedule/');
-        setSchedule(response.data);
-      } catch (err) {
-        console.error('Failed to fetch schedule', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSchedule();
+    apiClient
+      .get('/doctor/schedule/')
+      .then((res) => setSchedule(res.data))
+      .catch((err) => console.error('Failed to fetch schedule', err))
+      .finally(() => setLoading(false));
   }, [router]);
 
-  const handleUpdateStatus = async (id: string, newStatus: string) => {
+  const handleStatus = async (id: string, status: string) => {
     try {
-      await apiClient.patch(`/doctor/consultation/${id}/update/`, { status: newStatus });
-      setSchedule(schedule.map(app => app.id === id ? { ...app, status: newStatus } : app));
+      await apiClient.patch(`/doctor/consultation/${id}/update/`, { status });
+      setSchedule((s) => s.map((a) => (a.id === id ? { ...a, status } : a)));
     } catch (err) {
       console.error('Failed to update status', err);
     }
   };
 
-  const handleUpdateSessionLink = async (id: string, sessionLink: string) => {
+  const handleLink = async (id: string, session_link: string) => {
     try {
-      await apiClient.patch(`/doctor/consultation/${id}/update/`, { session_link: sessionLink });
-      setSchedule(schedule.map(app => app.id === id ? { ...app, session_link: sessionLink } : app));
+      await apiClient.patch(`/doctor/consultation/${id}/update/`, { session_link });
+      setSchedule((s) => s.map((a) => (a.id === id ? { ...a, session_link } : a)));
     } catch (err) {
       console.error('Failed to update session link', err);
     }
   };
 
+  const now = new Date();
+  const withWhen = schedule.map((a) => ({ a, when: whenOf(a) }));
+  const isPast = (x: { a: Appointment; when: Date | null }) =>
+    toStatus(x.a.status) === 'completed' || toStatus(x.a.status) === 'cancelled' || (x.when ? x.when < now : false);
+
+  const upcoming = withWhen.filter((x) => !isPast(x)).sort((x, y) => (x.when?.getTime() ?? 0) - (y.when?.getTime() ?? 0));
+  const past = withWhen.filter(isPast).sort((x, y) => (y.when?.getTime() ?? 0) - (x.when?.getTime() ?? 0));
+  const today = withWhen.filter((x) => x.when && sameDay(x.when, now) && toStatus(x.a.status) !== 'cancelled');
+
+  const stats = [
+    { label: 'Today', value: today.length },
+    { label: 'Upcoming', value: upcoming.length },
+    { label: 'Past', value: past.length },
+  ];
+
+  const group = (title: string, items: typeof withWhen, isPastGroup: boolean) =>
+    items.length > 0 && (
+      <section className="mt-8">
+        <h2 className="mb-3 flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.14em] text-gray-500">
+          {title} <span className="rounded-full bg-gray-200/70 px-2 py-0.5 text-gray-600 dark:bg-white/10 dark:text-gray-300">{items.length}</span>
+        </h2>
+        <ul className="divide-y divide-gray-100 overflow-hidden rounded-3xl border border-gray-200 bg-white dark:divide-white/5 dark:border-white/10 dark:bg-gray-900">
+          {items.map(({ a }) => (
+            <AppointmentRow key={a.id} appointment={a} past={isPastGroup} onStatus={handleStatus} onLink={handleLink} />
+          ))}
+        </ul>
+      </section>
+    );
+
   if (loading) {
     return (
-      <div className="min-h-full pb-12 bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      <div className="min-h-screen grid place-items-center">
+        <div className="h-10 w-10 animate-spin rounded-full border-2 border-gray-200 border-t-primary dark:border-white/10" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-full pb-12 bg-gray-50 dark:bg-gray-900 transition-colors p-4 sm:p-6 lg:p-8">
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2">
-            Schedule
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 text-lg">
-            Manage your upcoming appointments and consultations.
-          </p>
+    <div className="pb-16">
+      <header className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 lg:pt-12">
+        <p className="font-mono text-xs uppercase tracking-[0.14em] text-gray-500">Doctor portal</p>
+        <h1 className="mt-3 font-display text-4xl sm:text-5xl font-extrabold tracking-tightest text-gray-900 dark:text-white">Schedule</h1>
+        <p className="mt-2 text-gray-500 dark:text-gray-400">Manage your upcoming appointments and consultations.</p>
+      </header>
+
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mt-8 grid grid-cols-3 overflow-hidden rounded-3xl bg-ink text-white dark:ring-1 dark:ring-white/10">
+          {stats.map((s, i) => (
+            <div key={s.label} className={`p-5 sm:p-6 ${i > 0 ? 'border-l border-white/10' : ''}`}>
+              <p className="font-display text-4xl sm:text-5xl font-bold tracking-tight tabular">{s.value}</p>
+              <p className="mt-1 text-sm text-white/60">{s.label}</p>
+            </div>
+          ))}
         </div>
 
         {schedule.length === 0 ? (
-          <Card className="shadow-xl shadow-primary/5 p-12 text-center border-t-4 border-primary">
-            <div className="w-20 h-20 bg-blue-50 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CalendarIcon size={40} className="text-primary" />
-            </div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">No Appointments Yet</h2>
-            <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+          <div className="mt-8 rounded-3xl border border-dashed border-gray-300 bg-white px-6 py-16 text-center dark:border-white/10 dark:bg-gray-900">
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-primary/10 text-primary">
+              <CalendarIcon size={24} />
+            </span>
+            <h2 className="mt-5 font-display text-2xl font-bold text-gray-900 dark:text-white">No Appointments Yet</h2>
+            <p className="mx-auto mt-2 max-w-md text-gray-500 dark:text-gray-400">
               No appointments scheduled yet. Appointments will appear here once patients book consultations with you.
             </p>
-          </Card>
-        ) : (
-          <div className="grid grid-cols-1 gap-6">
-            {schedule.map((appointment) => (
-              <ConsultationCard 
-                key={appointment.id} 
-                appointment={appointment} 
-                onUpdateStatus={handleUpdateStatus}
-                onUpdateSessionLink={handleUpdateSessionLink}
-              />
-            ))}
           </div>
+        ) : (
+          <>
+            {group('Upcoming', upcoming, false)}
+            {upcoming.length === 0 && (
+              <p className="mt-8 rounded-3xl border border-dashed border-gray-300 px-5 py-4 text-gray-500 dark:border-white/10 dark:text-gray-400">
+                Nothing booked ahead. New bookings from patients will show up here.
+              </p>
+            )}
+            {group('Past', past, true)}
+          </>
         )}
       </div>
     </div>

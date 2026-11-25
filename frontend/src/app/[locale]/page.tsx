@@ -1,140 +1,93 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
-import { 
-  Shield, Smartphone, Brain, QrCode, ArrowRight, Check, 
-  Stethoscope, Zap, Lock, FileText, Users, Globe, 
-  Award, Clock, ShieldCheck, ChevronRight, ChevronLeft
-} from 'lucide-react';
+import Image from 'next/image';
+import { ArrowRight, Check, Lock, Clock, Stethoscope } from 'lucide-react';
+import ZoomImage from '@/components/motion/ZoomImage';
 
-// Animated Counter Component
-const AnimatedCounter = ({ end, suffix = '', duration = 2000 }: any) => {
+// Counts up once when the number scrolls into view
+const AnimatedCounter = ({ end, suffix = '', prefix = '', duration = 1800 }: { end: number; suffix?: string; prefix?: string; duration?: number }) => {
   const [count, setCount] = useState(0);
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
-    if (!hasAnimated) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              setHasAnimated(true);
-              let start = 0;
-              const increment = end / (duration / 16); // 60fps
-              
-              const timer = setInterval(() => {
-                start += increment;
-                if (start > end) {
-                  setCount(end);
-                  clearInterval(timer);
-                } else {
-                  setCount(Math.floor(start));
-                }
-              }, 16);
-            }
-          });
-        },
-        { threshold: 0.5 }
-      );
-
-      const element = document.getElementById(`counter-${end}`);
-      if (element) observer.observe(element);
-
-      return () => observer.disconnect();
-    }
-  }, [end, duration, hasAnimated]);
+    const el = ref.current;
+    if (!el) return;
+    let raf = 0;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        observer.disconnect();
+        const start = performance.now();
+        const step = (now: number) => {
+          const t = Math.min(1, (now - start) / duration);
+          const eased = 1 - Math.pow(1 - t, 3);
+          setCount(Math.round(end * eased));
+          if (t < 1) raf = requestAnimationFrame(step);
+        };
+        raf = requestAnimationFrame(step);
+      },
+      { threshold: 0.4 }
+    );
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, [end, duration]);
 
   return (
-    <div id={`counter-${end}`} className="text-4xl lg:text-5xl font-bold bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent mb-2">
-      {count.toLocaleString()}{suffix}
-    </div>
+    <span ref={ref} className="tabular">
+      {prefix}{count.toLocaleString()}{suffix}
+    </span>
   );
 };
 
+const stats = [
+  { value: 1000, suffix: '+', label: 'Active Patients' },
+  { value: 50, suffix: '+', label: 'Healthcare Providers' },
+  { value: 85, suffix: '%', label: 'Time Saved' },
+  { value: 5, suffix: 'M+', label: 'Costs Prevented', prefix: '₣' },
+];
+
+const features = [
+  { title: 'Longitudinal Vital Tracking', description: 'Track your blood pressure and blood sugar readings across multiple clinic visits over time' },
+  { title: 'AI Kidney Risk Scoring', description: 'Predictive Random Forest machine learning model analyzes your vital trajectory to detect silent kidney decline' },
+  { title: 'Remote Nephrologist Consultation', description: 'Connect directly with Kigali-based specialists without leaving your district when alerts trigger' },
+  { title: 'QR Health Record Sharing', description: 'Securely share your longitudinal health records with any doctor instantly via a QR scan' },
+  { title: 'Mobile Money Payments', description: 'Pay for remote specialist consultations seamlessly using MTN Mobile Money or Airtel Money' },
+  { title: 'SMS Reminders', description: "Automated 7-day and 14-day Africa's Talking SMS alerts ensure you never miss logging your vitals" },
+];
+
+const steps = [
+  {
+    title: 'Register & Get Your Personal QR Code',
+    body: 'Create your free account in under 2 minutes. We verify your identity and generate a unique QR code that securely represents your medical identity.',
+    points: ['Free forever for patients', '2-minute registration', 'Secure identity verification', 'Instant QR generation'],
+    image: '/images/step-1.jpg',
+    alt: 'Patient registering on a phone',
+  },
+  {
+    title: 'Visit Any Healthcare Facility',
+    body: 'Show your QR code at any registered clinic or hospital. The doctor scans it, requests access to your records, and you approve instantly from your phone.',
+    points: ['Works at any registered facility', 'Patient-controlled access', 'Real-time approval', 'Audit trail for privacy'],
+    image: '/images/doctors/doctor-2.jpg',
+    alt: 'Doctor ready to scan a patient QR code',
+  },
+  {
+    title: 'Seamless Care & Payment',
+    body: 'Doctor sees your complete history, provides informed care. Pay instantly via mobile money, receive digital receipts, and your records are updated automatically.',
+    points: ['Complete medical history view', 'Mobile money payments', 'Digital receipts', 'Auto-updated records'],
+    image: '/images/step-3.jpg',
+    alt: 'Paying for a consultation with a phone',
+  },
+];
+
 export default function HomePage() {
-  const [currentFeature, setCurrentFeature] = useState(0);
-  const featuresRef = useRef<HTMLDivElement>(null);
-  
-  const stats = [
-    { value: 1000, suffix: '+', label: 'Active Patients' },
-    { value: 50, suffix: '+', label: 'Healthcare Providers' },
-    { value: 85, suffix: '%', label: 'Time Saved' },
-    { value: 5, suffix: 'M+', label: 'Costs Prevented', prefix: '₣' },
-  ];
-
-  const features = [
-    {
-      icon: FileText,
-      title: 'Longitudinal Vital Tracking',
-      description: 'Track your blood pressure and blood sugar readings across multiple clinic visits over time',
-      color: 'from-blue-500 to-cyan-400',
-      bgColor: 'bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-900/80 dark:to-cyan-900/80'
-    },
-    {
-      icon: Brain,
-      title: 'AI Kidney Risk Scoring',
-      description: 'Predictive Random Forest machine learning model analyzes your vital trajectory to detect silent kidney decline',
-      color: 'from-emerald-500 to-green-400',
-      bgColor: 'bg-gradient-to-br from-emerald-50 to-green-50 dark:from-emerald-900/80 dark:to-green-900/80'
-    },
-    {
-      icon: Stethoscope,
-      title: 'Remote Nephrologist Consultation',
-      description: 'Connect directly with Kigali-based specialists without leaving your district when alerts trigger',
-      color: 'from-violet-500 to-purple-400',
-      bgColor: 'bg-gradient-to-br from-violet-50 to-purple-50 dark:from-violet-900/80 dark:to-purple-900/80'
-    },
-    {
-      icon: QrCode,
-      title: 'QR Health Record Sharing',
-      description: 'Securely share your longitudinal health records with any doctor instantly via a QR scan',
-      color: 'from-indigo-500 to-blue-400',
-      bgColor: 'bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/80 dark:to-blue-900/80'
-    },
-    {
-      icon: Smartphone,
-      title: 'Mobile Money Payments',
-      description: 'Pay for remote specialist consultations seamlessly using MTN Mobile Money or Airtel Money',
-      color: 'from-amber-500 to-orange-400',
-      bgColor: 'bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/80 dark:to-orange-900/80'
-    },
-    {
-      icon: Clock,
-      title: 'SMS Reminders',
-      description: 'Automated 7-day and 14-day Africa\'s Talking SMS alerts ensure you never miss logging your vitals',
-      color: 'from-rose-500 to-pink-400',
-      bgColor: 'bg-gradient-to-br from-rose-50 to-pink-50 dark:from-rose-900/80 dark:to-pink-900/80'
-    },
-  ];
-
-  const scrollToFeature = (index: number) => {
-    setCurrentFeature(index);
-    if (featuresRef.current) {
-      const cardWidth = featuresRef.current.children[0]?.clientWidth || 0;
-      featuresRef.current.scrollTo({
-        left: index * (cardWidth + 32),
-        behavior: 'smooth'
-      });
-    }
-  };
-
-  const nextFeature = () => {
-    if (currentFeature < features.length - 1) {
-      scrollToFeature(currentFeature + 1);
-    }
-  };
-
-  const prevFeature = () => {
-    if (currentFeature > 0) {
-      scrollToFeature(currentFeature - 1);
-    }
-  };
-
   return (
-    <div className="bg-white dark:bg-gray-900 transition-colors">
-      {/* Enhanced Hero Section */}
+    <div className="bg-white dark:bg-ink text-gray-900 dark:text-gray-100">
+      {/* Hero (kept as the original) */}
       <section className="relative min-h-[600px] md:min-h-[700px] overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
@@ -210,328 +163,126 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats Section - FIXED to white background with dark text */}
-      <section className="py-16 bg-white dark:bg-gray-900 transition-colors">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <AnimatedCounter 
-                  end={stat.value} 
-                  suffix={stat.suffix} 
-                  duration={2000 + index * 500}
-                />
-                <p className="text-gray-600 dark:text-gray-400 font-medium">{stat.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features Grid with Mobile Carousel */}
-      <section className="py-24 bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-2 rounded-full mb-6">
-              <Award size={16} />
-              <span className="text-sm font-semibold">Why Choose NephroSasa</span>
-            </div>
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              Transform Healthcare Experience
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              Combining cutting-edge technology with Rwanda's healthcare vision
-            </p>
-          </div>
-
-          {/* Desktop Grid */}
-          <div className="hidden md:grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div 
-                key={index} 
-                className={`${feature.bgColor} p-8 rounded-2xl border border-gray-100 dark:border-gray-700 hover:border-transparent hover:shadow-2xl transition-all duration-300 hover:-translate-y-1`}
-              >
-                <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${feature.color} mb-6`}>
-                  <feature.icon size={28} className="text-white" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{feature.title}</h3>
-                <p className="text-gray-600 dark:text-gray-200 mb-6">{feature.description}</p>
-                
-              </div>
-            ))}
-          </div>
-
-          {/* Mobile Carousel */}
-          <div className="md:hidden relative">
-            {/* Navigation Arrows */}
-            <div className="flex justify-between items-center mb-6">
-              <button
-                onClick={prevFeature}
-                disabled={currentFeature === 0}
-                className={`p-3 rounded-full ${currentFeature === 0 ? 'text-gray-300' : 'text-blue-600 hover:bg-blue-50'}`}
-              >
-                <ChevronLeft size={24} />
-              </button>
-              
-              <div className="flex gap-2">
-                {features.map((_, index) => (
-                  <button
-                    key={index}
-                    onClick={() => scrollToFeature(index)}
-                    className={`w-2 h-2 rounded-full ${currentFeature === index ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700'}`}
-                  />
-                ))}
-              </div>
-              
-              <button
-                onClick={nextFeature}
-                disabled={currentFeature === features.length - 1}
-                className={`p-3 rounded-full ${currentFeature === features.length - 1 ? 'text-gray-300' : 'text-blue-600 hover:bg-blue-50'}`}
-              >
-                <ChevronRight size={24} />
-              </button>
-            </div>
-
-            {/* Carousel Container */}
-            <div 
-              ref={featuresRef}
-              className="flex overflow-x-auto snap-x snap-mandatory scrollbar-hide space-x-8 pb-4"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {features.map((feature, index) => (
-                <div 
-                  key={index}
-                  className="flex-shrink-0 w-[calc(100vw-4rem)] snap-center"
-                >
-                  <div className={`${feature.bgColor} p-8 rounded-2xl border border-gray-100 dark:border-gray-700`}>
-                    <div className={`inline-flex p-4 rounded-2xl bg-gradient-to-br ${feature.color} mb-6`}>
-                      <feature.icon size={28} className="text-white" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">{feature.title}</h3>
-                    <p className="text-gray-600 dark:text-gray-200 mb-6">{feature.description}</p>
-                    
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Mobile Indicator */}
-            <div className="text-center mt-4 text-sm text-gray-500 dark:text-gray-400">
-              {currentFeature + 1} / {features.length}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works - Enhanced with Fixed Images */}
-      <section className="py-24 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 transition-colors duration-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-20">
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              Simple, Secure Process
-            </h2>
-            <p className="text-xl text-gray-600 dark:text-gray-400">
-              Three steps to better healthcare management
-            </p>
-          </div>
-
-          <div className="space-y-32">
-            {/* Step 1 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div className="order-2 lg:order-1">
-                <div className="inline-flex items-center gap-3 bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-6 py-3 rounded-full mb-6">
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">1</div>
-                  <span className="font-bold">STEP 1</span>
-                </div>
-                <h3 className="text-3xl lg:text-4xl font-bold mb-6">Register & Get Your Personal QR Code</h3>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-                  Create your free account in under 2 minutes. We verify your identity and 
-                  generate a unique QR code that securely represents your medical identity.
-                </p>
-                <ul className="space-y-4">
-                  {['Free forever for patients', '2-minute registration', 'Secure identity verification', 'Instant QR generation'].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3">
-                      <Check size={20} className="text-green-500" />
-                      <span className="text-gray-700 dark:text-gray-300 dark:text-gray-300">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="relative h-80 lg:h-96 order-1 lg:order-2">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-3xl blur-xl" />
-                <Image
-                  src="/images/step-1.jpg"
-                  alt="Patient registration on mobile"
-                  fill
-                  className="object-cover rounded-3xl shadow-2xl"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              </div>
-            </div>
-
-            {/* Step 2 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div className="relative h-80 lg:h-96">
-                <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/20 to-green-500/20 rounded-3xl blur-xl" />
-                <Image
-                  src="/images/doctors/doctor-2.jpg"
-                  alt="Doctor scanning QR code"
-                  fill
-                  className="object-cover rounded-3xl shadow-2xl"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              </div>
-              <div>
-                <div className="inline-flex items-center gap-3 bg-gradient-to-r from-emerald-600 to-green-500 text-white px-6 py-3 rounded-full mb-6">
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">2</div>
-                  <span className="font-bold">STEP 2</span>
-                </div>
-                <h3 className="text-3xl lg:text-4xl font-bold mb-6">Visit Any Healthcare Facility</h3>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-                  Show your QR code at any registered clinic or hospital. The doctor scans it, 
-                  requests access to your records, and you approve instantly from your phone.
-                </p>
-                <ul className="space-y-4">
-                  {['Works at any registered facility', 'Patient-controlled access', 'Real-time approval', 'Audit trail for privacy'].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3">
-                      <Check size={20} className="text-green-500" />
-                      <span className="text-gray-700 dark:text-gray-300 dark:text-gray-300">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            {/* Step 3 */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-              <div className="order-2 lg:order-1">
-                <div className="inline-flex items-center gap-3 bg-gradient-to-r from-violet-600 to-purple-500 text-white px-6 py-3 rounded-full mb-6">
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">3</div>
-                  <span className="font-bold">STEP 3</span>
-                </div>
-                <h3 className="text-3xl lg:text-4xl font-bold mb-6">Seamless Care & Payment</h3>
-                <p className="text-lg text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-                  Doctor sees your complete history, provides informed care. Pay instantly via 
-                  mobile money, receive digital receipts, and your records are updated automatically.
-                </p>
-                <ul className="space-y-4">
-                  {['Complete medical history view', 'Mobile money payments', 'Digital receipts', 'Auto-updated records'].map((item, i) => (
-                    <li key={i} className="flex items-center gap-3">
-                      <Check size={20} className="text-green-500" />
-                      <span className="text-gray-700 dark:text-gray-300 dark:text-gray-300">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="relative h-80 lg:h-96 order-1 lg:order-2">
-                <div className="absolute inset-0 bg-gradient-to-br from-violet-500/20 to-purple-500/20 rounded-3xl blur-xl" />
-                <Image
-                  src="/images/step-3.jpg"
-                  alt="QR code payment and records"
-                  fill
-                  className="object-cover rounded-3xl shadow-2xl"
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Security & Trust Section - FIXED back to original gradient */}
-      <section className="py-24 bg-gradient-to-br from-blue-900 to-gray-900 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-8">
-                <ShieldCheck size={16} />
-                <span className="text-sm font-semibold">Security First</span>
-              </div>
-              <h2 className="text-4xl lg:text-5xl font-bold mb-8">
-                Built with Rwanda's Trust & Security Standards
-              </h2>
-              <p className="text-xl text-blue-100 mb-10">
-                Your health data is protected with enterprise-grade security measures 
-                compliant with Rwanda's Data Protection Law and Ministry of Health guidelines.
+      {/* Stats */}
+      <section className="bg-ink-2 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid grid-cols-2 lg:grid-cols-4 gap-8">
+          {stats.map((s) => (
+            <div key={s.label}>
+              <p className="font-display text-4xl lg:text-5xl font-bold tracking-tight">
+                <AnimatedCounter end={s.value} suffix={s.suffix} prefix={s.prefix} />
               </p>
-              
-              <div className="grid grid-cols-2 gap-6">
-                <div className="bg-white/5 backdrop-blur-sm p-6 rounded-2xl border border-white/10">
-                  <Lock size={24} className="text-cyan-300 mb-4" />
-                  <h3 className="text-xl font-bold mb-2">256-bit Encryption</h3>
-                  <p className="text-blue-200/80">Military-grade data protection</p>
-                </div>
-                <div className="bg-white/5 backdrop-blur-sm p-6 rounded-2xl border border-white/10">
-                  <Clock size={24} className="text-cyan-300 mb-4" />
-                  <h3 className="text-xl font-bold mb-2">Real-time Audit Trail</h3>
-                  <p className="text-blue-200/80">Track every access to your records</p>
-                </div>
-              </div>
+              <p className="mt-1 text-sm text-blue-200/70">{s.label}</p>
             </div>
-            
-            <div className="relative h-80 lg:h-[500px]">
-              <Image
-                src="/images/others/about-2.jpg"
-                alt="Secure healthcare technology"
-                fill
-                className="object-cover rounded-3xl"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-              />
-              <div className="absolute inset-0 bg-black/20 rounded-3xl" />
-            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Why NephroSasa */}
+      <section className="py-24 lg:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tightest leading-[0.95]">
+            Why choose NephroSasa.
+            <span className="block text-gray-400 dark:text-gray-500">Transform healthcare experience.</span>
+          </h2>
+
+          <div className="mt-14 grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12 lg:gap-16 items-start">
+            <ZoomImage src="/images/testimonial/husband-and-wife.jpg" alt="A couple at home checking their health readings on a laptop" className="aspect-[4/3] rounded-3xl lg:sticky lg:top-24" imgClassName="object-center" sizes="(max-width: 1024px) 100vw, 900px" />
+            <ul className="border-t border-gray-200 dark:border-gray-800">
+              {features.map((f) => (
+                <li key={f.title} className="group border-b border-gray-200 dark:border-gray-800 py-6 transition-[padding] duration-300 hover:pl-3">
+                  <h3 className="flex items-center justify-between gap-4 text-xl lg:text-2xl font-bold">
+                    {f.title}
+                    <ArrowRight size={20} className="text-primary opacity-0 -translate-x-2 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-0" />
+                  </h3>
+                  <p className="mt-2 max-w-xl text-gray-600 dark:text-gray-400">{f.description}</p>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
 
-      {/* Enhanced CTA Section - Nephro Azure Theme */}
-       <section className="relative py-24 overflow-hidden bg-gradient-to-br from-primary via-primary-dark to-primary">
-        {/* Modern decorative glassmorphism elements */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-accent opacity-20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl translate-x-1/4 translate-y-1/4"></div>
-        
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center h-full flex flex-col justify-center items-center">
-         
-          
-          <h2 className="text-4xl lg:text-5xl font-bold text-white mb-8">
-            Ready to Monitor Your Kidney Health?
+      {/* How it works */}
+      <section className="py-24 lg:py-32 bg-gray-50 dark:bg-gray-950 border-y border-gray-200 dark:border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tightest leading-[0.95]">
+            Simple, secure process.
+            <span className="block text-gray-400 dark:text-gray-500">Three steps to better healthcare management.</span>
           </h2>
-          
-          <p className="text-xl text-blue-100 mb-12 max-w-2xl mx-auto leading-relaxed">
+
+          <div className="mt-16 space-y-24 lg:space-y-32">
+            {steps.map((s, i) => (
+              <div key={s.title} className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+                <ZoomImage src={s.image} alt={s.alt} className={`aspect-[4/3] rounded-3xl ${i % 2 ? '' : 'lg:order-2'}`} />
+                <div>
+                  <p className="font-mono text-sm text-primary">Step {i + 1} of 3</p>
+                  <h3 className="mt-3 text-3xl lg:text-4xl font-bold tracking-tight">{s.title}</h3>
+                  <p className="mt-5 text-lg text-gray-600 dark:text-gray-400 leading-relaxed">{s.body}</p>
+                  <ul className="mt-7 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                    {s.points.map((p) => (
+                      <li key={p} className="flex items-center gap-2.5 text-gray-700 dark:text-gray-300">
+                        <Check size={17} className="text-primary flex-shrink-0" />{p}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Security */}
+      <section className="bg-ink text-white py-24 lg:py-32">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
+          <div>
+            <p className="font-mono text-sm text-primary-light">Security first</p>
+            <h2 className="mt-4 font-display text-4xl lg:text-5xl font-extrabold tracking-tightest leading-[0.95]">
+              Built with Rwanda&apos;s trust &amp; security standards
+            </h2>
+            <p className="mt-6 text-lg text-gray-300 max-w-xl">
+              Your health data is protected with enterprise-grade security measures compliant with Rwanda&apos;s Data Protection Law and Ministry of Health guidelines.
+            </p>
+            <div className="mt-10 grid grid-cols-1 sm:grid-cols-2 border-t border-white/10">
+              <div className="py-6 sm:pr-6">
+                <Lock size={20} className="text-primary-light" />
+                <h3 className="mt-4 text-xl font-bold">256-bit Encryption</h3>
+                <p className="mt-1 text-gray-400">Military-grade data protection</p>
+              </div>
+              <div className="py-6 sm:pl-6 border-t sm:border-t-0 sm:border-l border-white/10">
+                <Clock size={20} className="text-primary-light" />
+                <h3 className="mt-4 text-xl font-bold">Real-time Audit Trail</h3>
+                <p className="mt-1 text-gray-400">Track every access to your records</p>
+              </div>
+            </div>
+          </div>
+          <ZoomImage src="/images/others/about-2.jpg" alt="NephroSasa clinicians reviewing patient records" className="aspect-[4/3] lg:aspect-[5/4] rounded-3xl" />
+        </div>
+      </section>
+
+      {/* Closing call to action */}
+      <section className="relative overflow-hidden text-white">
+        <ZoomImage src="/images/others/cta-healthcare.jpg" alt="" className="absolute inset-0" imgClassName="object-[70%_30%]" sizes="100vw" from={1.04} />
+        <div className="absolute inset-0 bg-gradient-to-r from-ink/90 via-ink/60 to-ink/0" />
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+          <h2 className="font-display text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tightest leading-[0.95] max-w-3xl">
+            Ready to monitor your kidney health?
+          </h2>
+          <p className="mt-6 text-lg text-gray-300 max-w-xl">
             Join thousands of Rwandans using NephroSasa for proactive kidney monitoring.
           </p>
-          
-          <div className="flex flex-col sm:flex-row gap-4 justify-center w-full sm:w-auto">
-            <Link href="/en/register/patient">
-              <button className="group bg-white/10 backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto">
-                <span>Register as Patient</span>
-                <ArrowRight className="group-hover:translate-x-1 transition-transform" size={20} />
-              </button>
+          <div className="mt-10 flex flex-col sm:flex-row gap-3">
+            <Link href="/en/register/patient" className="group inline-flex items-center justify-center gap-2.5 rounded-full bg-white px-7 py-4 font-semibold text-ink transition-all hover:-translate-y-0.5">
+              Register as Patient
+              <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
             </Link>
-            
-            <Link href="/en/register/doctor">
-              <button className="group bg-white/10 backdrop-blur-sm border-2 border-white text-white px-8 py-4 rounded-xl font-semibold hover:bg-white/20 transition-all duration-300 flex items-center justify-center gap-3 w-full sm:w-auto">
-                <Stethoscope size={20} />
-                <span>Register as Doctor</span>
-              </button>
+            <Link href="/en/register/doctor" className="inline-flex items-center justify-center gap-2.5 rounded-full border border-white/30 px-7 py-4 font-semibold transition-all hover:border-white hover:-translate-y-0.5">
+              Register as Doctor
             </Link>
           </div>
-          
-          <p className="mt-8 text-blue-100">
-            No credit card required • Free forever for patients • 24/7 support
-          </p>
+          <p className="mt-8 text-sm text-gray-400">No credit card required · Free forever for patients · 24/7 support</p>
         </div>
       </section>
-
-      {/* Add custom CSS for hiding scrollbar */}
-      <style jsx global>{`
-        .scrollbar-hide {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-        .scrollbar-hide::-webkit-scrollbar {
-          display: none;
-        }
-      `}</style>
     </div>
   );
 }

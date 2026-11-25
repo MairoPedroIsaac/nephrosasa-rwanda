@@ -12,27 +12,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Menu, X, Globe, Moon, Sun } from 'lucide-react';
 import { getCurrentUser, logout, isAuthenticated } from '@/lib/auth';
 import Button from '../ui/Button';
-
-// Fix for Google Translate crashing React apps during DOM reconciliation
-if (typeof window !== 'undefined' && typeof Node !== 'undefined' && Node.prototype) {
-  const originalRemoveChild = Node.prototype.removeChild;
-  Node.prototype.removeChild = function(child: any) {
-    if (child.parentNode !== this) {
-      if (console) console.warn('Cannot remove a child from a different parent', child, this);
-      return child;
-    }
-    return originalRemoveChild.apply(this, arguments as any);
-  };
-  
-  const originalInsertBefore = Node.prototype.insertBefore;
-  Node.prototype.insertBefore = function(newNode: any, referenceNode: any) {
-    if (referenceNode && referenceNode.parentNode !== this) {
-      if (console) console.warn('Cannot insert before a reference node from a different parent', referenceNode, this);
-      return newNode;
-    }
-    return originalInsertBefore.apply(this, arguments as any);
-  };
-}
+import { getLang, setLang, Lang } from '@/lib/translate';
 
 const Navbar = () => {
   const router = useRouter();
@@ -75,38 +55,8 @@ const Navbar = () => {
       setUserType(user.user_type);
     }
     
-    // Get current locale from pathname
-    const locale = pathname.split('/')[1];
-    if (['en', 'rw', 'fr'].includes(locale)) {
-      setCurrentLocale(locale);
-    }
+    setCurrentLocale(getLang());
     
-    // Add Google Translate Script
-    const addGoogleTranslateScript = () => {
-      if (document.getElementById('google-translate-script')) return;
-      
-      // @ts-ignore
-      window.googleTranslateElementInit = () => {
-        // @ts-ignore
-        if (window.google && window.google.translate) {
-          // @ts-ignore
-          new window.google.translate.TranslateElement({
-            pageLanguage: 'en',
-            includedLanguages: 'en,rw,fr',
-            layout: 1, // InlineLayout.SIMPLE
-            autoDisplay: false
-          }, 'google_translate_element');
-        }
-      };
-
-      const script = document.createElement('script');
-      script.id = 'google-translate-script';
-      script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-      script.async = true;
-      document.body.appendChild(script);
-    };
-
-    addGoogleTranslateScript();
   }, [pathname]);
 
   // Toggle mobile menu
@@ -119,49 +69,37 @@ const Navbar = () => {
     logout();
   };
 
-  // Custom Language switcher via Google Translate
+  // Language switcher: applies to the whole platform and is remembered
   const switchLanguage = (locale: string) => {
+    if (locale === currentLocale) return;
     setCurrentLocale(locale);
-    
-    // Map our locale codes to Google Translate codes
-    const gtLocaleMap: Record<string, string> = {
-      'en': 'en',
-      'rw': 'rw',
-      'fr': 'fr'
-    };
-    
-    const targetLang = gtLocaleMap[locale];
-    
-    // Find the hidden Google Translate select element and trigger a change
-    const selectElement = document.querySelector('.goog-te-combo') as HTMLSelectElement;
-    if (selectElement) {
-      selectElement.value = targetLang;
-      selectElement.dispatchEvent(new Event('change'));
-    }
+    setLang(locale as Lang);
   };
 
   // Navigation links
   const navLinks = [
-    { href: `/${currentLocale}`, label: 'Home' },
-    { href: `/${currentLocale}/about`, label: 'About' },
-    { href: `/${currentLocale}/contact`, label: 'Contact' },
-    { href: `/${currentLocale}/privacy-policy`, label: 'Privacy Policy' },
+    { href: `/en`, label: 'Home' },
+    { href: `/en/about`, label: 'About' },
+    { href: `/en/contact`, label: 'Contact' },
+    { href: `/en/privacy-policy`, label: 'Privacy Policy' },
   ];
 
   if (pathname.includes('/patient/') || pathname.includes('/doctor/') || pathname.includes('/admin/') || pathname.includes('/shared-record/')) {
-    return <div id="google_translate_element" className="hidden"></div>;
+    return null;
   }
 
+  // Solid bar everywhere; kept as a flag in case a dark page header needs it later
+  const onDark = false;
+  const linkTone = onDark ? 'text-white/70 hover:text-white' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white';
+
   return (
-    <nav className="bg-white dark:bg-gray-900 shadow-md sticky top-0 z-50 transition-colors duration-200">
-      {/* Hidden Google Translate container */}
-      <div id="google_translate_element" className="hidden"></div>
+    <nav className={`sticky top-0 z-50 transition-colors duration-300 ${onDark ? 'bg-ink text-white' : 'bg-white/85 dark:bg-ink/85 backdrop-blur-xl border-b border-gray-200/70 dark:border-white/10'}`}>
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-[72px]">
           {/* Logo - Theme Aware */}
-          <Link href={`/${currentLocale}`} className="flex items-center gap-2 md:gap-3">
-            <div className="h-10 w-10 md:h-12 md:w-12 relative flex-shrink-0">
+          <Link href={isLoggedIn ? `/en/${userType === 'DOCTOR' ? 'doctor' : 'patient'}/dashboard` : '/en'} className="flex items-center gap-2 md:gap-3">
+            <div className="h-9 w-9 md:h-10 md:w-10 relative flex-shrink-0">
               <Image
                 src="/nephrosasa-icon.png"
                 alt="NephroSasa Rwanda Logo Icon"
@@ -172,11 +110,11 @@ const Navbar = () => {
               />
             </div>
             <div className="flex flex-col">
-              <span className="text-lg md:text-xl font-bold text-gray-900 dark:text-white leading-tight tracking-tight">
+              <span translate="no" className={`notranslate font-display text-lg md:text-xl font-bold leading-tight tracking-tight ${onDark ? 'text-white' : 'text-gray-900 dark:text-white'}`}>
                 NephroSasa Rwanda
               </span>
-              <span className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
-                Monitor Your Kidneys. Before It's Too Late.
+              <span className={`text-xs font-medium hidden sm:block ${onDark ? 'text-white/60' : 'text-gray-500 dark:text-gray-400'}`}>
+                Monitor Your Kidneys. Before It&apos;s Too Late.
               </span>
             </div>
           </Link>
@@ -188,8 +126,8 @@ const Navbar = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary transition-colors duration-200 ${
-                  pathname === link.href ? 'text-primary dark:text-primary font-semibold' : ''
+                className={`text-[15px] transition-colors duration-200 ${linkTone} ${
+                  pathname === link.href ? (onDark ? '!text-white font-semibold' : '!text-gray-900 dark:!text-white font-semibold') : ''
                 }`}
               >
                 {link.label}
@@ -198,13 +136,13 @@ const Navbar = () => {
 
             {/* Custom Language Switcher */}
             <div className="relative group">
-              <button className="flex items-center space-x-1 text-gray-700 dark:text-gray-200 hover:text-primary dark:hover:text-primary">
+              <button className={`flex items-center space-x-1 text-[15px] ${linkTone}`}>
                 <Globe size={20} />
                 <span className="uppercase">{currentLocale}</span>
               </button>
               
               {/* Dropdown */}
-              <div className="absolute right-0 mt-2 w-40 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden border border-gray-100 dark:border-gray-700">
+              <div className="absolute right-0 mt-2 w-44 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50 overflow-hidden border border-gray-100 dark:border-gray-700">
                 <button
                   onClick={() => switchLanguage('en')}
                   className="flex items-center space-x-3 w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
@@ -232,7 +170,7 @@ const Navbar = () => {
             {/* Theme Toggle */}
             <button 
               onClick={toggleTheme}
-              className="p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+              className={`p-2 rounded-full transition-colors ${onDark ? 'text-white/80 hover:bg-white/10' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
               aria-label="Toggle Dark Mode"
             >
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
@@ -242,7 +180,7 @@ const Navbar = () => {
             {isLoggedIn && (
               <div className="flex items-center space-x-4">
                 {!pathname.includes('/dashboard') && (
-                  <Link href={`/${currentLocale}/${userType === 'DOCTOR' ? 'doctor' : 'patient'}/dashboard`}>
+                  <Link href={`/en/${userType === 'DOCTOR' ? 'doctor' : 'patient'}/dashboard`}>
                     <Button variant="outline" size="sm">
                       Dashboard
                     </Button>
@@ -255,13 +193,13 @@ const Navbar = () => {
             )}
             {!isLoggedIn && (
               <div className="flex items-center space-x-4">
-                <Link href={`/${currentLocale}/login`}>
-                  <Button variant="outline" size="sm">
+                <Link href={`/en/login`}>
+                  <Button variant="outline" size="sm" className={onDark ? '!border-white/30 !text-white hover:!border-white' : ''}>
                     Login
                   </Button>
                 </Link>
-                <Link href={`/${currentLocale}/register`}>
-                  <Button variant="primary" size="sm">
+                <Link href={`/en/register`}>
+                  <Button variant={onDark ? 'outline' : 'secondary'} size="sm" className={onDark ? '!bg-white !text-ink !border-white' : ''}>
                     Register
                   </Button>
                 </Link>
@@ -272,7 +210,7 @@ const Navbar = () => {
           <div className="flex items-center space-x-2 md:hidden">
             <button 
               onClick={toggleTheme}
-              className="p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+              className={`p-2 rounded-full transition-colors ${onDark ? 'text-white/80 hover:bg-white/10' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
               aria-label="Toggle Dark Mode"
             >
               {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
@@ -280,7 +218,8 @@ const Navbar = () => {
             {/* Mobile Menu Button */}
             <button
               onClick={toggleMenu}
-              className="p-2 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors"
+              aria-label="Open menu"
+              className={`p-2 rounded-full transition-colors ${onDark ? 'text-white hover:bg-white/10' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800'}`}
             >
               {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -309,13 +248,13 @@ const Navbar = () => {
             <div className="px-4 py-2 border-t border-gray-100 dark:border-gray-800">
               <p className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">Language</p>
               <div className="flex space-x-2">
-                <button onClick={() => { switchLanguage('en'); setIsMenuOpen(false); }} className={`px-3 py-1.5 text-sm rounded-lg border flex items-center gap-2 ${currentLocale === 'en' ? 'bg-primary text-white border-primary' : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200'}`}>
+                <button onClick={() => { switchLanguage('en'); setIsMenuOpen(false); }} className={`px-3 py-1.5 text-sm rounded-full border flex items-center gap-2 ${currentLocale === 'en' ? 'bg-primary text-white border-primary' : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200'}`}>
                   <img src="https://flagcdn.com/w20/gb.png" srcSet="https://flagcdn.com/w40/gb.png 2x" width="16" alt="EN" className="rounded-sm" /> EN
                 </button>
-                <button onClick={() => { switchLanguage('rw'); setIsMenuOpen(false); }} className={`px-3 py-1.5 text-sm rounded-lg border flex items-center gap-2 ${currentLocale === 'rw' ? 'bg-primary text-white border-primary' : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200'}`}>
+                <button onClick={() => { switchLanguage('rw'); setIsMenuOpen(false); }} className={`px-3 py-1.5 text-sm rounded-full border flex items-center gap-2 ${currentLocale === 'rw' ? 'bg-primary text-white border-primary' : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200'}`}>
                   <img src="https://flagcdn.com/w20/rw.png" srcSet="https://flagcdn.com/w40/rw.png 2x" width="16" alt="RW" className="rounded-sm" /> RW
                 </button>
-                <button onClick={() => { switchLanguage('fr'); setIsMenuOpen(false); }} className={`px-3 py-1.5 text-sm rounded-lg border flex items-center gap-2 ${currentLocale === 'fr' ? 'bg-primary text-white border-primary' : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200'}`}>
+                <button onClick={() => { switchLanguage('fr'); setIsMenuOpen(false); }} className={`px-3 py-1.5 text-sm rounded-full border flex items-center gap-2 ${currentLocale === 'fr' ? 'bg-primary text-white border-primary' : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200'}`}>
                   <img src="https://flagcdn.com/w20/fr.png" srcSet="https://flagcdn.com/w40/fr.png 2x" width="16" alt="FR" className="rounded-sm" /> FR
                 </button>
               </div>
@@ -326,7 +265,7 @@ const Navbar = () => {
               {isLoggedIn ? (
                 <>
                   {!pathname.includes('/dashboard') && (
-                    <Link href={`/${currentLocale}/${userType === 'DOCTOR' ? 'doctor' : 'patient'}/dashboard`} onClick={() => setIsMenuOpen(false)}>
+                    <Link href={`/en/${userType === 'DOCTOR' ? 'doctor' : 'patient'}/dashboard`} onClick={() => setIsMenuOpen(false)}>
                       <Button variant="outline" fullWidth>
                         Dashboard
                       </Button>
@@ -338,12 +277,12 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
-                  <Link href={`/${currentLocale}/login`} onClick={() => setIsMenuOpen(false)}>
+                  <Link href={`/en/login`} onClick={() => setIsMenuOpen(false)}>
                     <Button variant="outline" fullWidth>
                       Login
                     </Button>
                   </Link>
-                  <Link href={`/${currentLocale}/register`} onClick={() => setIsMenuOpen(false)}>
+                  <Link href={`/en/register`} onClick={() => setIsMenuOpen(false)}>
                     <Button variant="primary" fullWidth>
                       Register
                     </Button>

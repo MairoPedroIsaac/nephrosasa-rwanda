@@ -28,20 +28,20 @@ const Button: React.FC<ButtonProps> = ({
   fullWidth = false,
 }) => {
   // Base styles (applied to all buttons)
-  const baseStyles = 'font-semibold rounded-lg transition-all duration-200 flex items-center justify-center';
+  const baseStyles = 'font-semibold rounded-full transition-all duration-200 flex items-center justify-center gap-2 hover:-translate-y-0.5 disabled:hover:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary';
   
   // Variant styles (different colors)
   const variantStyles = {
     primary: 'bg-primary text-white hover:bg-primary-dark disabled:bg-gray-300',
-    secondary: 'bg-accent text-white hover:bg-accent-dark disabled:bg-gray-300',
-    outline: 'bg-transparent border-2 border-primary text-primary hover:bg-primary hover:text-white disabled:border-gray-300 disabled:text-gray-300',
+    secondary: 'bg-ink-2 text-white hover:bg-ink dark:bg-white dark:text-ink dark:hover:bg-gray-200 disabled:bg-gray-300',
+    outline: 'bg-transparent border border-gray-300 text-gray-900 hover:border-gray-900 dark:border-gray-700 dark:text-white dark:hover:border-white disabled:border-gray-300 disabled:text-gray-300',
     danger: 'bg-danger text-white hover:bg-red-600 disabled:bg-gray-300',
   };
   
   // Size styles
   const sizeStyles = {
-    sm: 'px-4 py-2 text-sm',
-    md: 'px-6 py-3 text-base',
+    sm: 'px-4 py-2.5 text-sm',
+    md: 'px-6 py-3.5 text-[15px]',
     lg: 'px-8 py-4 text-lg',
   };
   

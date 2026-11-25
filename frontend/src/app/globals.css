@@ -5,15 +5,18 @@
 
 /* Global CSS variables (from your brand colors) */
 :root {
-  /* Primary Colors (Nephro Azure) */
+  /* Brand: ink navy + clinical blue */
+  --ink: #070D1A;
+  --ink-2: #0D1F45;
+  /* Primary Colors */
   --primary-blue: #3B82F6;
   --primary-blue-light: #60A5FA;
   --primary-blue-dark: #2563EB;
   
-  /* Accent Colors (Soft Mint) */
-  --accent-teal: #34D399;
-  --accent-teal-light: #6EE7B7;
-  --accent-teal-dark: #10B981;
+  /* Accent (navy) */
+  --accent-teal: #0D1F45;
+  --accent-teal-light: #60A5FA;
+  --accent-teal-dark: #070D1A;
   
   /* Status Colors */
   --success: #10B981;
@@ -21,26 +24,26 @@
   --danger: #EF4444;
   
   /* Neutral Colors */
-  --background: #F9FAFB;
-  --foreground: #111827;
+  --background: #F8FAFC;
+  --foreground: #0F172A;
   --card-bg: #FFFFFF;
-  --border: #E5E7EB;
+  --border: #E2E8F0;
 }
 
 /* Dark mode (Supports the class toggle and system preference) */
 .dark {
-  --background: #111827;
-  --foreground: #F9FAFB;
-  --card-bg: #1F2937;
-  --border: #374151;
+  --background: #070D1A;
+  --foreground: #F1F5F9;
+  --card-bg: #0F172A;
+  --border: #1E293B;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not(.light) {
-    --background: #111827;
-    --foreground: #F9FAFB;
-    --card-bg: #1F2937;
-    --border: #374151;
+    --background: #070D1A;
+    --foreground: #F1F5F9;
+    --card-bg: #0F172A;
+    --border: #1E293B;
   }
 }
 
@@ -48,7 +51,24 @@
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-body), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Headings use the display face everywhere */
+h1, h2, h3 {
+  font-family: var(--font-display), var(--font-body), system-ui, sans-serif;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* Numbers line up in tables and readings */
+.tabular { font-variant-numeric: tabular-nums; }
+
+::selection { background: #3B82F6; color: #fff; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 
 /* Smooth scrolling */
@@ -60,22 +80,22 @@ html {
 @layer components {
   /* Card component */
   .card {
-    @apply bg-white rounded-lg shadow-md p-6 border border-gray-200;
+    @apply bg-white dark:bg-gray-900 rounded-2xl p-6 border border-gray-200 dark:border-gray-800;
   }
   
   /* Button primary */
   .btn-primary {
-    @apply bg-primary text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-dark transition-colors duration-200;
+    @apply bg-primary text-white px-6 py-3 rounded-full font-semibold hover:bg-primary-dark hover:-translate-y-0.5 transition-all duration-200;
   }
   
   /* Button secondary */
   .btn-secondary {
-    @apply bg-accent text-white px-6 py-3 rounded-lg font-semibold hover:bg-accent-dark transition-colors duration-200;
+    @apply bg-ink-2 text-white px-6 py-3 rounded-full font-semibold hover:bg-ink hover:-translate-y-0.5 transition-all duration-200;
   }
   
   /* Input field */
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all duration-200;
+    @apply w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all duration-200;
   }
   
   /* Alert success */
@@ -120,4 +140,17 @@ body {
     -webkit-box-shadow: 0 0 0 30px #111827 inset !important;
     -webkit-text-fill-color: white !important;
     transition: background-color 5000s ease-in-out 0s;
+}
+
+/* Hide Google Translate's own bar, tooltips and hover highlights */
+iframe.skiptranslate,
+.VIpgJd-ZVi9od-ORHb-OEVmcd,
+.VIpgJd-yAWNEb-L7lbkb,
+.goog-te-banner-frame {
+  display: none !important;
+}
+.VIpgJd-yAWNEb-OIL7Pe,
+.VIpgJd-yAWNEb-hvhgNd {
+  background: none !important;
+  box-shadow: none !important;
 }

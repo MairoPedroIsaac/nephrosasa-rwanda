@@ -37,6 +37,38 @@ NephroSasa Rwanda is an AI-powered longitudinal kidney health monitoring platfor
 
 ---
 
+## Screenshots
+
+Current design, captured from a local run with demo data. All images live in [`docs/screenshots/`](docs/screenshots/).
+
+| Patient dashboard | Patient dashboard (dark) |
+| --- | --- |
+| ![Patient dashboard](docs/screenshots/04-patient-dashboard-light.png) | ![Patient dashboard in dark mode](docs/screenshots/05-patient-dashboard-dark.png) |
+
+| Doctor dashboard | Patient dashboard on a phone |
+| --- | --- |
+| ![Doctor dashboard](docs/screenshots/11-doctor-dashboard.png) | <img src="docs/screenshots/10-patient-dashboard-phone.png" alt="Patient dashboard on a phone" width="260"> |
+
+| # | File | Page |
+| -- | -- | -- |
+| 01 | `01-home.png` | Home page |
+| 02 | `02-login.png` | Sign in |
+| 03 | `03-forgot-password.png` | Forgot password |
+| 04 | `04-patient-dashboard-light.png` | Patient dashboard, light mode |
+| 05 | `05-patient-dashboard-dark.png` | Patient dashboard, dark mode |
+| 06 | `06-patient-log-vitals.png` | Log vitals |
+| 07 | `07-patient-health-history.png` | Health history |
+| 08 | `08-patient-consultations.png` | Book and view consultations |
+| 09 | `09-patient-share-record.png` | Share record by QR |
+| 10 | `10-patient-dashboard-phone.png` | Patient dashboard on a phone |
+| 11 | `11-doctor-dashboard.png` | Doctor dashboard |
+| 12 | `12-doctor-patients.png` | My patients |
+| 13 | `13-doctor-schedule.png` | Doctor schedule |
+| 14 | `14-doctor-prescriptions.png` | Prescriptions |
+| 15 | `15-doctor-scan-qr.png` | Scan patient QR |
+
+---
+
 ## Demo Video
 
 [Click here to watch the 5-minute core functionality demo](https://youtu.be/wWy2c76qtjU)
@@ -45,9 +77,9 @@ NephroSasa Rwanda is an AI-powered longitudinal kidney health monitoring platfor
 
 ---
 
-## Testing Evidence
+## Testing Evidence (Capstone)
 
-All testing screenshots are located in the `testing/screenshots/` folder.
+These are the original capstone test screenshots, kept as submitted. All testing screenshots are located in the `testing/screenshots/` folder.
 
 | #  | File                                      | Description                             |
 | -- | ----------------------------------------- | --------------------------------------- |
@@ -191,6 +223,26 @@ npm run dev
 
 * Frontend: `http://localhost:3000`
 * Backend Admin: `http://localhost:8000/admin`
+
+### 5. Local demo data (optional)
+
+To try the dashboards without touching the live database, run the backend on a local SQLite file and load the demo accounts:
+
+```bash
+cd backend
+# Windows (Git Bash) or Mac/Linux
+export DATABASE_URL=sqlite:///db.sqlite3
+python manage.py migrate
+python manage.py shell < scripts/seed_demo.py
+python manage.py runserver
+```
+
+Demo logins (password `Demo@2026!`):
+
+* Patient: `patient@demo.nephrosasa.rw`
+* Doctor: `doctor@demo.nephrosasa.rw`
+
+Password reset works locally too. When no SendGrid key is set, the reset link is printed in the Django console.
 
 ---
 

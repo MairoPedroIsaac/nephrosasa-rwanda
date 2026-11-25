@@ -97,3 +97,9 @@ yarn-error.log*
 *.tmp
 *.temp
 .temp/
+# ============ LOCAL TOOLING ============
+# Claude Code and other local assistant folders
+.claude/
+
+# TypeScript incremental build info
+*.tsbuildinfo
